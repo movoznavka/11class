@@ -716,8 +716,11 @@ function appendStudentParam_(href, name){
   return href + sep + 'student=' + encodeURIComponent(name);
 }
 
-function finishStudentView_(studentCode, allowed, displayName){
-  loadHomework(studentCode);
+function applyAccessAndRender_(studentCode, staticAllowed, displayName, dynamicAllowed){
+  const allowed = staticAllowed.concat((dynamicAllowed || []).filter(function(h){
+    return staticAllowed.indexOf(h) === -1;
+  }));
+
   const desc = document.getElementById('subDesc');
   if (desc) desc.remove();
 
@@ -748,6 +751,34 @@ function finishStudentView_(studentCode, allowed, displayName){
       location.reload();
     });
   }
+}
+
+// Теми можна відкривати або вручну (STUDENT_ACCESS вище), або через
+// бота кнопкою "🔓 Теми" — портал чекає відповідь бота (максимум 2.5с)
+// і показує ОБ'ЄДНАННЯ обох списків, щоб жоден спосіб не «перебивав» інший.
+function finishStudentView_(studentCode, allowedStatic, displayName){
+  loadHomework(studentCode);
+
+  if (!HOMEWORK_API_URL || HOMEWORK_API_URL.indexOf('ВСТАВТЕ') === 0) {
+    applyAccessAndRender_(studentCode, allowedStatic, displayName, []);
+    return;
+  }
+
+  let resolved = false;
+  window.applyAccess = function(dynamicList){
+    if (resolved) return;
+    resolved = true;
+    applyAccessAndRender_(studentCode, allowedStatic, displayName, dynamicList);
+  };
+
+  const sep = HOMEWORK_API_URL.indexOf('?') > -1 ? '&' : '?';
+  const s = document.createElement('script');
+  s.src = HOMEWORK_API_URL + sep + 'mode=access&callback=applyAccess&student=' + encodeURIComponent(studentCode);
+  document.body.appendChild(s);
+
+  setTimeout(function(){
+    if (!resolved) { resolved = true; applyAccessAndRender_(studentCode, allowedStatic, displayName, []); }
+  }, 2500);
 }
 
 function showNamePicker_(studentCode, allowed, members){
@@ -829,6 +860,10 @@ function showNamePicker_(studentCode, allowed, members){
     msg.textContent = 'Це посилання недійсне. Зверніться до вчительки за новим.';
     document.querySelector('.wrap').appendChild(msg);
   }
+})();
+</script>
+</body>
+</html>
 })();
 </script>
 </body>
