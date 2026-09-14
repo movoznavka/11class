@@ -594,33 +594,36 @@ function generalTestPillHtml(test){
   return `<a class="block-test-pill ${test.status}" href="${clickable ? test.href : '#'}" data-testkey="${test.href}">${label}</a>`;
 }
 
-blocksEl.innerHTML = BLOCKS.map(block => `
-  <div class="block">
-    <div class="block-header">
-      <h2 class="block-title">${block.name}</h2>
-      ${generalTestPillHtml(block.generalTest)}
-    </div>
-    ${block.subgroups.map(sg => `
-      <div class="subgroup">
-        ${sg.title ? `<div class="subgroup-title">${sg.title}</div>` : ''}
-        <div class="grid">
-          ${sg.items.map(it => `
-            <div class="card-wrap">
-              <a class="card ${it.status}" href="${it.status==='soon'?'#':it.href}" data-key="${it.href}">
-                <div class="card-top">
-                  <span class="tile">${it.icon}</span>
-                  <span class="status ${it.status}">${it.status==='soon'?'Скоро':'Готово'}</span>
-                </div>
-                <p class="card-title">${it.title}</p>
-                ${it.desc?`<p class="card-sub">${it.desc}</p>`:''}
-              </a>
-              ${pillHtml(it.test)}
-            </div>`).join('')}
-        </div>
+function renderBlocks_(){
+  blocksEl.innerHTML = BLOCKS.map(block => `
+    <div class="block">
+      <div class="block-header">
+        <h2 class="block-title">${block.name}</h2>
+        ${generalTestPillHtml(block.generalTest)}
       </div>
-    `).join('')}
-  </div>
-`).join('');
+      ${block.subgroups.map(sg => `
+        <div class="subgroup">
+          ${sg.title ? `<div class="subgroup-title">${sg.title}</div>` : ''}
+          <div class="grid">
+            ${sg.items.map(it => `
+              <div class="card-wrap">
+                <a class="card ${it.status}" href="${it.status==='soon'?'#':it.href}" data-key="${it.href}">
+                  <div class="card-top">
+                    <span class="tile">${it.icon}</span>
+                    <span class="status ${it.status}">${it.status==='soon'?'Скоро':'Готово'}</span>
+                  </div>
+                  <p class="card-title">${it.title}</p>
+                  ${it.desc?`<p class="card-sub">${it.desc}</p>`:''}
+                </a>
+                ${pillHtml(it.test)}
+              </div>`).join('')}
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+renderBlocks_();
 
 // ============================================================
 // ДЗ — ЯСКРАВЕ ПОЗНАЧЕННЯ (ПЕРСОНАЛЬНО ДЛЯ КОЖНОГО УЧНЯ)
@@ -668,11 +671,11 @@ function loadHomework(studentCode){
 // портал покаже "Це посилання недійсне".
 // ============================================================
 const STUDENT_ACCESS = {
-  "Liza Nastya":   ["https://movoznavka.github.io/11class/urok-fonetyka.html", "https://movoznavka.github.io/11class/urok-sproshchennya.html", "https://movoznavka.github.io/11class/urok-cherguvannya-u-v.html"],
-  "Victoria":   ["https://movoznavka.github.io/11class/urok-fonetyka.html", "https://movoznavka.github.io/11class/urok-sproshchennya.html", "https://movoznavka.github.io/11class/urok-cherguvannya-sk.html","https://movoznavka.github.io/11class/urok-cherguvannya-u-v.html","https://movoznavka.github.io/11class/urok-prefiksy.html", "https://movoznavka.github.io/11class/urok-myakyj-znak.html", "https://movoznavka.github.io/11class/urok-apostrof.html", "https://movoznavka.github.io/11class/urok-podvoiennya.html", "https://movoznavka.github.io/11class/urok-ne-z-chastynamy-movy.html", "https://movoznavka.github.io/11class/urok-velyka-bukva.html", "https://movoznavka.github.io/11class/urok-skladni-imennyky.html",  "https://movoznavka.github.io/11class/urok-skladni-prykmetnyky.html", "https://movoznavka.github.io/11class/urok-skladni-prysliv.html", "https://movoznavka.github.io/11class/urok-imennyk-rid.html", "https://movoznavka.github.io/11class/urok-imennyk-chyslo.html", "https://movoznavka.github.io/11class/urok-prykmetnyk-stupeni.html", "https://movoznavka.github.io/11class/urok-prykmetnyk-sufiksy.html", "https://movoznavka.github.io/11class/urok-chyslivnyk-vidminy.html", "https://movoznavka.github.io/11class/urok-chyslivnyk-uzgodzhennya.html"],
-  "Maruna Svitlana": ["https://movoznavka.github.io/11class/urok-fonetyka.html", "https://movoznavka.github.io/11class/urok-sproshchennya.html", "https://movoznavka.github.io/11class/urok-cherguvannya-sk.html"],
-  "Yana":   ["https://movoznavka.github.io/11class/urok-fonetyka.html", "https://movoznavka.github.io/11class/urok-sproshchennya.html", "https://movoznavka.github.io/11class/urok-cherguvannya-sk.html"],
-  "Vika":   ["https://movoznavka.github.io/11class/urok-fonetyka.html", "https://movoznavka.github.io/11class/urok-sproshchennya.html", "https://movoznavka.github.io/11class/urok-cherguvannya-sk.html","https://movoznavka.github.io/11class/urok-cherguvannya-u-v.html","https://movoznavka.github.io/11class/urok-prefiksy.html", "https://movoznavka.github.io/11class/urok-myakyj-znak.html", "https://movoznavka.github.io/11class/urok-apostrof.html", "https://movoznavka.github.io/11class/urok-podvoiennya.html", "https://movoznavka.github.io/11class/urok-ne-z-chastynamy-movy.html"],
+  "Ліза Настя":   ["https://movoznavka.github.io/11class/urok-fonetyka.html", "https://movoznavka.github.io/11class/urok-sproshchennya.html", "https://movoznavka.github.io/11class/urok-cherguvannya-u-v.html"],
+  "Вікторія":   ["https://movoznavka.github.io/11class/urok-fonetyka.html", "https://movoznavka.github.io/11class/urok-sproshchennya.html", "https://movoznavka.github.io/11class/urok-cherguvannya-sk.html","https://movoznavka.github.io/11class/urok-cherguvannya-u-v.html","https://movoznavka.github.io/11class/urok-prefiksy.html", "https://movoznavka.github.io/11class/urok-myakyj-znak.html", "https://movoznavka.github.io/11class/urok-apostrof.html", "https://movoznavka.github.io/11class/urok-podvoiennya.html", "https://movoznavka.github.io/11class/urok-ne-z-chastynamy-movy.html", "https://movoznavka.github.io/11class/urok-velyka-bukva.html", "https://movoznavka.github.io/11class/urok-skladni-imennyky.html",  "https://movoznavka.github.io/11class/urok-skladni-prykmetnyky.html", "https://movoznavka.github.io/11class/urok-skladni-prysliv.html", "https://movoznavka.github.io/11class/urok-imennyk-rid.html", "https://movoznavka.github.io/11class/urok-imennyk-chyslo.html", "https://movoznavka.github.io/11class/urok-prykmetnyk-stupeni.html", "https://movoznavka.github.io/11class/urok-prykmetnyk-sufiksy.html", "https://movoznavka.github.io/11class/urok-chyslivnyk-vidminy.html", "https://movoznavka.github.io/11class/urok-chyslivnyk-uzgodzhennya.html"],
+  "Марина Світлана": ["https://movoznavka.github.io/11class/urok-fonetyka.html", "https://movoznavka.github.io/11class/urok-sproshchennya.html", "https://movoznavka.github.io/11class/urok-cherguvannya-sk.html"],
+  "Яна":   ["https://movoznavka.github.io/11class/urok-fonetyka.html", "https://movoznavka.github.io/11class/urok-sproshchennya.html", "https://movoznavka.github.io/11class/urok-cherguvannya-sk.html"],
+  "Віка":   ["https://movoznavka.github.io/11class/urok-fonetyka.html", "https://movoznavka.github.io/11class/urok-sproshchennya.html", "https://movoznavka.github.io/11class/urok-cherguvannya-sk.html","https://movoznavka.github.io/11class/urok-cherguvannya-u-v.html","https://movoznavka.github.io/11class/urok-prefiksy.html", "https://movoznavka.github.io/11class/urok-myakyj-znak.html", "https://movoznavka.github.io/11class/urok-apostrof.html", "https://movoznavka.github.io/11class/urok-podvoiennya.html", "https://movoznavka.github.io/11class/urok-ne-z-chastynamy-movy.html"],
   "Андрій": [],
   "Аня": [],
   "Марія": [],
@@ -680,7 +683,7 @@ const STUDENT_ACCESS = {
   "Анастасія": [],
   "Ростислав": [],
   "Вероніка": [],
-  "Violeta Sofiia": [],
+  "Віолета Софія": [],
   
   // "код-учня": ["href-теми-1", "href-теми-2"]
 };
@@ -693,9 +696,9 @@ const STUDENT_ACCESS = {
 // Одиночних учнів сюди додавати не треба.
 // ============================================================
 const GROUP_MEMBERS = {
-  "liza nastya": ["Ліза", "Настя"],
-  "maruna svitlana": ["Марина", "Світлана"],
-  "violeta sofiia": ["Віолета", "Софія"]
+  "ліза настя": ["Ліза", "Настя"],
+  "марина світлана": ["Марина", "Світлана"],
+  "віолета софія": ["Віолета", "Софія"]
 };
 
 function normalizeCode(s){
@@ -717,11 +720,7 @@ function appendStudentParam_(href, name){
   return href + sep + 'student=' + encodeURIComponent(name);
 }
 
-function applyAccessAndRender_(studentCode, staticAllowed, displayName, dynamicAllowed){
-  const allowed = staticAllowed.concat((dynamicAllowed || []).filter(function(h){
-    return staticAllowed.indexOf(h) === -1;
-  }));
-
+function applyAccessAndRender_(studentCode, allowed, displayName){
   const desc = document.getElementById('subDesc');
   if (desc) desc.remove();
 
@@ -740,6 +739,7 @@ function applyAccessAndRender_(studentCode, staticAllowed, displayName, dynamicA
     if (!b.querySelector('.card')) b.remove();
   });
 
+  document.querySelectorAll('#switchWho').forEach(function(el){ el.closest('p').remove(); });
   if (GROUP_MEMBERS[studentCode]) {
     const who = document.createElement('p');
     who.className = 'sub';
@@ -755,31 +755,31 @@ function applyAccessAndRender_(studentCode, staticAllowed, displayName, dynamicA
 }
 
 // Теми можна відкривати або вручну (STUDENT_ACCESS вище), або через
-// бота кнопкою "🔓 Теми" — портал чекає відповідь бота (максимум 2.5с)
-// і показує ОБ'ЄДНАННЯ обох списків, щоб жоден спосіб не «перебивав» інший.
+// бота кнопкою "🔓 Теми". Щоб сторінка не «блимала» (спочатку всі теми,
+// потім лише дозволені), спершу одразу й синхронно показуємо статичний
+// список — і лише ЯКЩО бот справді відкрив щось додаткове, перемальовуємо
+// список ще раз (це рідкісний випадок, і невеличке оновлення тут не заважає).
 function finishStudentView_(studentCode, allowedStatic, displayName){
   loadHomework(studentCode);
+  applyAccessAndRender_(studentCode, allowedStatic, displayName);
 
-  if (!HOMEWORK_API_URL || HOMEWORK_API_URL.indexOf('ВСТАВТЕ') === 0) {
-    applyAccessAndRender_(studentCode, allowedStatic, displayName, []);
-    return;
-  }
+  if (!HOMEWORK_API_URL || HOMEWORK_API_URL.indexOf('ВСТАВТЕ') === 0) return;
 
   let resolved = false;
   window.applyAccess = function(dynamicList){
     if (resolved) return;
     resolved = true;
-    applyAccessAndRender_(studentCode, allowedStatic, displayName, dynamicList);
+    dynamicList = dynamicList || [];
+    const extra = dynamicList.filter(function(h){ return allowedStatic.indexOf(h) === -1; });
+    if (extra.length === 0) return; // нічого нового — DOM лишаємо як є, без перемальовування
+    renderBlocks_();
+    applyAccessAndRender_(studentCode, allowedStatic.concat(extra), displayName);
   };
 
   const sep = HOMEWORK_API_URL.indexOf('?') > -1 ? '&' : '?';
   const s = document.createElement('script');
   s.src = HOMEWORK_API_URL + sep + 'mode=access&callback=applyAccess&student=' + encodeURIComponent(studentCode);
   document.body.appendChild(s);
-
-  setTimeout(function(){
-    if (!resolved) { resolved = true; applyAccessAndRender_(studentCode, allowedStatic, displayName, []); }
-  }, 2500);
 }
 
 function showNamePicker_(studentCode, allowed, members){
