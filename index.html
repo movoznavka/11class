@@ -840,6 +840,9 @@ function showNamePicker_(studentCode, allowed, members){
   }
 
   if (studentCode && allowed) {
+    const tag = document.querySelector('.kicker.tag');
+    if (tag) tag.remove();
+
     const members = GROUP_MEMBERS[studentCode];
     if (members) {
       const chosen = sessionStorage.getItem('chosenName_' + studentCode);
