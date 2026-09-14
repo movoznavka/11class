@@ -558,8 +558,23 @@ const QUESTIONS = [
 const LETTERS = ["А","Б","В","Г","Д"];
 
 // --- Telegram reporting config ---
-const TG_BOT_TOKEN = "8859310874:AAEJoYfUnv54dLOqglpMk5yfi06zeZ2oc9Q";
-const TG_CHAT_ID = "7255798532";
+// Адреса вашого Apps Script веб-застосунку (закінчується на /exec).
+// Через нього результат одразу і зберігається в таблицю, і надсилається
+// вчителю в Telegram (див. Code.gs) — сама сторінка тесту в бот більше
+// напряму не пише.
+const LOG_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyDGcDVtwD0L8WW0zDIsXwYwwf6zp4XzmofzdI0wU-AhhfZIXbH2lOHquNSHI8cKRc7/exec";
+
+function logToSheet(payload){
+  try{
+    return fetch(LOG_WEBAPP_URL, {
+      method: 'POST',
+      headers: {'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    }).then(resp => resp.ok).catch(()=>false);
+  }catch(e){
+    return Promise.resolve(false);
+  }
+}
 
 let qIdx = 0;
 let answers = {};
@@ -680,44 +695,21 @@ async function sendTelegramReport(){
     if(rec && !rec.correct) wrongList.push(i+1);
   });
 
-  let text = `📘 Написання складних іменників · Тренажер\n`;
-  text += `Учень: ${studentName}\n`;
-  if(answered < total){
-    text += `Результат: ${correct}/${answered} (виконано ${answered} із ${total} завдань)\n`;
-  } else {
-    text += `Результат: ${correct}/${total}\n`;
-  }
-  if(wrongList.length){
-    text += `Помилки в завданнях: ${wrongList.join(', ')}`;
-  } else {
-    text += `Помилок немає 🎉`;
-  }
-
   const reviewLink = buildReviewLink();
-
   const statusEl = document.getElementById('sendStatus');
-  try{
-    const resp = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        chat_id: TG_CHAT_ID,
-        text,
-        reply_markup: {
-          inline_keyboard: [[
-            { text: "🔍 Переглянути розбір відповідей", url: reviewLink }
-          ]]
-        }
-      })
-    });
-    const data = await resp.json();
-    if(data.ok){
-      if(statusEl){ statusEl.textContent = 'Результат надіслано вчителю ✓'; statusEl.className = 'send-status ok'; }
-    } else {
-      if(statusEl){ statusEl.textContent = 'Не вдалося надіслати результат'; statusEl.className = 'send-status bad'; }
-    }
-  } catch(err){
-    if(statusEl){ statusEl.textContent = 'Не вдалося надіслати результат'; statusEl.className = 'send-status bad'; }
+
+  const ok = await logToSheet({
+    type: "quiz_result",
+    student: studentName,
+    testName: "Складні іменники",
+    correct, answered, total,
+    wrongList,
+    reviewLink
+  });
+
+  if(statusEl){
+    if(ok){ statusEl.textContent = 'Результат надіслано вчителю ✓'; statusEl.className = 'send-status ok'; }
+    else { statusEl.textContent = 'Не вдалося надіслати результат'; statusEl.className = 'send-status bad'; }
   }
 }
 
@@ -854,10 +846,15 @@ async function init(){
     renderQuiz();
     return;
   }
-  const fromUrl = new URLSearchParams(location.search).get('student');
+  const urlParams = new URLSearchParams(location.search);
+  const fromUrl = urlParams.get('student');
   if(fromUrl){
     studentName = fromUrl;
     started = true;
+    const hw = parseInt(urlParams.get('hw'), 10);
+    if(!isNaN(hw) && hw >= 1 && hw <= QUESTIONS.length){
+      qIdx = hw - 1;
+    }
     renderQuiz();
     return;
   }

@@ -647,6 +647,11 @@ function applyHomework(map){
       span.textContent = ' · ДЗ ' + hw.number;
       el.appendChild(span);
     }
+    const hwNum = parseInt(hw.number, 10);
+    if (!isNaN(hwNum) && el.getAttribute('href') !== '#') {
+      const sep = el.getAttribute('href').indexOf('?') > -1 ? '&' : '?';
+      el.setAttribute('href', el.getAttribute('href') + sep + 'hw=' + hwNum);
+    }
   });
 }
 
