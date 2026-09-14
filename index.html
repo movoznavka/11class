@@ -1,561 +1,870 @@
-const BOT_TOKEN = "8859310874:AAEJoYfUnv54dLOqglpMk5yfi06zeZ2oc9Q";
-const TEACHER_CHAT_ID = "7255798532";
-const SHEET_NAME = "Результати";
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Уроки й тести · Навігація</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#D0E9FC;
+    --bg-soft:#E4F2FC;
+    --card:#FFFFFF;
+    --ink:#13213B;
+    --ink-soft:#6478A0;
+    --line: rgba(19,33,59,0.08);
+
+    --c1-a:#6C8CFF; --c1-b:#3355EE; --c1-sh: rgba(51,85,238,0.45);
+    --c3-a:#5FE0A8; --c3-b:#17A863; --c3-sh: rgba(23,168,99,0.4);
+    --c2-b:#E5484D;
+
+    --correct-bg:#E6F8EE;
+    --correct-ink:#128A54;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    padding:28px 16px 64px;
+  }
+  .wrap{max-width:960px;margin:0 auto;}
+
+  .topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding-bottom:16px;
+    margin-bottom:22px;
+    border-bottom:1.5px solid rgba(19,33,59,0.14);
+  }
+  .kicker{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:12.5px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--ink);
+    opacity:.55;
+  }
+  .kicker.tag{opacity:.4;}
+
+  h1{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:clamp(26px,6vw,38px);
+    line-height:1.05;
+    letter-spacing:-0.01em;
+    margin:0 0 8px;
+    text-transform:uppercase;
+  }
+  h1 .hl{color:var(--c1-b);}
+  .sub{color:var(--ink-soft);font-size:15px;max-width:60ch;margin:0 0 30px;font-weight:500;}
+
+  .block{
+    margin-bottom:46px;
+  }
+  .block-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    flex-wrap:wrap;
+    margin:0 0 4px;
+    padding-bottom:12px;
+    border-bottom:2px solid rgba(19,33,59,0.14);
+  }
+  .block-title{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:24px;
+    letter-spacing:-0.01em;
+    margin:0;
+  }
+  .block-test-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    text-decoration:none;
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:12.5px;
+    letter-spacing:.01em;
+    padding:9px 16px;
+    border-radius:999px;
+    white-space:nowrap;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .block-test-pill.ready{
+    color:var(--c3-b);
+    background:var(--correct-bg);
+    cursor:pointer;
+  }
+  .block-test-pill.ready:hover{
+    transform:translateY(-2px);
+    box-shadow: 0 10px 20px -14px var(--c3-sh);
+  }
+  .block-test-pill.soon{
+    color:var(--ink-soft);
+    background:var(--bg-soft);
+    opacity:.7;
+    cursor:default;
+    pointer-events:none;
+  }
+
+  .subgroup{ margin-bottom:26px; margin-top:24px; }
+  .subgroup:first-of-type{ margin-top:22px; }
+  .subgroup-title{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:14px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:var(--c1-b);
+    margin:0 0 14px 2px;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:5px 14px 5px 12px;
+    border-radius:999px;
+    background: rgba(51,85,238,0.10);
+  }
+  .subgroup-title::before{
+    content:'';
+    width:6px;height:6px;
+    border-radius:50%;
+    background:var(--c1-b);
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(250px, 1fr));
+    gap:14px;
+  }
+
+  .card-wrap{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+
+  .card{
+    background:var(--card);
+    border-radius:22px;
+    padding:22px 22px 20px;
+    box-shadow: 0 14px 30px -24px rgba(19,33,59,0.35);
+    text-decoration:none;
+    color:var(--ink);
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    position:relative;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .card.ready:hover{
+    transform:translateY(-3px);
+    box-shadow: 0 18px 34px -18px rgba(19,33,59,0.4);
+  }
+  .card.soon{
+    opacity:.5;
+    cursor:default;
+    pointer-events:none;
+  }
+
+  .card-top{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:8px;
+  }
+
+  .tile{
+    width:40px;height:40px;min-width:40px;
+    border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:15px;
+    color:var(--c1-b);
+    background: linear-gradient(150deg, rgba(255,255,255,0.75), rgba(108,140,255,0.22));
+    backdrop-filter: blur(6px) saturate(160%);
+    -webkit-backdrop-filter: blur(6px) saturate(160%);
+    border:1px solid rgba(255,255,255,0.7);
+    box-shadow: 0 4px 12px -7px var(--c1-sh), inset 0 1px 1px rgba(255,255,255,0.8);
+  }
+
+  .status{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:10.5px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    padding:5px 10px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  .status.ready{background:var(--correct-bg);color:var(--correct-ink);}
+  .status.soon{background:var(--bg-soft);color:var(--ink-soft);}
+
+  .card-title{
+    font-family:'Manrope',sans-serif;
+    font-weight:700;
+    font-size:16.5px;
+    line-height:1.32;
+    margin:0;
+  }
+  .card-sub{
+    font-size:13px;
+    color:var(--ink-soft);
+    font-weight:500;
+    margin:0;
+  }
+
+  /* --- плашка "тест до теми" --- */
+  .test-pill{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    text-decoration:none;
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:12px;
+    letter-spacing:.01em;
+    padding:9px 14px;
+    border-radius:14px;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .test-pill.ready{
+    color:var(--c3-b);
+    background:var(--correct-bg);
+    cursor:pointer;
+  }
+  .test-pill.ready:hover{
+    transform:translateY(-2px);
+    box-shadow: 0 10px 20px -14px var(--c3-sh);
+  }
+  .test-pill.soon{
+    color:var(--ink-soft);
+    background:var(--bg-soft);
+    opacity:.6;
+    cursor:default;
+    pointer-events:none;
+  }
+
+  /* --- ДЗ: яскраве світіння --- */
+  .test-pill.homework, .block-test-pill.homework{
+    color:#7A3B00 !important;
+    background: linear-gradient(135deg, #FFE27A, #FF9A3D) !important;
+    animation: hwGlow 1.6s ease-in-out infinite;
+  }
+  @keyframes hwGlow{
+    0%,100%{ box-shadow: 0 0 6px 0 rgba(255,140,40,0.55); }
+    50%{ box-shadow: 0 0 18px 6px rgba(255,140,40,0.85); }
+  }
+  .hw-badge{
+    margin-left:6px;
+    font-weight:800;
+  }
+
+  footer{
+    text-align:center;
+    margin-top:36px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-weight:500;
+  }
+
+  .teacher-banner{
+    display:none;
+    background: var(--c2-b);
+    color:#fff;
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:12.5px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    text-align:center;
+    padding:9px 14px;
+    border-radius:12px;
+    margin-bottom:20px;
+  }
+  body.teacher-mode .teacher-banner{ display:block; }
+
+  .open-badge{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:10.5px;
+    letter-spacing:.03em;
+    text-transform:uppercase;
+    padding:5px 10px;
+    border-radius:999px;
+    align-self:flex-start;
+    margin-top:-2px;
+  }
+  .open-badge.open{ background:var(--correct-bg); color:var(--correct-ink); }
+  .open-badge.closed{ background:rgba(229,72,77,0.12); color:var(--c2-b); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="kicker">Навігація</div>
+    <div class="kicker tag">для вчителя</div>
+  </div>
+
+  <div class="teacher-banner">Режим вчителя — учні цього не бачать</div>
+
+  <h1>Усі <span class="hl">теми</span></h1>
+  <p class="sub" id="subDesc">Кожному учню — своє посилання з кодом (…/index.html?u=Maryna). Він бачить лише ті теми, які ви йому відкрили — і урок, і тест до нього. Собі додайте в кінець ?vchytel=1 — побачите все і хто що має відкритим.</p>
+
+  <div id="blocks"></div>
+
+  <footer>@movoznavka</footer>
+</div>
+
+<script>
+/* ============================================================
+   ЯК ДОДАТИ НОВУ ТЕМУ
+   Структура: BLOCKS (розділ) → subgroups (підрозділ) → items (картка теми).
+   Кожен item — це один УРОК, і, за бажання, один ТЕСТ до нього:
+
+   {
+     icon: "Ф",                 // літера на плитці
+     status: "ready"/"soon",    // готовність УРОКУ
+     title: "Назва теми",
+     desc: "необов'язковий підпис",
+     href: "https://.../urok-....html",   // посилання на урок (ПОВНЕ)
+     test: {                    // необов'язково — якщо тесту ще нема, просто не пишіть test
+       status: "ready"/"soon",
+       href: "https://movoznavka.github.io/11class/....html"
+     }
+   }
+
+   Якщо готовий тільки тест, а уроку ще нема — став status уроку "soon"
+   (картка уроку стане сірою й неактивною), а test.status постав "ready" —
+   плашка тесту однаково буде клікабельною.
+
+   Щоб додати підрозділ — скопіюй { title: "...", items: [...] }.
+   Щоб додати розділ — скопіюй { name: "...", subgroups: [...] } у BLOCKS.
+   ============================================================ */
+
+const BLOCKS = [
+  {
+    name: "Фонетика",
+    subgroups: [
+      { title: null, items: [
+        {icon: "Ф", status: "ready", title: "Фонетика", desc: "Інтерактивний конспект із картками",
+          href: "https://movoznavka.github.io/11class/urok-fonetyka.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/fonetyka.html"}}
+      ]}
+    ]
+  },
+  {
+    name: "Орфографія",
+    generalTest: {status: "soon", href: "orfografiya-zagalnyi.html"},
+    subgroups: [
+      { title: null, items: [
+        {icon: "С", status: "ready", title: "Спрощення в групах приголосних",
+          href: "https://movoznavka.github.io/11class/urok-sproshchennya.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/sproshchennya.html"}},
+        {icon: "Ч", status: "ready", title: "Чергування суфіксів при додаванні -ськ-",
+          href: "https://movoznavka.github.io/11class/urok-cherguvannya-sk.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/sufiksy-vsi.html"}},
+        {icon: "Ч", status: "ready", title: "Чергування у-в та і-й",
+          href: "https://movoznavka.github.io/11class/urok-cherguvannya-u-v.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/cherguvannya-u-v.html"}},
+        {icon: "П", status: "ready", title: "Правопис префіксів",
+          href: "https://movoznavka.github.io/11class/urok-prefiksy.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/prefiksy.html"}},
+        {icon: "М", status: "ready", title: "М'який знак",
+          href: "https://movoznavka.github.io/11class/urok-myakyj-znak.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/myakyj-znak.html"}},
+        {icon: "А", status: "ready", title: "Апостроф",
+          href: "https://movoznavka.github.io/11class/urok-apostrof.html",
+          test: {status: "soon", href: "apostrof.html"}},
+        {icon: "П", status: "ready", title: "Подвоєння букв",
+          href: "https://movoznavka.github.io/11class/urok-podvoiennya.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/podvoiennya.html"}},
+        {icon: "Н", status: "ready", title: "Правопис НЕ з різними частинами мови", desc: "Разом і окремо за частинами мови",
+          href: "https://movoznavka.github.io/11class/urok-ne-z-chastynamy-movy.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/ne-z-chastynamy-movy.html"}},
+        {icon: "В", status: "ready", title: "Велика буква й лапки у власних назвах",
+          href: "https://movoznavka.github.io/11class/urok-velyka-bukva.html",
+          test: {status: "soon", href: "velyka-bukva.html"}}
+      ]},
+      { title: "Написання іншомовних слів", items: [
+        {icon: "И", status: "soon", title: "Букви и, і", href: "urok-inshomovni-y-i.html",
+          test: {status: "soon", href: "inshomovni-y-i.html"}},
+        {icon: "П", status: "ready", title: "Подвоєні букви",
+          href: "https://movoznavka.github.io/11class/urok-inshomovni-podvoiennya.html",
+          test: {status: "soon", href: "inshomovni-podvoiennya.html"}},
+        {icon: "М", status: "soon", title: "М'який знак", href: "urok-inshomovni-myakyj-znak.html",
+          test: {status: "soon", href: "inshomovni-myakyj-znak.html"}},
+        {icon: "А", status: "soon", title: "Апостроф", href: "urok-inshomovni-apostrof.html",
+          test: {status: "soon", href: "inshomovni-apostrof.html"}}
+      ]},
+      { title: "Складні слова", items: [
+        {icon: "С", status: "ready", title: "Складні іменники",
+          href: "https://movoznavka.github.io/11class/urok-skladni-imennyky.html",
+          test: {status: "soon", href: "skladni-imennyky.html"}},
+        {icon: "С", status: "ready", title: "Складні прикметники",
+          href: "https://movoznavka.github.io/11class/urok-skladni-prykmetnyky.html",
+          test: {status: "soon", href: "skladni-prykmetnyky.html"}},
+        {icon: "С", status: "ready", title: "Складний прислівник",
+          href: "https://movoznavka.github.io/11class/urok-skladni-prysliv.html",
+          test: {status: "soon", href: "skladni-prysliv.html"}}
+      ]}
+    ]
+  },
+  {
+    name: "Лексикологія",
+    subgroups: [
+      { title: null, items: [
+        {icon: "Л", status: "soon", title: "Лексичні помилки", href: "urok-leksychni-pomylky.html",
+          test: {status: "soon", href: "leksychni-pomylky.html"}},
+        {icon: "Ф", status: "soon", title: "Фразеологія", href: "urok-frazeologiya.html",
+          test: {status: "soon", href: "frazeologiya.html"}}
+      ]}
+    ]
+  },
+  {
+    name: "Морфологія",
+    generalTest: {status: "soon", href: "morfologiya-zagalnyi.html"},
+    subgroups: [
+      { title: "Іменник", items: [
+        {icon: "І", status: "ready", title: "Рід",
+          href: "https://movoznavka.github.io/11class/urok-imennyk-rid.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/rid_imennyka_trainer.html"}},
+        {icon: "І", status: "ready", title: "Число",
+          href: "https://movoznavka.github.io/11class/urok-imennyk-chyslo.html",
+          test: {status: "soon", href: "imennyk-chyslo.html"}},
+        {icon: "І", status: "soon", title: "Групи", href: "urok-imennyk-hrupy.html",
+          test: {status: "soon", href: "imennyk-hrupy.html"}},
+        {icon: "І", status: "soon", title: "Відміни", href: "urok-imennyk-vidminy.html",
+          test: {status: "soon", href: "imennyk-vidminy.html"}},
+        {icon: "І", status: "soon", title: "Родовий відмінок", href: "urok-imennyk-rodovyi.html",
+          test: {status: "soon", href: "imennyk-rodovyi.html"}},
+        {icon: "І", status: "soon", title: "Кличний відмінок", href: "urok-klychnyj-vidminok.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/klychnyj-vidminok.html"}},
+        {icon: "І", status: "soon", title: "Імена по батькові", href: "urok-imennyk-po-batkovi.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/imennyk-po-batkovi.html"}}
+      ]},
+      { title: "Прикметник", items: [
+        {icon: "П", status: "ready", title: "Ступені порівняння",
+          href: "https://movoznavka.github.io/11class/urok-prykmetnyk-stupeni.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/prykmetnyk-stupeni.html"}},
+        {icon: "П", status: "ready", title: "Правопис прикметникових суфіксів",
+          href: "https://movoznavka.github.io/11class/urok-prykmetnyk-sufiksy.html",
+          test: {status: "soon", href: "prykmetnyk-sufiksy.html"}}
+      ]},
+      { title: "Числівник", items: [
+        {icon: "Ч", status: "ready", title: "Відмінювання числівників",
+          href: "https://movoznavka.github.io/11class/urok-chyslivnyk-vidminy.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/chyslivnyk-vidminy.html"}},
+        {icon: "Ч", status: "ready", title: "Узгодження числівника з іменником",
+          href: "https://movoznavka.github.io/11class/urok-chyslivnyk-uzgodzhennya.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/chyslivnyk-uzgodzhennya.html"}},
+        {icon: "Ч", status: "ready", title: "Позначення часу",
+          href: "https://movoznavka.github.io/11class/urok-chyslivnyk-chas.html",
+          test: {status: "soon", href: "chyslivnyk-chas.html"}}
+      ]},
+      { title: "Займенник", items: [
+        {icon: "З", status: "soon", title: "Займенник", href: "urok-zaimennyk.html",
+          test: {status: "soon", href: "zaimennyk.html"}}
+      ]},
+      { title: "Дієслово", items: [
+        {icon: "Д", status: "soon", title: "Форми дієслова", href: "urok-diyeslovo-formy.html",
+          test: {status: "soon", href: "diyeslovo-formy.html"}},
+        {icon: "Д", status: "soon", title: "Дієвідміни", href: "urok-diyeslovo-diyevidminy.html",
+          test: {status: "soon", href: "diyeslovo-diyevidminy.html"}},
+        {icon: "Д", status: "soon", title: "Способи", href: "urok-diyeslovo-sposoby.html",
+          test: {status: "soon", href: "diyeslovo-sposoby.html"}},
+        {icon: "Д", status: "soon", title: "Дієприкметник", href: "urok-diyeprykmetnyk.html",
+          test: {status: "soon", href: "diyeprykmetnyk.html"}},
+        {icon: "Д", status: "soon", title: "Дієприслівник", href: "urok-diyeprysliv.html",
+          test: {status: "soon", href: "diyeprysliv.html"}}
+      ]},
+      { title: "Прислівник", items: [
+        {icon: "П", status: "soon", title: "Прислівник", href: "urok-prysliv.html",
+          test: {status: "soon", href: "prysliv.html"}}
+      ]},
+      { title: "Службові частини мови", items: [
+        {icon: "П", status: "soon", title: "Прийменник", href: "urok-pryimennyk.html",
+          test: {status: "soon", href: "pryimennyk.html"}},
+        {icon: "С", status: "soon", title: "Сполучник", href: "urok-spoluchnyk.html",
+          test: {status: "soon", href: "spoluchnyk.html"}},
+        {icon: "Ч", status: "soon", title: "Частка", href: "urok-chastka.html",
+          test: {status: "soon", href: "chastka.html"}}
+      ]},
+      { title: "Вигук", items: [
+        {icon: "В", status: "soon", title: "Вигук", href: "urok-vyhuk.html",
+          test: {status: "soon", href: "vyhuk.html"}}
+      ]}
+    ]
+  },
+  {
+    name: "Синтаксис і пунктуація",
+    generalTest: {status: "soon", href: "syntaksys-zagalnyi.html"},
+    subgroups: [
+      { title: null, items: [
+        {icon: "С", status: "soon", title: "Словосполучення", href: "urok-slovospoluchennya.html",
+          test: {status: "soon", href: "slovospoluchennya.html"}},
+        {icon: "В", status: "soon", title: "Види речення", href: "urok-vydy-rechennya.html",
+          test: {status: "soon", href: "vydy-rechennya.html"}}
+      ]},
+      { title: "Члени речення", items: [
+        {icon: "Ч", status: "soon", title: "Головні члени", href: "urok-chleny-holovni.html",
+          test: {status: "soon", href: "chleny-holovni.html"}},
+        {icon: "Ч", status: "soon", title: "Другорядні члени", href: "urok-chleny-druhoryadni.html",
+          test: {status: "soon", href: "chleny-druhoryadni.html"}}
+      ]},
+      { title: null, items: [
+        {icon: "Т", status: "soon", title: "Тире між підметом і присудком", href: "urok-tyre-pidmet-prysudok.html",
+          test: {status: "soon", href: "tyre-pidmet-prysudok.html"}},
+        {icon: "Т", status: "soon", title: "Типи односкладних речень", href: "urok-odnoskladni.html",
+          test: {status: "soon", href: "odnoskladni.html"}}
+      ]},
+      { title: "Однорідні члени речення", items: [
+        {icon: "О", status: "soon", title: "Однорідні члени", href: "urok-odnoridni.html",
+          test: {status: "soon", href: "odnoridni.html"}},
+        {icon: "О", status: "soon", title: "Однорідні й неоднорідні означення", href: "urok-odnoridni-neodnoridni.html",
+          test: {status: "soon", href: "odnoridni-neodnoridni.html"}}
+      ]},
+      { title: null, items: [
+        {icon: "В", status: "soon", title: "Вставні слова, словосполучення та речення", href: "urok-vstavni.html",
+          test: {status: "soon", href: "vstavni.html"}},
+        {icon: "З", status: "soon", title: "Звертання", href: "urok-zvertannya.html",
+          test: {status: "soon", href: "zvertannya.html"}}
+      ]},
+      { title: "Відокремлені другорядні члени речення", items: [
+        {icon: "В", status: "soon", title: "Означення", href: "urok-vidokremleni-oznachennya.html",
+          test: {status: "soon", href: "vidokremleni-oznachennya.html"}},
+        {icon: "В", status: "soon", title: "Прикладка", href: "urok-vidokremleni-prykladka.html",
+          test: {status: "soon", href: "vidokremleni-prykladka.html"}},
+        {icon: "В", status: "soon", title: "Обставина", href: "urok-vidokremleni-obstavyna.html",
+          test: {status: "soon", href: "vidokremleni-obstavyna.html"}},
+        {icon: "В", status: "soon", title: "Додаток", href: "urok-vidokremleni-dodatok.html",
+          test: {status: "soon", href: "vidokremleni-dodatok.html"}}
+      ]},
+      { title: "Складне речення", items: [
+        {icon: "С", status: "soon", title: "Сурядні", href: "urok-skladne-suryadni.html",
+          test: {status: "soon", href: "skladne-suryadni.html"}},
+        {icon: "С", status: "soon", title: "Підрядні", href: "urok-skladne-pidryadni.html",
+          test: {status: "soon", href: "skladne-pidryadni.html"}},
+        {icon: "С", status: "soon", title: "Безсполучникові", href: "urok-skladne-bezspoluchnykovi.html",
+          test: {status: "soon", href: "skladne-bezspoluchnykovi.html"}},
+        {icon: "С", status: "soon", title: "З різними видами зв'язку", href: "urok-skladne-rizni-zvyazky.html",
+          test: {status: "soon", href: "skladne-rizni-zvyazky.html"}}
+      ]},
+      { title: null, items: [
+        {icon: "П", status: "ready", title: "Пряма мова",
+          href: "https://movoznavka.github.io/11class/urok-pryama-mova.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/pryama-mova.html"}}
+      ]}
+    ]
+  },
+  {
+    name: "Тексти",
+    subgroups: [
+      { title: null, items: [
+        {icon: "Т", status: "soon", title: "Тексти", href: "urok-teksty.html",
+          test: {status: "soon", href: "teksty.html"}}
+      ]}
+    ]
+  }
+];
+
+const blocksEl = document.getElementById('blocks');
+
+function pillHtml(test){
+  if(!test) return '';
+  const clickable = test.status === 'ready';
+  const label = "📝 Тест до теми";
+  return `<a class="test-pill ${test.status}" href="${clickable ? test.href : '#'}" data-testkey="${test.href}">${label}</a>`;
+}
+
+function generalTestPillHtml(test){
+  if(!test) return '';
+  const clickable = test.status === 'ready';
+  const label = "📝 Загальний тест";
+  return `<a class="block-test-pill ${test.status}" href="${clickable ? test.href : '#'}" data-testkey="${test.href}">${label}</a>`;
+}
+
+function renderBlocks_(){
+  blocksEl.innerHTML = BLOCKS.map(block => `
+    <div class="block">
+      <div class="block-header">
+        <h2 class="block-title">${block.name}</h2>
+        ${generalTestPillHtml(block.generalTest)}
+      </div>
+      ${block.subgroups.map(sg => `
+        <div class="subgroup">
+          ${sg.title ? `<div class="subgroup-title">${sg.title}</div>` : ''}
+          <div class="grid">
+            ${sg.items.map(it => `
+              <div class="card-wrap">
+                <a class="card ${it.status}" href="${it.status==='soon'?'#':it.href}" data-key="${it.href}">
+                  <div class="card-top">
+                    <span class="tile">${it.icon}</span>
+                    <span class="status ${it.status}">${it.status==='soon'?'Скоро':'Готово'}</span>
+                  </div>
+                  <p class="card-title">${it.title}</p>
+                  ${it.desc?`<p class="card-sub">${it.desc}</p>`:''}
+                </a>
+                ${pillHtml(it.test)}
+              </div>`).join('')}
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+renderBlocks_();
 
 // ============================================================
-// СПИСОК УЧНІВ ДЛЯ КОМАНДИ /дз
-// Ці імена мають ЗБІГАТИСЯ з ключами в STUDENT_ACCESS на сайті
-// (index.html) — саме за таким кодом учень заходить по посиланню
-// ?u=Ім'я. Коли додаєте нового учня в STUDENT_ACCESS на сайті —
-// додайте його ім'я і сюди.
+// ДЗ — ЯСКРАВЕ ПОЗНАЧЕННЯ (ПЕРСОНАЛЬНО ДЛЯ КОЖНОГО УЧНЯ)
+// Тут вказуєте посилання вашого Apps Script (те саме, що для бота),
+// закінчується на /exec. Керуєте позначками ДЗ прямо в Telegram-боті
+// командою /дз (там спершу обираєте учня) — код нижче лише зчитує,
+// що призначено САМЕ ЦЬОМУ учню (за кодом ?u=...), і підсвічує пілюлі
+// тільки на його сторінці.
 // ============================================================
-const STUDENTS = ["Ліза Настя", "Вікторія", "Марина Світлана", "Яна", "Віка", "Андрій", "Аня", "Марія", "Максим", "Анастасія", "Ростислав", "Віолета Софія", "Вероніка"];
+const HOMEWORK_API_URL = "https://script.google.com/macros/s/AKfycbyDGcDVtwD0L8WW0zDIsXwYwwf6zp4XzmofzdI0wU-AhhfZIXbH2lOHquNSHI8cKRc7/exec";
+
+function applyHomework(map){
+  map = map || {};
+  document.querySelectorAll('[data-testkey]').forEach(function(el){
+    const hw = map[el.getAttribute('data-testkey')];
+    if(!hw) return;
+    el.classList.add('homework');
+    if(!el.querySelector('.hw-badge')){
+      const span = document.createElement('span');
+      span.className = 'hw-badge';
+      span.textContent = ' · ДЗ ' + hw.number;
+      el.appendChild(span);
+    }
+  });
+}
+
+function loadHomework(studentCode){
+  if(!HOMEWORK_API_URL || HOMEWORK_API_URL.indexOf('ВСТАВТЕ') === 0) return;
+  if(!studentCode) return;
+  const sep = HOMEWORK_API_URL.indexOf('?') > -1 ? '&' : '?';
+  const s = document.createElement('script');
+  s.src = HOMEWORK_API_URL + sep + 'callback=applyHomework&student=' + encodeURIComponent(studentCode);
+  document.body.appendChild(s);
+}
 
 // ============================================================
-// ГРУПОВІ КОДИ — ті самі, що й у GROUP_MEMBERS в index.html.
-// Учень на сайті обирає своє ім'я (Ліза/Настя), і саме воно
-// потрапляє в результати. Ця мапа потрібна, щоб бот знав, що
-// "Ліза" і "Настя" належать до групового коду "Ліза Настя" —
-// інакше позначки ДЗ (які прив'язані до коду) і кнопка
-// "Результати" (яка теж працює через код) не знайдуть їх.
+// ХТО ЩО БАЧИТЬ
+// Код учня (те, що йде після ?u=) — обирайте самі, наприклад ім'я.
+// Посилання для учня: .../index.html?u=Maryna
+//
+// Кожен код відкриває СПИСОК ТЕМ (масив href уроків, як і раніше) —
+// а урок і тест до нього показуються/ховаються РАЗОМ, як одна тема.
+//
+// ВАЖЛИВО: якщо учня немає в цьому списку — посилання НЕ спрацює,
+// портал покаже "Це посилання недійсне".
 // ============================================================
-const GROUP_MEMBERS = {
-  "Ліза Настя": ["Ліза", "Настя"],
-  "Марина Світлана": ["Марина", "Світлана"],
-  "Віолета Софія": ["Віолета", "Софія"]
+const STUDENT_ACCESS = {
+  "Ліза Настя":   ["https://movoznavka.github.io/11class/urok-fonetyka.html", "https://movoznavka.github.io/11class/urok-sproshchennya.html", "https://movoznavka.github.io/11class/urok-cherguvannya-u-v.html"],
+  "Вікторія":   ["https://movoznavka.github.io/11class/urok-fonetyka.html", "https://movoznavka.github.io/11class/urok-sproshchennya.html", "https://movoznavka.github.io/11class/urok-cherguvannya-sk.html","https://movoznavka.github.io/11class/urok-cherguvannya-u-v.html","https://movoznavka.github.io/11class/urok-prefiksy.html", "https://movoznavka.github.io/11class/urok-myakyj-znak.html", "https://movoznavka.github.io/11class/urok-apostrof.html", "https://movoznavka.github.io/11class/urok-podvoiennya.html", "https://movoznavka.github.io/11class/urok-ne-z-chastynamy-movy.html", "https://movoznavka.github.io/11class/urok-velyka-bukva.html", "https://movoznavka.github.io/11class/urok-skladni-imennyky.html",  "https://movoznavka.github.io/11class/urok-skladni-prykmetnyky.html", "https://movoznavka.github.io/11class/urok-skladni-prysliv.html", "https://movoznavka.github.io/11class/urok-imennyk-rid.html", "https://movoznavka.github.io/11class/urok-imennyk-chyslo.html", "https://movoznavka.github.io/11class/urok-prykmetnyk-stupeni.html", "https://movoznavka.github.io/11class/urok-prykmetnyk-sufiksy.html", "https://movoznavka.github.io/11class/urok-chyslivnyk-vidminy.html", "https://movoznavka.github.io/11class/urok-chyslivnyk-uzgodzhennya.html"],
+  "Марина Світлана": ["https://movoznavka.github.io/11class/urok-fonetyka.html", "https://movoznavka.github.io/11class/urok-sproshchennya.html", "https://movoznavka.github.io/11class/urok-cherguvannya-sk.html"],
+  "Яна":   ["https://movoznavka.github.io/11class/urok-fonetyka.html", "https://movoznavka.github.io/11class/urok-sproshchennya.html", "https://movoznavka.github.io/11class/urok-cherguvannya-sk.html"],
+  "Віка":   ["https://movoznavka.github.io/11class/urok-fonetyka.html", "https://movoznavka.github.io/11class/urok-sproshchennya.html", "https://movoznavka.github.io/11class/urok-cherguvannya-sk.html","https://movoznavka.github.io/11class/urok-cherguvannya-u-v.html","https://movoznavka.github.io/11class/urok-prefiksy.html", "https://movoznavka.github.io/11class/urok-myakyj-znak.html", "https://movoznavka.github.io/11class/urok-apostrof.html", "https://movoznavka.github.io/11class/urok-podvoiennya.html", "https://movoznavka.github.io/11class/urok-ne-z-chastynamy-movy.html"],
+  "Андрій": [],
+  "Аня": [],
+  "Марія": [],
+  "Максим": [],
+  "Анастасія": [],
+  "Ростислав": [],
+  "Вероніка": [],
+  "Віолета Софія": [],
+  
+  // "код-учня": ["href-теми-1", "href-теми-2"]
 };
 
-function groupCodeForMember_(name) {
-  const n = normalizeCode_(name);
-  for (const code in GROUP_MEMBERS) {
-    if (GROUP_MEMBERS[code].some(function (m) { return normalizeCode_(m) === n; })) {
-      return code;
-    }
-  }
-  return null;
+// ============================================================
+// ГРУПОВІ КОДИ (одне посилання — двоє учнів)
+// Якщо код є ключем тут — портал спершу спитає, хто саме зайшов,
+// і далі підставлятиме ОСОБИСТЕ ім'я і в лінки на уроки/тести,
+// і в результати в Telegram — щоб було видно, хто саме що зробив.
+// Одиночних учнів сюди додавати не треба.
+// ============================================================
+const GROUP_MEMBERS = {
+  "ліза настя": ["Ліза", "Настя"],
+  "марина світлана": ["Марина", "Світлана"],
+  "віолета софія": ["Віолета", "Софія"]
+};
+
+function normalizeCode(s){
+  return (s || '').trim().replace(/\s+/g, ' ').toLowerCase();
 }
+
+const NORMALIZED_ACCESS = {};
+Object.keys(STUDENT_ACCESS).forEach(function(code){
+  NORMALIZED_ACCESS[normalizeCode(code)] = STUDENT_ACCESS[code];
+});
 
 // ============================================================
-// СПИСОК ТЕМ ДЛЯ КОМАНДИ /дз
-// Тут — тільки готові тести (ті, що status: "ready" на сайті),
-// бо саме їх можна позначати як ДЗ.
-// Коли додаєте новий готовий тест на сайті (index.html, масив BLOCKS) —
-// додайте його і сюди, в ту саму тему (name має збігатись із назвою
-// розділу на сайті). Формат:
-//   { title: "Назва картки", href: "ПОВНЕ посилання на тест" }
+// ЗАВЕРШЕННЯ ВХОДУ УЧНЯ: ховає закриті теми, підвантажує ДЗ,
+// і — головне — дописує ?student=Ім'я в кожне посилання на урок,
+// щоб сторінка тесту брала ім'я з лінка й не питала його вручну.
 // ============================================================
-const TOPICS = [
-  { name: "Фонетика", tests: [
-    { title: "Фонетика", href: "https://movoznavka.github.io/11class/fonetyka.html" }
-  ]},
-  { name: "Орфографія", tests: [
-    { title: "Спрощення в групах приголосних", href: "https://movoznavka.github.io/11class/sproshchennya.html" },
-    { title: "Чергування суфіксів при додаванні -ськ-", href: "https://movoznavka.github.io/11class/sufiksy-vsi.html" },
-    { title: "Чергування у-в та і-й", href: "https://movoznavka.github.io/11class/cherguvannya-u-v.html" },
-    { title: "Правопис префіксів", href: "https://movoznavka.github.io/11class/prefiksy.html" },
-    { title: "М'який знак", href: "https://movoznavka.github.io/11class/myakyj-znak.html" },
-    { title: "Подвоєння букв", href: "https://movoznavka.github.io/11class/podvoiennya.html" },
-    { title: "Правопис НЕ з різними частинами мови", href: "https://movoznavka.github.io/11class/ne-z-chastynamy-movy.html" }
-  ]},
-  { name: "Морфологія", tests: [
-    { title: "Іменник · Рід", href: "https://movoznavka.github.io/11class/rid_imennyka_trainer.html" },
-    { title: "Іменник · Кличний відмінок", href: "https://movoznavka.github.io/11class/klychnyj-vidminok.html" },
-    { title: "Іменник · Імена по батькові", href: "https://movoznavka.github.io/11class/imennyk-po-batkovi.html" },
-    { title: "Прикметник · Ступені порівняння", href: "https://movoznavka.github.io/11class/prykmetnyk-stupeni.html" },
-    { title: "Числівник · Відмінювання", href: "https://movoznavka.github.io/11class/chyslivnyk-vidminy.html" },
-    { title: "Числівник · Узгодження з іменником", href: "https://movoznavka.github.io/11class/chyslivnyk-uzgodzhennya.html" }
-  ]},
-  { name: "Синтаксис і пунктуація", tests: [
-    { title: "Пряма мова", href: "https://movoznavka.github.io/11class/pryama-mova.html" }
-  ]}
-];
-
-// ============================================================
-// КАТАЛОГ УРОКІВ ДЛЯ ВІДКРИТТЯ ДОСТУПУ (кнопка "🔓 Теми" в боті).
-// Це той самий список готових уроків, що й на порталі (BLOCKS
-// в index.html), лише ті, що вже опубліковані ("ready").
-// Якщо додаєте новий готовий урок на сайті — додайте його і сюди,
-// інакше бот не зможе його відкривати.
-// ============================================================
-const LESSON_ACCESS_TOPICS = [
-  { name: "Фонетика", items: [
-    { title: "Фонетика", href: "https://movoznavka.github.io/11class/urok-fonetyka.html" }
-  ]},
-  { name: "Орфографія", items: [
-    { title: "Спрощення в групах приголосних", href: "https://movoznavka.github.io/11class/urok-sproshchennya.html" },
-    { title: "Чергування суфіксів при додаванні -ськ-", href: "https://movoznavka.github.io/11class/urok-cherguvannya-sk.html" },
-    { title: "Чергування у-в та і-й", href: "https://movoznavka.github.io/11class/urok-cherguvannya-u-v.html" },
-    { title: "Правопис префіксів", href: "https://movoznavka.github.io/11class/urok-prefiksy.html" },
-    { title: "М'який знак", href: "https://movoznavka.github.io/11class/urok-myakyj-znak.html" },
-    { title: "Апостроф", href: "https://movoznavka.github.io/11class/urok-apostrof.html" },
-    { title: "Подвоєння букв", href: "https://movoznavka.github.io/11class/urok-podvoiennya.html" },
-    { title: "Правопис НЕ з різними частинами мови", href: "https://movoznavka.github.io/11class/urok-ne-z-chastynamy-movy.html" },
-    { title: "Велика буква й лапки у власних назвах", href: "https://movoznavka.github.io/11class/urok-velyka-bukva.html" },
-    { title: "Подвоєні букви (іншомовні слова)", href: "https://movoznavka.github.io/11class/urok-inshomovni-podvoiennya.html" },
-    { title: "Складні іменники", href: "https://movoznavka.github.io/11class/urok-skladni-imennyky.html" },
-    { title: "Складні прикметники", href: "https://movoznavka.github.io/11class/urok-skladni-prykmetnyky.html" },
-    { title: "Складний прислівник", href: "https://movoznavka.github.io/11class/urok-skladni-prysliv.html" }
-  ]},
-  { name: "Морфологія", items: [
-    { title: "Іменник · Рід", href: "https://movoznavka.github.io/11class/urok-imennyk-rid.html" },
-    { title: "Іменник · Число", href: "https://movoznavka.github.io/11class/urok-imennyk-chyslo.html" },
-    { title: "Прикметник · Ступені порівняння", href: "https://movoznavka.github.io/11class/urok-prykmetnyk-stupeni.html" },
-    { title: "Прикметник · Правопис суфіксів", href: "https://movoznavka.github.io/11class/urok-prykmetnyk-sufiksy.html" },
-    { title: "Числівник · Відмінювання", href: "https://movoznavka.github.io/11class/urok-chyslivnyk-vidminy.html" },
-    { title: "Числівник · Узгодження з іменником", href: "https://movoznavka.github.io/11class/urok-chyslivnyk-uzgodzhennya.html" },
-    { title: "Числівник · Позначення часу", href: "https://movoznavka.github.io/11class/urok-chyslivnyk-chas.html" }
-  ]},
-  { name: "Синтаксис і пунктуація", items: [
-    { title: "Пряма мова", href: "https://movoznavka.github.io/11class/urok-pryama-mova.html" }
-  ]}
-];
-
-function getSheet_() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  let sheet = ss.getSheetByName(SHEET_NAME);
-  if (!sheet) {
-    sheet = ss.insertSheet(SHEET_NAME);
-    sheet.appendRow(["Дата", "Учень", "Тема", "Правильно", "Відповів", "Всього", "Помилки", "Посилання на розбір"]);
-  }
-  return sheet;
+function appendStudentParam_(href, name){
+  const sep = href.indexOf('?') > -1 ? '&' : '?';
+  return href + sep + 'student=' + encodeURIComponent(name);
 }
 
-function tgCall_(method, payload) {
-  const url = "https://api.telegram.org/bot" + BOT_TOKEN + "/" + method;
-  const options = {
-    method: "post",
-    contentType: "application/json",
-    payload: JSON.stringify(payload),
-    muteHttpExceptions: true
-  };
-  return UrlFetchApp.fetch(url, options);
-}
+function applyAccessAndRender_(studentCode, allowed, displayName){
+  const desc = document.getElementById('subDesc');
+  if (desc) desc.remove();
 
-function sendMessage_(chatId, text, replyMarkup) {
-  const payload = { chat_id: chatId, text: text, parse_mode: "HTML" };
-  if (replyMarkup) payload.reply_markup = replyMarkup;
-  tgCall_("sendMessage", payload);
-}
-
-function doPost(e) {
-  try {
-    const data = JSON.parse(e.postData.contents);
-
-    if (data.update_id !== undefined) {
-      handleTelegramUpdate_(data);
-      return ContentService.createTextOutput("ok");
+  document.querySelectorAll('.card-wrap').forEach(function(wrap){
+    const card = wrap.querySelector('.card');
+    const key = card.getAttribute('data-key');
+    if (allowed.indexOf(key) === -1) { wrap.remove(); return; }
+    if (card.getAttribute('href') !== '#') {
+      card.setAttribute('href', appendStudentParam_(card.getAttribute('href'), displayName));
     }
-
-    if (data.type === "quiz_result") {
-      logQuizResult_(data);
-      return ContentService.createTextOutput("ok");
-    }
-
-    return ContentService.createTextOutput("ignored");
-  } catch (err) {
-    return ContentService.createTextOutput("error: " + err);
-  }
-}
-
-// ------------------------------------------------------------
-// ГОЛОВНА СТОРІНКА ЧИТАЄ ПОЗНАЧКИ ДЗ ЗВІДСИ (через ?callback=...&student=...)
-// Повертає ДЗ лише для того учня, чий код переданий в student —
-// без student повертає порожньо (щоб один учень не бачив ДЗ інших).
-// ------------------------------------------------------------
-function doGet(e) {
-  const student = e && e.parameter && e.parameter.student;
-  const callback = e && e.parameter && e.parameter.callback;
-  const mode = e && e.parameter && e.parameter.mode;
-
-  let data;
-  if (mode === "access") {
-    const map = getAccessMap_();
-    data = student ? (map[normalizeCode_(student)] || []) : [];
-  } else {
-    const map = getHomeworkMap_();
-    data = student ? (map[normalizeCode_(student)] || {}) : {};
-  }
-
-  const json = JSON.stringify(data);
-  if (callback) {
-    return ContentService.createTextOutput(callback + "(" + json + ");").setMimeType(ContentService.MimeType.JAVASCRIPT);
-  }
-  return ContentService.createTextOutput(json).setMimeType(ContentService.MimeType.JSON);
-}
-
-function findHomeworkLabel_(studentName, testName) {
-  if (!testName) return null;
-  const studentMap = getHomeworkMap_()[normalizeCode_(studentName)];
-  if (!studentMap) return null;
-  const target = normalizeCode_(testName);
-  for (const href in studentMap) {
-    if (normalizeCode_(studentMap[href].title) === target) {
-      return studentMap[href].number;
-    }
-  }
-  return null;
-}
-
-function logQuizResult_(data) {
-  const sheet = getSheet_();
-  const studentName = (data.student || "Без імені").toString().trim();
-  sheet.appendRow([
-    new Date(),
-    studentName,
-    data.testName || "",
-    data.correct,
-    data.answered,
-    data.total,
-    (data.wrongList || []).join(", "),
-    data.reviewLink || ""
-  ]);
-
-  const groupCode = groupCodeForMember_(studentName);
-  const hwNumber = findHomeworkLabel_(groupCode || studentName, data.testName);
-  let text = hwNumber ? ("📌 <b>Це ДЗ " + hwNumber + "</b>\n") : "";
-  text += "📘 " + (data.testName || "Тест") + "\n";
-  text += "Учень: " + studentName + (groupCode ? " (" + groupCode + ")" : "") + "\n";
-  if (data.answered < data.total) {
-    text += "Результат: " + data.correct + "/" + data.answered + " (виконано " + data.answered + " із " + data.total + ")\n";
-  } else {
-    text += "Результат: " + data.correct + "/" + data.total + "\n";
-  }
-  text += (data.wrongList && data.wrongList.length)
-    ? "Помилки в завданнях: " + data.wrongList.join(", ")
-    : "Помилок немає 🎉";
-
-  const keyboard = data.reviewLink
-    ? { inline_keyboard: [[{ text: "🔍 Переглянути розбір відповідей", url: data.reviewLink }]] }
-    : undefined;
-
-  sendMessage_(TEACHER_CHAT_ID, text, keyboard);
-}
-
-function sendStudentResults_(chatId, studentName) {
-  const sheet = getSheet_();
-  const rows = sheet.getDataRange().getValues();
-  let found = 0;
-
-  // Якщо studentName — груповий код, шукаємо рядки за іменами обох
-  // учасників (плюс сам код — про всяк випадок, якщо є старі записи
-  // з часів, коли ім'я вручну не обирали).
-  const members = GROUP_MEMBERS[studentName];
-  const acceptedNames = members ? members.concat([studentName]) : [studentName];
-
-  sendMessage_(chatId, "👤 <b>" + studentName + "</b>");
-
-  for (let i = 1; i < rows.length; i++) {
-    const [date, name, test, correct, answered, total, wrong, reviewLink] = rows[i];
-    if (acceptedNames.indexOf(name) === -1) continue;
-    found++;
-
-    const d = Utilities.formatDate(new Date(date), Session.getScriptTimeZone(), "dd.MM HH:mm");
-
-    const hwNumber = findHomeworkLabel_(studentName, test);
-    let text = hwNumber ? ("📌 <b>Це ДЗ " + hwNumber + "</b>\n") : "";
-    text += members ? ("👤 " + name + "\n") : "";
-    text += "📘 " + (test || "Тест") + "\n";
-    text += d + "\n";
-
-    if (answered < total) {
-      text += "Результат: " + correct + "/" + answered + " (виконано " + answered + " із " + total + ")\n";
-    } else {
-      text += "Результат: " + correct + "/" + total + "\n";
-    }
-
-    text += wrong ? "Помилки в завданнях: " + wrong : "Помилок немає 🎉";
-
-    const keyboard = reviewLink
-      ? { inline_keyboard: [[{ text: "🔍 Переглянути розбір відповідей", url: reviewLink }]] }
-      : undefined;
-
-    sendMessage_(chatId, text, keyboard);
-  }
-
-  if (!found) {
-    sendMessage_(chatId, "Поки що немає жодного результату.");
-  }
-}
-
-// ------------------------------------------------------------
-// ДЗ: зберігання позначок (PropertiesService — переживає перезапуски)
-// Структура: { "<нормалізований код учня>": { "<href тесту>": {number, title} } }
-// ------------------------------------------------------------
-function normalizeCode_(s) {
-  return (s || "").toString().trim().replace(/\s+/g, " ").toLowerCase();
-}
-
-function getHomeworkMap_() {
-  const raw = PropertiesService.getScriptProperties().getProperty("HOMEWORK_MAP");
-  return raw ? JSON.parse(raw) : {};
-}
-
-function saveHomeworkMap_(map) {
-  PropertiesService.getScriptProperties().setProperty("HOMEWORK_MAP", JSON.stringify(map));
-}
-
-// ------------------------------------------------------------
-// ДОСТУП ДО ТЕМ: які уроки боту дозволено показувати учню
-// (кнопка "🔓 Теми"). Структура: { "<нормалізований код учня>": ["href1", "href2", ...] }
-// Портал (index.html) підвантажує це так само, як ДЗ, і об'єднує
-// зі своїм статичним списком STUDENT_ACCESS.
-// ------------------------------------------------------------
-function getAccessMap_() {
-  const raw = PropertiesService.getScriptProperties().getProperty("ACCESS_MAP");
-  return raw ? JSON.parse(raw) : {};
-}
-
-function saveAccessMap_(map) {
-  PropertiesService.getScriptProperties().setProperty("ACCESS_MAP", JSON.stringify(map));
-}
-
-// ------------------------------------------------------------
-// СТАН РОЗМОВИ (щоб бот пам'ятав, на якому кроці вчителька:
-// учень → дія → тема → тест → номер)
-// ------------------------------------------------------------
-function getState_(chatId) {
-  const raw = PropertiesService.getScriptProperties().getProperty("STATE_" + chatId);
-  return raw ? JSON.parse(raw) : null;
-}
-
-function setState_(chatId, state) {
-  PropertiesService.getScriptProperties().setProperty("STATE_" + chatId, JSON.stringify(state));
-}
-
-const BACK_TO_STUDENTS = "‹ Назад до учнів";
-const BACK_TO_ACTIONS = "‹ Назад";
-const BACK_TO_TOPICS = "‹ Назад до тем";
-
-function kb_(rows) {
-  return { keyboard: rows, resize_keyboard: true, one_time_keyboard: false };
-}
-
-function showStudentsKeyboard_(chatId) {
-  const rows = [];
-  for (let i = 0; i < STUDENTS.length; i += 2) {
-    rows.push(STUDENTS.slice(i, i + 2).map(function (name) { return { text: name }; }));
-  }
-  setState_(chatId, { step: "student" });
-  sendMessage_(chatId, "👤 Оберіть учня:", kb_(rows));
-}
-
-function showActionsKeyboard_(chatId, studentIdx) {
-  setState_(chatId, { step: "action", studentIdx: studentIdx });
-  sendMessage_(chatId, "👤 " + STUDENTS[studentIdx], kb_([
-    [{ text: "📊 Результати" }, { text: "🎯 ДЗ" }],
-    [{ text: "🔓 Теми" }],
-    [{ text: BACK_TO_STUDENTS }]
-  ]));
-}
-
-function showTopicsKeyboard_(chatId, studentIdx) {
-  const rows = TOPICS.map(function (t) { return [{ text: t.name }]; });
-  rows.push([{ text: BACK_TO_ACTIONS }]);
-  setState_(chatId, { step: "topic", studentIdx: studentIdx });
-  sendMessage_(chatId, "📚 " + STUDENTS[studentIdx] + " — оберіть тему для ДЗ:", kb_(rows));
-}
-
-function showTestsKeyboard_(chatId, studentIdx, blockIndex) {
-  const topic = TOPICS[blockIndex];
-  const name = STUDENTS[studentIdx];
-  const studentMap = getHomeworkMap_()[normalizeCode_(name)] || {};
-  const rows = topic.tests.map(function (test) {
-    const on = studentMap[test.href];
-    const label = on ? ("🟢 ДЗ " + on.number + " · " + test.title) : ("⚪ " + test.title);
-    return [{ text: label }];
   });
-  rows.push([{ text: BACK_TO_TOPICS }]);
-  rows.push([{ text: BACK_TO_STUDENTS }]);
-  setState_(chatId, { step: "test", studentIdx: studentIdx, blockIndex: blockIndex });
-  sendMessage_(chatId, "📝 " + name + " · «" + topic.name + "» — тисніть, щоб увімкнути/вимкнути ДЗ:", kb_(rows));
-}
-
-function extractTestTitle_(buttonText) {
-  const dotIdx = buttonText.indexOf(" · ");
-  if (dotIdx !== -1) return buttonText.substring(dotIdx + 3).trim();
-  return buttonText.replace(/^[⚪🟢]\s*/, "").trim();
-}
-
-// ------------------------------------------------------------
-// ВІДКРИТТЯ ДОСТУПУ ДО ТЕМ (кнопка "🔓 Теми")
-// На відміну від ДЗ (яке лише позначає тест), тут перемикач
-// реально відкриває/закриває учню весь урок на порталі.
-// ------------------------------------------------------------
-function showAccessTopicsKeyboard_(chatId, studentIdx) {
-  const rows = LESSON_ACCESS_TOPICS.map(function (t) { return [{ text: t.name }]; });
-  rows.push([{ text: BACK_TO_ACTIONS }]);
-  setState_(chatId, { step: "access_topic", studentIdx: studentIdx });
-  sendMessage_(chatId, "🔓 " + STUDENTS[studentIdx] + " — оберіть розділ:", kb_(rows));
-}
-
-function showAccessLessonsKeyboard_(chatId, studentIdx, blockIndex) {
-  const block = LESSON_ACCESS_TOPICS[blockIndex];
-  const name = STUDENTS[studentIdx];
-  const opened = getAccessMap_()[normalizeCode_(name)] || [];
-  const rows = block.items.map(function (item) {
-    const on = opened.indexOf(item.href) !== -1;
-    return [{ text: (on ? "🟢 " : "⚪ ") + item.title }];
+  document.querySelectorAll('.subgroup').forEach(function(sg){
+    if (!sg.querySelector('.card')) sg.remove();
   });
-  rows.push([{ text: BACK_TO_TOPICS }]);
-  rows.push([{ text: BACK_TO_STUDENTS }]);
-  setState_(chatId, { step: "access_lesson", studentIdx: studentIdx, blockIndex: blockIndex });
-  sendMessage_(chatId, "🔓 " + name + " · «" + block.name + "» — тисніть, щоб відкрити/закрити тему:", kb_(rows));
-}
+  document.querySelectorAll('.block').forEach(function(b){
+    if (!b.querySelector('.card')) b.remove();
+  });
 
-function handleTelegramUpdate_(update) {
-  if (!(update.message && update.message.text)) return;
-
-  const chatId = update.message.chat.id;
-  const text = update.message.text.trim();
-  const normalized = text.toLowerCase();
-
-  const isEntryCommand = ["/start", "/дз", "/hw", "/students", "/учні"].indexOf(normalized) !== -1;
-
-  if (String(chatId) !== TEACHER_CHAT_ID) {
-    sendMessage_(chatId, "Привіт! Ця команда доступна лише вчительці.");
-    return;
-  }
-
-  if (isEntryCommand) {
-    showStudentsKeyboard_(chatId);
-    return;
-  }
-
-  const state = getState_(chatId) || { step: "student" };
-
-  if (state.step === "student") {
-    const idx = STUDENTS.findIndex(function (n) { return n.toLowerCase() === normalized; });
-    if (idx === -1) {
-      sendMessage_(chatId, "Оберіть учня з клавіатури нижче 👇");
-      showStudentsKeyboard_(chatId);
-      return;
-    }
-    showActionsKeyboard_(chatId, idx);
-    return;
-  }
-
-  if (state.step === "action") {
-    if (text === BACK_TO_STUDENTS) { showStudentsKeyboard_(chatId); return; }
-    if (text === "📊 Результати") {
-      sendStudentResults_(chatId, STUDENTS[state.studentIdx]);
-      showActionsKeyboard_(chatId, state.studentIdx);
-      return;
-    }
-    if (text === "🎯 ДЗ") { showTopicsKeyboard_(chatId, state.studentIdx); return; }
-    if (text === "🔓 Теми") { showAccessTopicsKeyboard_(chatId, state.studentIdx); return; }
-    sendMessage_(chatId, "Оберіть дію з клавіатури нижче 👇");
-    showActionsKeyboard_(chatId, state.studentIdx);
-    return;
-  }
-
-  if (state.step === "access_topic") {
-    if (text === BACK_TO_ACTIONS) { showActionsKeyboard_(chatId, state.studentIdx); return; }
-    const blockIndex = LESSON_ACCESS_TOPICS.findIndex(function (t) { return t.name === text; });
-    if (blockIndex === -1) {
-      sendMessage_(chatId, "Оберіть розділ з клавіатури нижче 👇");
-      showAccessTopicsKeyboard_(chatId, state.studentIdx);
-      return;
-    }
-    showAccessLessonsKeyboard_(chatId, state.studentIdx, blockIndex);
-    return;
-  }
-
-  if (state.step === "access_lesson") {
-    if (text === BACK_TO_TOPICS) { showAccessTopicsKeyboard_(chatId, state.studentIdx); return; }
-    if (text === BACK_TO_STUDENTS) { showStudentsKeyboard_(chatId); return; }
-
-    const block = LESSON_ACCESS_TOPICS[state.blockIndex];
-    const title = extractTestTitle_(text);
-    const item = block.items.find(function (it) { return it.title === title; });
-    if (!item) {
-      sendMessage_(chatId, "Оберіть тему з клавіатури нижче 👇");
-      showAccessLessonsKeyboard_(chatId, state.studentIdx, state.blockIndex);
-      return;
-    }
-
-    const name = STUDENTS[state.studentIdx];
-    const key = normalizeCode_(name);
-    const map = getAccessMap_();
-    const opened = map[key] || [];
-    const idx = opened.indexOf(item.href);
-    let confirmText;
-    if (idx !== -1) {
-      opened.splice(idx, 1);
-      confirmText = "🔒 «" + item.title + "» закрито для " + name + ".";
-    } else {
-      opened.push(item.href);
-      confirmText = "✅ «" + item.title + "» відкрито для " + name + ".";
-    }
-    map[key] = opened;
-    saveAccessMap_(map);
-
-    const rows = block.items.map(function (it) {
-      const on = opened.indexOf(it.href) !== -1;
-      return [{ text: (on ? "🟢 " : "⚪ ") + it.title }];
+  document.querySelectorAll('#switchWho').forEach(function(el){ el.closest('p').remove(); });
+  if (GROUP_MEMBERS[studentCode]) {
+    const who = document.createElement('p');
+    who.className = 'sub';
+    who.style.cssText = 'margin-top:28px;font-size:13px;';
+    who.innerHTML = 'Ви зайшли як <b>' + displayName + '</b>. <a href="#" id="switchWho" style="color:var(--c1-b);">Це не я</a>';
+    document.querySelector('.wrap').appendChild(who);
+    document.getElementById('switchWho').addEventListener('click', function(e){
+      e.preventDefault();
+      sessionStorage.removeItem('chosenName_' + studentCode);
+      location.reload();
     });
-    rows.push([{ text: BACK_TO_TOPICS }]);
-    rows.push([{ text: BACK_TO_STUDENTS }]);
-    setState_(chatId, { step: "access_lesson", studentIdx: state.studentIdx, blockIndex: state.blockIndex });
-    sendMessage_(chatId, confirmText, kb_(rows));
-    return;
   }
-
-  if (state.step === "topic") {
-    if (text === BACK_TO_ACTIONS) { showActionsKeyboard_(chatId, state.studentIdx); return; }
-    const blockIndex = TOPICS.findIndex(function (t) { return t.name === text; });
-    if (blockIndex === -1) {
-      sendMessage_(chatId, "Оберіть тему з клавіатури нижче 👇");
-      showTopicsKeyboard_(chatId, state.studentIdx);
-      return;
-    }
-    showTestsKeyboard_(chatId, state.studentIdx, blockIndex);
-    return;
-  }
-
-  if (state.step === "test") {
-    if (text === BACK_TO_TOPICS) { showTopicsKeyboard_(chatId, state.studentIdx); return; }
-    if (text === BACK_TO_STUDENTS) { showStudentsKeyboard_(chatId); return; }
-    const topic = TOPICS[state.blockIndex];
-    const title = extractTestTitle_(text);
-    const testIndex = topic.tests.findIndex(function (t) { return t.title === title; });
-    if (testIndex === -1) {
-      sendMessage_(chatId, "Оберіть тест з клавіатури нижче 👇");
-      showTestsKeyboard_(chatId, state.studentIdx, state.blockIndex);
-      return;
-    }
-
-    const test = topic.tests[testIndex];
-    const name = STUDENTS[state.studentIdx];
-    const key = normalizeCode_(name);
-    const map = getHomeworkMap_();
-    const studentMap = map[key] || {};
-
-    if (studentMap[test.href]) {
-      delete studentMap[test.href];
-      map[key] = studentMap;
-      saveHomeworkMap_(map);
-      sendMessage_(chatId, "✅ Вимкнено ДЗ для «" + test.title + "».");
-      showTestsKeyboard_(chatId, state.studentIdx, state.blockIndex);
-    } else {
-      setState_(chatId, { step: "number", studentIdx: state.studentIdx, blockIndex: state.blockIndex, href: test.href, title: test.title });
-      sendMessage_(chatId, "Введіть номер ДЗ для «" + name + " · " + test.title + "» (наприклад: 17):");
-    }
-    return;
-  }
-
-  if (state.step === "number") {
-    const number = text;
-    const name = STUDENTS[state.studentIdx];
-    const key = normalizeCode_(name);
-    const map = getHomeworkMap_();
-    const studentMap = map[key] || {};
-    studentMap[state.href] = { number: number, title: state.title };
-    map[key] = studentMap;
-    saveHomeworkMap_(map);
-    sendMessage_(chatId, "✅ «" + name + " · " + state.title + "» тепер світиться як ДЗ " + number + ".");
-    showTestsKeyboard_(chatId, state.studentIdx, state.blockIndex);
-    return;
-  }
-
-  showStudentsKeyboard_(chatId);
 }
+
+// Теми можна відкривати або вручну (STUDENT_ACCESS вище), або через
+// бота кнопкою "🔓 Теми". Щоб сторінка не «блимала» (спочатку всі теми,
+// потім лише дозволені), спершу одразу й синхронно показуємо статичний
+// список — і лише ЯКЩО бот справді відкрив щось додаткове, перемальовуємо
+// список ще раз (це рідкісний випадок, і невеличке оновлення тут не заважає).
+function finishStudentView_(studentCode, allowedStatic, displayName){
+  loadHomework(studentCode);
+  applyAccessAndRender_(studentCode, allowedStatic, displayName);
+
+  if (!HOMEWORK_API_URL || HOMEWORK_API_URL.indexOf('ВСТАВТЕ') === 0) return;
+
+  let resolved = false;
+  window.applyAccess = function(dynamicList){
+    if (resolved) return;
+    resolved = true;
+    dynamicList = dynamicList || [];
+    const extra = dynamicList.filter(function(h){ return allowedStatic.indexOf(h) === -1; });
+    if (extra.length === 0) return; // нічого нового — DOM лишаємо як є, без перемальовування
+    renderBlocks_();
+    applyAccessAndRender_(studentCode, allowedStatic.concat(extra), displayName);
+  };
+
+  const sep = HOMEWORK_API_URL.indexOf('?') > -1 ? '&' : '?';
+  const s = document.createElement('script');
+  s.src = HOMEWORK_API_URL + sep + 'mode=access&callback=applyAccess&student=' + encodeURIComponent(studentCode);
+  document.body.appendChild(s);
+}
+
+function showNamePicker_(studentCode, allowed, members){
+  const blocksEl = document.getElementById('blocks');
+  blocksEl.style.display = 'none';
+  const desc = document.getElementById('subDesc');
+  if (desc) desc.remove();
+
+  const box = document.createElement('div');
+  box.id = 'namePicker';
+  box.innerHTML = '<p class="sub" style="margin-bottom:18px;">Це спільне посилання. Оберіть, хто зараз проходить тести:</p>';
+
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:12px;flex-wrap:wrap;';
+
+  members.forEach(function(name){
+    const btn = document.createElement('button');
+    btn.textContent = name;
+    btn.style.cssText = 'font-family:Manrope,sans-serif;font-weight:800;font-size:16px;padding:18px 30px;border:none;border-radius:16px;cursor:pointer;background:var(--card);color:var(--ink);box-shadow:0 14px 30px -24px rgba(19,33,59,0.35);';
+    btn.addEventListener('click', function(){
+      sessionStorage.setItem('chosenName_' + studentCode, name);
+      box.remove();
+      blocksEl.style.display = '';
+      finishStudentView_(studentCode, allowed, name);
+    });
+    row.appendChild(btn);
+  });
+
+  box.appendChild(row);
+  document.querySelector('.wrap').insertBefore(box, blocksEl);
+}
+
+(function(){
+  const params = new URLSearchParams(location.search);
+  const isTeacher = params.get('vchytel') === '1';
+  const studentCode = normalizeCode(params.get('u'));
+  const allowed = studentCode ? NORMALIZED_ACCESS[studentCode] : null;
+
+  if (isTeacher) {
+    document.body.classList.add('teacher-mode');
+    document.querySelectorAll('.card').forEach(function(card){
+      const key = card.getAttribute('data-key');
+      const openFor = Object.keys(STUDENT_ACCESS).filter(function(code){
+        return STUDENT_ACCESS[code].indexOf(key) !== -1;
+      });
+      const badge = document.createElement('span');
+      if (openFor.length) {
+        badge.className = 'open-badge open';
+        badge.textContent = '🔓 Відкрито · ' + openFor.length;
+        badge.title = openFor.join(', ');
+      } else {
+        badge.className = 'open-badge closed';
+        badge.textContent = '🔒 нікому не відкрито';
+      }
+      card.appendChild(badge);
+    });
+    return;
+  }
+
+  if (studentCode && allowed) {
+    const tag = document.querySelector('.kicker.tag');
+    if (tag) tag.remove();
+
+    const members = GROUP_MEMBERS[studentCode];
+    if (members) {
+      const chosen = sessionStorage.getItem('chosenName_' + studentCode);
+      if (chosen && members.indexOf(chosen) !== -1) {
+        finishStudentView_(studentCode, allowed, chosen);
+      } else {
+        showNamePicker_(studentCode, allowed, members);
+      }
+    } else {
+      // одиночний учень — його ім'я і є кодом у посиланні
+      finishStudentView_(studentCode, allowed, params.get('u').trim());
+    }
+  } else {
+    const desc = document.getElementById('subDesc');
+    if (desc) desc.remove();
+    document.querySelectorAll('.block').forEach(function(b){ b.remove(); });
+    const msg = document.createElement('p');
+    msg.className = 'sub';
+    msg.textContent = 'Це посилання недійсне. Зверніться до вчительки за новим.';
+    document.querySelector('.wrap').appendChild(msg);
+  }
+})();
+</script>
+</body>
+</html>
