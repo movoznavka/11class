@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Фонетика · Урок</title>
+<title>Фонетика · Тренажер</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -18,7 +18,6 @@
     --c1-a:#6C8CFF; --c1-b:#3355EE; --c1-sh: rgba(51,85,238,0.45);
     --c3-a:#5FE0A8; --c3-b:#17A863; --c3-sh: rgba(23,168,99,0.4);
     --c2-b:#E5484D;
-    --c4-a:#FFB86C; --c4-b:#F5820D;
 
     --correct-bg:#E6F8EE;
     --correct-ink:#128A54;
@@ -35,203 +34,301 @@
     padding:28px 16px 64px;
     position:relative;
   }
-  .wrap{max-width:760px;margin:0 auto;}
+  .wrap{max-width:720px;margin:0 auto;}
 
   .topbar{
-    display:flex;justify-content:space-between;align-items:center;
-    padding-bottom:16px;margin-bottom:22px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding-bottom:16px;
+    margin-bottom:22px;
     border-bottom:1.5px solid rgba(19,33,59,0.14);
   }
   .kicker{
-    font-family:'Manrope',sans-serif;font-weight:800;font-size:12.5px;
-    letter-spacing:.12em;text-transform:uppercase;color:var(--ink);opacity:.55;
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:12.5px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--ink);
+    opacity:.55;
   }
   .kicker.tag{opacity:.4;}
 
+  .review-banner{
+    display:none;
+    align-items:center;
+    gap:8px;
+    background:#FFF4E0;
+    color:#8A5A00;
+    font-family:'Manrope',sans-serif;
+    font-weight:700;
+    font-size:13px;
+    padding:10px 16px;
+    border-radius:14px;
+    margin-bottom:16px;
+  }
+  .review-banner.show{display:flex;}
+
   h1{
-    font-family:'Manrope',sans-serif;font-weight:800;
-    font-size:clamp(24px,5.6vw,36px);line-height:1.08;letter-spacing:-0.01em;
-    margin:0 0 8px;text-transform:uppercase;
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:clamp(26px,6vw,38px);
+    line-height:1.05;
+    letter-spacing:-0.01em;
+    margin:0 0 8px;
+    text-transform:uppercase;
   }
   h1 .hl{color:var(--c1-b);}
-  .sub{color:var(--ink-soft);font-size:15px;max-width:56ch;margin:0 0 22px;font-weight:500;}
-
-  /* level 1: Голосні / Приголосні */
-  .topictoggle{display:flex;gap:10px;margin-bottom:14px;}
-  .topictoggle button{
-    flex:1;padding:15px;border-radius:20px;border:none;background:var(--card);
-    font-family:'Manrope',sans-serif;font-weight:800;font-size:14.5px;color:var(--ink-soft);
-    cursor:pointer;box-shadow:0 8px 18px -14px rgba(19,33,59,.3);
-    display:flex;align-items:center;justify-content:center;gap:8px;
-  }
-  .topictoggle button.active{
-    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));color:#fff;
-    box-shadow:0 10px 20px -10px var(--c1-sh);
-  }
-
-  /* level 2 & level 3 tabs */
-  .tabbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
-  .tabbar.nested{margin-bottom:20px;}
-  .tab{
-    padding:10px 15px 10px 10px;border-radius:999px;border:none;background:var(--card);
-    color:var(--ink-soft);font-family:'Manrope',sans-serif;font-weight:800;font-size:12.5px;
-    cursor:pointer;display:flex;align-items:center;gap:8px;
-    box-shadow: 0 8px 18px -14px rgba(19,33,59,0.3);
-  }
-  .tabbar.nested .tab{background:var(--bg-soft);box-shadow:none;}
-  .tab .dot{
-    width:22px;height:22px;border-radius:8px;background:rgba(51,85,238,.1);color:var(--c1-b);
-    display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;
-  }
-  .tab.active{
-    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));color:#fff;
-    box-shadow:0 10px 20px -10px var(--c1-sh);
-  }
-  .tab.active .dot{background:rgba(255,255,255,.25);color:#fff;}
-
-  .tabbar.nested .tab.active{background:#fff;color:var(--c1-b);box-shadow:0 6px 16px -10px rgba(19,33,59,.3);}
-  .tabbar.nested .tab.active .dot{background:var(--c1-b);color:#fff;}
+  .sub{color:var(--ink-soft);font-size:15px;max-width:50ch;margin:0 0 22px;font-weight:500;}
 
   .card{
-    background:var(--card);border-radius:28px;padding:28px 24px;
+    background:var(--card);
+    border-radius:28px;
+    padding:30px 26px;
     box-shadow: 0 20px 44px -28px rgba(19,33,59,0.35);
   }
 
-  .section-title{font-family:'Manrope',sans-serif;font-weight:800;font-size:20px;letter-spacing:-0.005em;margin:0 0 8px;}
-  .section-intro{color:var(--ink-soft);font-size:14.5px;line-height:1.6;margin:0 0 18px;}
-  .section-intro b{color:var(--ink);}
-
-  .callout{
-    background:linear-gradient(155deg, rgba(255,184,108,.22), rgba(245,130,13,.10));
-    border-radius:18px;padding:14px 18px;margin-bottom:20px;font-size:13.5px;line-height:1.55;color:var(--ink);
+  .progress-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:16px;
   }
-  .callout b{color:var(--c4-b);font-family:'Manrope',sans-serif;}
+  .qnum{
+    font-family:'Manrope',sans-serif;
+    font-weight:700;
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+  .score{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:12.5px;
+    color:var(--c3-b);
+    background:var(--correct-bg);
+    padding:6px 13px;
+    border-radius:999px;
+  }
 
-  .mnemo{margin-top:16px;font-size:13px;line-height:1.55;color:var(--ink-soft);}
-  .mnemo b{color:var(--ink);}
+  .segbar{display:flex;gap:3px;margin-bottom:22px;flex-wrap:wrap;}
+  .seg{
+    flex:1;
+    min-width:6px;
+    height:6px;
+    border-radius:999px;
+    background:var(--bg-soft);
+    cursor:pointer;
+  }
+  .seg.current{background:var(--c1-b);}
+  .seg.done-correct{background:var(--c3-b);}
+  .seg.done-wrong{background:var(--c2-b);}
 
-  /* flip cards */
-  .cardgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-  @media(max-width:560px){.cardgrid{grid-template-columns:1fr;}}
-  .flip{perspective:1200px;height:158px;cursor:pointer;position:relative;}
-  .flip-inner{position:relative;width:100%;height:100%;transition:transform .5s cubic-bezier(.4,.2,.2,1);transform-style:preserve-3d;}
-  .flip.open .flip-inner{transform:rotateY(180deg);}
-  .flip-face{position:absolute;inset:0;border-radius:20px;padding:16px 18px;backface-visibility:hidden;display:flex;flex-direction:column;justify-content:center;}
-  .flip-front{background:var(--bg-soft);}
-  .flip-back{background:linear-gradient(155deg,var(--c1-a),var(--c1-b));color:#fff;transform:rotateY(180deg);align-items:center;text-align:center;}
-  .flip-tag{font-family:'Manrope',sans-serif;font-weight:800;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;opacity:.55;margin-bottom:7px;}
-  .flip-back .flip-tag{opacity:.75;}
-  .flip-rule{font-family:'Manrope',sans-serif;font-weight:800;font-size:15px;line-height:1.32;}
-  .flip-desc{font-size:12.5px;margin-top:7px;opacity:.8;line-height:1.4;}
-  .flip-example{font-size:14px;font-weight:700;margin-bottom:3px;}
-  .flip-example:last-child{margin-bottom:0;}
-  .flip-note{font-size:11px;opacity:.7;font-weight:500;}
-  .flip-hint{position:absolute;bottom:9px;right:14px;font-size:10px;font-weight:700;opacity:.4;}
+  .qtext{
+    font-family:'Manrope',sans-serif;
+    font-size:19px;
+    font-weight:700;
+    line-height:1.4;
+    margin:0 0 20px;
+    letter-spacing:-0.005em;
+  }
+  .qtext u{ text-decoration-thickness:2px; text-underline-offset:2px; }
 
-  /* exceptions chips */
-  .chiprow{display:flex;flex-wrap:wrap;gap:10px;}
-  .chip{background:var(--bg-soft);border-radius:16px;padding:13px 18px;cursor:pointer;min-width:126px;transition:background .2s;}
-  .chip .w{font-family:'Manrope',sans-serif;font-weight:800;font-size:14.5px;}
-  .chip .ipa{font-size:12.5px;color:#fff;font-weight:700;margin-top:5px;display:none;}
-  .chip.open{background:linear-gradient(155deg, var(--c4-a), var(--c4-b));}
-  .chip.open .w{color:#fff;}
-  .chip.open .ipa{display:block;}
-
-  /* combo table */
-  .combo-table{display:flex;flex-direction:column;gap:8px;}
-  .combo-row{display:flex;align-items:center;gap:12px;background:var(--bg-soft);border-radius:16px;padding:12px 16px;cursor:pointer;flex-wrap:wrap;}
-  .combo-write{font-family:'Manrope',sans-serif;font-weight:800;font-size:14px;color:var(--c1-b);min-width:56px;}
-  .combo-say{font-family:'Manrope',sans-serif;font-weight:800;font-size:13px;color:var(--ink-soft);min-width:52px;}
-  .combo-example{flex:1;font-size:14px;font-weight:600;min-width:110px;}
-  .combo-ipa{font-size:13px;font-weight:700;color:var(--c3-b);opacity:0;transition:opacity .2s;}
-  .combo-row.open .combo-ipa{opacity:1;}
-
-  /* mini quiz */
-  .qtext{font-family:'Manrope',sans-serif;font-size:18px;font-weight:700;line-height:1.4;margin:0 0 18px;}
   .options{display:flex;flex-direction:column;gap:10px;}
   .opt{
-    display:flex;align-items:center;gap:13px;text-align:left;width:100%;
-    padding:9px 14px 9px 9px;border-radius:18px;border:none;background:var(--bg-soft);
-    cursor:pointer;font-family:'Inter',sans-serif;font-size:14.5px;font-weight:500;color:var(--ink);
+    display:flex;
+    align-items:center;
+    gap:13px;
+    text-align:left;
+    width:100%;
+    padding:9px 14px 9px 9px;
+    border-radius:18px;
+    border:none;
+    background:var(--bg-soft);
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    font-weight:500;
+    color:var(--ink);
     transition:transform .12s ease, background .15s ease;
   }
   .opt:hover{transform:translateY(-1px);}
   .opt[disabled]{cursor:default;}
   .opt[disabled]:hover{transform:none;}
+  .opt u{ text-decoration-thickness:2px; text-underline-offset:2px; }
+
+  /* --- glass letter tile: uniform accent color, translucent, blurred, like iOS icons --- */
   .tile{
-    position:relative;width:30px;height:30px;min-width:30px;border-radius:10px;
+    position:relative;
+    width:32px;height:32px;min-width:32px;
+    border-radius:10px;
     display:flex;align-items:center;justify-content:center;
-    font-family:'Manrope',sans-serif;font-weight:800;font-size:13px;color:var(--c1-b);
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:13.5px;
+    color:var(--c1-b);
     background: linear-gradient(150deg, rgba(255,255,255,0.75), rgba(108,140,255,0.22));
     backdrop-filter: blur(6px) saturate(160%);
+    -webkit-backdrop-filter: blur(6px) saturate(160%);
     border:1px solid rgba(255,255,255,0.7);
     box-shadow: 0 4px 12px -7px var(--c1-sh), inset 0 1px 1px rgba(255,255,255,0.8);
+    overflow:visible;
   }
+  .tile > span{position:relative;z-index:1;}
+
   .badge{
-    position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;
-    border:2px solid var(--card);display:flex;align-items:center;justify-content:center;
-    font-size:9.5px;font-weight:800;color:#fff;
+    position:absolute;
+    top:-5px;right:-5px;
+    width:16px;height:16px;
+    border-radius:50%;
+    border:2px solid var(--card);
+    display:flex;align-items:center;justify-content:center;
+    font-size:9.5px;
+    font-weight:800;
+    color:#fff;
+    z-index:2;
   }
   .badge.ok{background:var(--c3-b);}
   .badge.no{background:var(--c2-b);}
+
   .opt.correct{background:var(--correct-bg);}
   .opt.wrong{background:var(--wrong-bg);}
   .opt.dim{opacity:.5;}
-  .feedback{margin-top:16px;padding:13px 16px;border-radius:16px;font-size:14px;font-weight:600;display:none;align-items:center;gap:9px;}
+
+  .feedback{
+    margin-top:16px;
+    padding:13px 16px;
+    border-radius:16px;
+    font-size:14.5px;
+    font-weight:600;
+    display:none;
+    align-items:center;
+    gap:9px;
+  }
   .feedback.show{display:flex;}
   .feedback.ok{background:var(--correct-bg);color:var(--correct-ink);}
   .feedback.bad{background:var(--wrong-bg);color:var(--wrong-ink);}
-  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:22px;}
-  .btn{
-    font-family:'Manrope',sans-serif;font-weight:800;font-size:13px;padding:12px 22px;
-    border-radius:999px;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;
+  .feedback b{font-family:'Manrope',sans-serif;}
+
+  .nav-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:24px;
   }
-  .btn.primary{background:linear-gradient(155deg,var(--c1-a),var(--c1-b));color:#fff;box-shadow:0 10px 20px -8px var(--c1-sh);}
+  .btn{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:13px;
+    padding:12px 22px;
+    border-radius:999px;
+    border:none;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .btn.primary{
+    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));
+    color:#fff;
+    box-shadow:0 10px 20px -8px var(--c1-sh);
+  }
   .btn.ghost{background:transparent;color:var(--ink-soft);}
   .btn:disabled{opacity:.3;cursor:default;box-shadow:none;}
-  .qprog{font-family:'Manrope',sans-serif;font-weight:700;font-size:13px;color:var(--ink-soft);margin-bottom:14px;}
+  .btn.small{
+    font-size:12px;
+    padding:8px 4px;
+    opacity:.55;
+    text-decoration:underline;
+    text-underline-offset:2px;
+  }
+  .btn.small:hover{opacity:.85;}
+  .reset-row{
+    text-align:center;
+    margin-top:6px;
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    flex-wrap:wrap;
+  }
 
   .done-screen{text-align:center;padding:16px 0;}
   .done-screen .ring{
-    width:110px;height:110px;margin:0 auto 16px;border-radius:50%;
+    width:120px;height:120px;
+    margin:0 auto 18px;
+    border-radius:50%;
     background:linear-gradient(155deg,var(--c1-a),var(--c1-b));
     box-shadow:0 16px 30px -12px var(--c1-sh);
-    display:flex;align-items:center;justify-content:center;position:relative;
+    display:flex;align-items:center;justify-content:center;
+    position:relative;
   }
-  .done-screen .big{font-family:'Manrope',sans-serif;font-weight:800;font-size:28px;color:#fff;}
+  .done-screen .ring::before{
+    content:'';
+    position:absolute;
+    top:6px;left:10px;right:10px;
+    height:46%;
+    border-radius:50% 50% 60% 60%;
+    background:linear-gradient(to bottom, rgba(255,255,255,0.5), rgba(255,255,255,0));
+  }
+  .done-screen .big{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:30px;
+    color:#fff;
+    position:relative;
+    z-index:1;
+  }
+  .done-screen .send-status{
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin-top:10px;
+    min-height:18px;
+  }
+  .done-screen .send-status.ok{color:var(--correct-ink);}
+  .done-screen .send-status.bad{color:var(--wrong-ink);}
 
-  footer{text-align:center;margin-top:22px;font-size:12.5px;color:var(--ink-soft);font-weight:500;}
+  .name-screen{padding:6px 0;}
+  .name-screen label{
+    display:block;
+    font-family:'Manrope',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    margin-bottom:10px;
+    color:var(--ink);
+  }
+  .name-screen input{
+    width:100%;
+    padding:14px 16px;
+    border-radius:16px;
+    border:1.5px solid var(--line);
+    background:var(--bg-soft);
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    font-weight:500;
+    color:var(--ink);
+    outline:none;
+    margin-bottom:18px;
+  }
+  .name-screen input:focus{border-color:var(--c1-b);}
+
+  footer{
+    text-align:center;
+    margin-top:22px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-weight:500;
+  }
 
   /* ===================== DRAWING / TEACHER MODE ===================== */
-  /* Canvas is positioned over the whole DOCUMENT (not just the viewport),
-     so ink scrolls together with the page content instead of staying
-     glued to the screen. Its size is recalculated after every content
-     change (see resizeCanvas() below). */
   #drawCanvas{
     position:absolute;
     top:0;
     left:0;
+    width:100%;
     z-index:9998;
-    pointer-events:none; /* drawing is handled via window-level listeners so
-                             taps/clicks on real UI underneath always pass through */
-  }
-
-  #drawDebug{
-    position:fixed;
-    top:8px;
-    left:8px;
-    z-index:10000;
-    background:rgba(19,33,59,0.82);
-    color:#fff;
-    font-family:'Manrope',monospace;
-    font-size:12px;
-    font-weight:700;
-    padding:5px 10px;
-    border-radius:10px;
     pointer-events:none;
-    display:none;
   }
-  #drawDebug.show{display:block;}
 
   #drawToggleBtn{
     position:fixed;
@@ -302,35 +399,6 @@
     opacity:1;
     pointer-events:auto;
   }
-  /* панель згорнута, але малювання лишається увімкненим */
-  #drawToolbar.mini{
-    transform:translateX(-50%) translateY(130%) scale(0.94);
-    opacity:0;
-    pointer-events:none;
-  }
-  #drawToolbarMini{
-    position:fixed;
-    left:50%;
-    bottom:20px;
-    transform:translateX(-50%) translateY(130%) scale(0.9);
-    opacity:0;
-    width:40px;height:26px;
-    border-radius:14px;
-    border:1px solid rgba(255,255,255,0.5);
-    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));
-    box-shadow:0 10px 20px -10px var(--c1-sh);
-    display:flex;align-items:center;justify-content:center;
-    cursor:pointer;
-    z-index:9999;
-    transition:transform .25s cubic-bezier(.34,1.56,.64,1), opacity .2s ease;
-    pointer-events:none;
-  }
-  #drawToolbarMini svg{width:18px;height:18px;}
-  #drawToolbarMini.show{
-    transform:translateX(-50%) translateY(0) scale(1);
-    opacity:1;
-    pointer-events:auto;
-  }
   .swatch{
     position:relative;
     width:25px;height:25px;
@@ -372,9 +440,8 @@
     border-radius:50%;
     background:currentColor;
   }
-  #xthinBtn .dot{ width:3.5px; height:3.5px; }
-  #thinBtn .dot{ width:7px; height:7px; }
-  #thickBtn .dot{ width:12.5px; height:12.5px; }
+  #thinBtn .dot{ width:6px; height:6px; }
+  #thickBtn .dot{ width:12px; height:12px; }
   .tool-btn.selected{
     background:var(--c1-b);
     color:#fff;
@@ -402,25 +469,24 @@
 <body>
 <div class="wrap">
   <div class="topbar">
-    <div class="kicker">Фонетика · Урок</div>
-    <div class="kicker tag" id="totalTag"></div>
+    <div class="kicker">Фонетика</div>
+    <div class="kicker tag" id="totalTag">49 завдань</div>
   </div>
 
-  <h1>Звуки і <span class="hl">букви</span></h1>
+  <div class="review-banner" id="reviewBanner">👀 Режим перегляду відповідей учня</div>
 
-  <div class="topictoggle" id="topictoggle"></div>
-  <div class="tabbar" id="subtabbar"></div>
-  <div class="tabbar nested" id="subsubtabbar"></div>
+  <h1>Тренажер <span class="hl">звуків і букв</span></h1>
+  <p class="sub">Формат НМТ — обери правильний варіант, перевір відповідь одразу.</p>
 
-  <div class="card" id="lessonArea"></div>
+  <div class="card">
+    <div id="quizArea"></div>
+  </div>
 
   <footer>@movoznavka</footer>
 </div>
 
 <!-- ==== Малювання поверх екрана (для вчителя) ==== -->
 <canvas id="drawCanvas"></canvas>
-<div id="drawDebug"></div>
-
 <button id="drawToggleBtn" title="Малювати">
   <svg id="drawIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M4 20L4.6 16.6C4.7 15.9 5.03 15.26 5.55 14.79L15.3 5.7C16.09 4.96 17.34 4.99 18.09 5.78L18.34 6.04C19.08 6.83 19.04 8.08 18.25 8.81L8.5 17.9C8 18.37 7.37 18.66 6.7 18.75L4 20Z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/>
@@ -428,13 +494,12 @@
   </svg>
 </button>
 <div id="drawToolbar">
-  <button class="swatch selected" style="background:#F5304A" data-color="#F5304A"></button>
+  <button class="swatch selected" style="background:#E5484D" data-color="#E5484D"></button>
   <button class="swatch" style="background:#3355EE" data-color="#3355EE"></button>
   <button class="swatch" style="background:#17A863" data-color="#17A863"></button>
   <button class="swatch" style="background:#13213B" data-color="#13213B"></button>
   <div class="tool-sep"></div>
-  <button class="tool-btn selected" id="xthinBtn" title="Дуже тонка лінія"><span class="dot"></span></button>
-  <button class="tool-btn" id="thinBtn" title="Тонка лінія"><span class="dot"></span></button>
+  <button class="tool-btn selected" id="thinBtn" title="Тонка лінія"><span class="dot"></span></button>
   <button class="tool-btn" id="thickBtn" title="Товста лінія"><span class="dot"></span></button>
   <div class="tool-sep"></div>
   <button class="tool-btn" id="eraserBtn" title="Ластик">
@@ -447,459 +512,418 @@
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M5 7H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
       <path d="M9.5 7V4.8C9.5 4.36 9.86 4 10.3 4H13.7C14.14 4 14.5 4.36 14.5 4.8V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M7 7L7.6 19.2C7.63 19.9 8.2 20.5 8.9 20.5H15.1C15.8 20.5 16.37 19.9 16.4 19.2L17 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  </button>
-  <div class="tool-sep"></div>
-  <button class="tool-btn" id="minimizeBtn" title="Згорнути панель">
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M7 7L7.7 18.6C7.75 19.42 8.42 20 9.24 20H14.76C15.58 20 16.25 19.42 16.3 18.6L17 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M10.3 10.5V16.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M13.7 10.5V16.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
     </svg>
   </button>
 </div>
-<button id="drawToolbarMini" title="Розгорнути панель">
-  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M6 15L12 9L18 15" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>
-</button>
 
 <script>
-/* ============================================================
-   ЯК ДОДАТИ ЧИ ЗМІНИТИ МАТЕРІАЛ
-   Весь контент живе в об'єкті TOPICS нижче.
-   Структура: TOPICS.voice / TOPICS.consonant → subs [ ... ] →
-   (якщо є) subsubs [ ... ]. Кожен розділ — один об'єкт { ... }.
-   Щоб додати картку/слово/рядок/питання — скопіюй існуючий блок
-   { ... } всередині потрібного масиву (cards / words / rows /
-   questions), встав кому після нього і зміни текст між лапками.
-   Щоб додати цілий новий підрозділ (нову кнопку-вкладку) —
-   скопіюй один об'єкт зі списку subs (або subsubs) цілком,
-   з фігурними дужками, і зміни в ньому tab / title / вміст.
-   Нічого більше в коді чіпати не треба.
-   ============================================================ */
+// Усі питання об'єднано в один суцільний список (розділи більше не розділені вкладками)
+// Слово в подвійних квадратних дужках, напр. [[а]] всередині опції, підкреслюється автоматично.
+const QUESTIONS = [
+  {q:"За алфавітом записано всі слова рядка", opts:["марка, марити, мастило, мафіозний","ожеледиця, ожеледь, ожити, ознака","яблучний, японський, ятрити, ясність","прірва, призначити, пружина, пташка"], a:1},
+  {q:"За алфавітом записано всі слова рядка", opts:["Капріо, Кідман, Куніс, Клуні","Джоуль, Ейнштейн, Евклід, Піфагор","Шафаренко, Шевченко, Шевчук, Шумейко","Мазуренко, Матвієнко, Масенко, Мережко"], a:2},
+  {q:"Букви я, ю, є позначають по два звуки в кожному слові рядка", opts:["пам'ять, Баюл, кольє, гравюра","в'юн, дзвякнути, В'єтнам, заява","каюк, ательє, Нью-Йорк, яшма","маяти, тюльпан, п'єш, Яготин"], a:2},
+  {q:"Букви я, ю, є позначають по два звуки в кожному слові рядка", opts:["ясність, здоров'я, Зоя, різьбяр","юність, нюанс, роз'юшити, Юта","ялинка, Звягель, мантилья, заячий","Єреван, конферансьє, єресь, проєкт"], a:3},
+  {q:"Звук [й] є в кожному слові рядка", opts:["кар'єра, знання, магній, Кир'ян","шифоньєр, курйоз, Лілія, з'їхати","пюре, краяти, Болгарія, їжачок","йорж, Люблін, пасьянс, роз'єм"], a:1},
+  {q:"Звук [й] є в кожному слові рядка", opts:["жульєн, Євген, тюль, в'язкий","миєшся, рейка, Ялта, жалюзі","райський, з'їсти, ясно, Єгор","олів'є, Євген, манікюр, рай"], a:2},
+  {q:"Звук [д] є в кожному слові рядка", opts:["мода, народжую, дим, Дон","народ, Дарина, подія, парад","дно, дзеркало, Дрезден, лад","Ужгород, модрина, піду, рід"], a:3},
+  {q:"Звук [т] є в кожному слові рядка", opts:["втіха, розтин, Тернопіль, монета","картина, Тамара, натиск, чинити","почуття, нота, Вашингтон, тиснути","танець, житній, тонути, Готьє"], a:1},
+  {q:"Звук [ш] є в кожному слові рядка", opts:["шина, марш, площа, Шаргород","стежка, пороша, Швець, мушка","шалено, зашити, книжка, Алушта","щебет, ніша, Польща, найнижчий"], a:0},
+  {q:"Звук [ж] є в кожному слові рядка", opts:["жовтий, наражати, бджола, Житомир","Жанна, ажурний, журі, переживати","жасмин, відроджую, морж, важити","кажан, Жиленко, подорож, джинси"], a:1},
+  {q:"Звук [ч] є в кожному слові рядка", opts:["начинка, наволоч, Чоп, невмирущий","ніченька, сердешний, позачиняти, Чехія","соняшник, чарунка, Чернігів, завчити","Чилі, заручник, чаювати, рушник"], a:0},
+  {q:"Звук [с] є в кожному слові рядка", opts:["Олександр, поросятко, собі, просити","ліс, Суми, волосся, перескакувати","масло, сузір'я, конферансьє, сват","собор, іконостас, Сергій, короста"], a:3},
+  {q:"Однакова кількість звуків і букв у кожному слові рядка", opts:["юність, щирість, двоїстість, відроджую","ясність, Юлька, джміль, щедрування","п'ять, зав'язю, Криворіжжя, колядка","пред'явлення, міський, дев'ять, п'ясть"], a:0},
+  {q:"Однакова кількість звуків і букв у кожному слові рядка", opts:["діяльний, щільний, долоня, ранній","єдність, яблунька, Поділля, в'язкість","щавель, ячмінь, каяття, знищення","сум'яття, бювет, ялтинський, маяк"], a:2},
+  {q:"Однакова кількість звуків і букв у кожному слові рядка", opts:["львів'янка, черв'як, пюре, в'язь","боснієць, панно, в'язання, свято","щогодинний, джаз, щабель, журі","український, Бельгія, прощання, юнь"], a:3},
+  {q:"Букву ґ пропущено в усіх словах рядка", opts:["..удзик, інтелі..ентний, ..аздиня","об..рунтування, а..рус, ..валт","..речний, ..андж, ..енерація","дзи..а, ..ел..отати, ні..ілізм"], a:1},
+  {q:"Буква ґ має бути на місці пропуску в рядку", opts:["..рати у футбол","залізні ..рати","..ніт для розсолу","феодальний ..ніт"], a:1},
+  {q:"Буквосполуки дз, дж позначають один звук у всіх словах рядка", opts:["задзвеніти, надзвуковий, ґедзь","дзиґа, відзиватися, видзьобувати","ґринджоли, джинси, підживити","народжувати, джміль, бджола"], a:3},
+  {q:"Підкреслені букви позначають той самий звук у всіх словах рядка", opts:["д[[е]]сять, к[[е]]рівник, Т[[е]]рнопіль","К[[и]]їв, в[[и]]брати, прав[[и]]льний","міс[[и]]во, Гал[[и]]на, в[[и]]падок","[[о]]лійний, з[[о]]зуля, к[[о]]жух"], a:3},
+  {q:"Підкреслені букви позначають той самий звук у всіх словах рядка", opts:["п[[о]]тік, р[[о]]зчулити, п[[о]]вітря","ш[[и]]нка, род[[и]]на, д[[и]]тятко","с[[е]]стра, мон[[е]]та, Б[[е]]рлін","м[[и]]ска, бр[[и]]тва, гр[[и]]бок"], a:0},
+  {q:"Підкреслені букви позначають той самий звук у всіх словах рядка", opts:["з[[е]]мля, Трускав[[е]]ць, п[[е]]чінка","г[[о]]лубка, П[[о]]ліна, п[[о]]лічити","пр[[и]]нести, л[[и]]мон, Вінн[[и]]ця","м[[е]]тро, ч[[е]]кати, превес[[е]]лий"], a:2},
+  {q:"Підкреслені букви позначають той самий звук у всіх словах рядка", opts:["[[т]]екстовий, Ві[[т]]чизна, наба[[т]]","[[т]]овар, ми[[т]]ці, [[т]]ернополяни","твори[[т]]ь, грію[[т]]ься, мабу[[т]]ь","само[[т]]ній, [[т]]існий, радіс[[т]]ю"], a:3},
+  {q:"Підкреслені букви позначають той самий звук у всіх словах рядка", opts:["[[т]]інь, ба[[т]]ьківський, боро[[т]]ьба","ма[[т]]інка, кві[[т]]ці, по[[т]]ьмянілий","ско[[т]]ч, за[[т]]очений, Коно[[т]]оп","[[т]]урбота, Ял[[т]]а, а[[т]]ракціон"], a:3},
+  {q:"Підкреслені букви позначають той самий звук у всіх словах рядка", opts:["ма[[ш]]ина, рома[[ш]]ці, [[ш]]вець","вагає[[ш]]ся, ни[[ш]]порка, но[[ш]]а","[[ш]]уліка, ме[[ш]]кати, хоро[[ш]]ий","дивує[[ш]]ся, да[[ш]]ок, [[ш]]петити"], a:2},
+  {q:"Підкреслені букви позначають той самий звук у всіх словах рядка", opts:["кола[[ж]], розва[[ж]]ся, У[[ж]]город","[[ж]]асмин, ро[[ж]]евий, бд[[ж]]ола","но[[ж]]і, запорі[[ж]]ці, схо[[ж]]ість","осору[[ж]]ний, [[Ж]]анна, ві[[ж]]ки"], a:3},
+  {q:"Підкреслені букви позначають той самий звук у всіх словах рядка", opts:["рі[[ж]]у, нава[[ж]]ся, [[ж]]оржина","воро[[ж]]ість, [[ж]]інчин, ро[[ж]]і","[[ж]]аский, Д[[ж]]ульєтта, [[ж]]аба","[[ж]]ивіт, кни[[ж]]ці, [[Ж]]итомир"], a:1},
+  {q:"Підкреслені букви позначають той самий звук у всіх словах рядка", opts:["порі[[ч]]ка, роз[[ч]]инити, О[[ч]]аків","рі[[ч]]ці, по[[ч]]аток, за[[ч]]итувати","[[ч]]іткість, Марі[[ч]]ці, Нагуєви[[ч]]і","цукеро[[ч]]ці, [[ч]]ас, рі[[ч]]ковий"], a:0},
+  {q:"Підкреслені букви позначають той самий звук у всіх словах рядка", opts:["ві[[с]]ті, [[С]]вітлана, [[с]]южет","та[[с]]ьма, гі[[с]]ть, ко[[с]]ьба","граєть[[с]]я, [[с]]ядь, [[с]]ірий","зані[[с]]ши, [[с]]міх, поро[[с]]я"], a:0},
+  {q:"Підкреслені букви позначають той самий звук у всіх словах рядка", opts:["ро[[з]]жуй, [[з]]ять, паморо[[з]]ь","[[з]]аява, [[з]]шиток, [[з]]устріч","ро[[з]]жився, ро[[з]]лив, [[з]]ло","[[з]]вістка, дру[[з]]яка, гря[[з]]ь"], a:3},
+  {q:"Підкреслені букви позначають той самий звук у всіх словах рядка", opts:["сте[[ж]]ці, зва[[ж]]ся, [[з]]яблик","фу[[т]]бол, [[Д]]арина, ра[[д]]жу","му[[ш]]ці, ні[[с]]ши, [[с]]оковито","несеть[[с]]я, [[С]]міла, по[[с]]істи"], a:0},
+  {q:"Підкреслені букви позначають той самий звук у всіх словах рядка", opts:["вчи[[т]]ься, ка[[ч]]ці, сі[[т]]ці","роз[[ш]]укай, ні[[ж]]ці, [[з]]ір","[[к]]атер, во[[к]]зал, [[ґ]]уля","су[[ш]]ці, миєть[[с]]я, ві[[с]]сю"], a:0},
+  {q:"Підкреслені букви позначають той самий звук у всіх словах речення", opts:["Наша фабри[[к]]а виготовляє товари повся[[к]]денного [[к]]ористування.","Команда з [[Д]]ніпра в нелегкій боро[[т]]ьбі [[д]]істала перемогу.","Тут ллю[[т]]ься пахощі гус[[т]]і, там гну[[т]]ься верби п'яні.","Ти не вміє[[ш]] [[ш]]видко писати на до[[ш]]ці."], a:1},
+  {q:"Підкреслені букви позначають той самий звук у всіх словах речення", opts:["З[[и]]ма пос[[и]]лає сніж[[и]]нки на землю.","Куплю с[[о]]бі с[[о]]пілку і т[[о]]бі заграю.","В[[е]]чірнє сонц[[е]], дякую за д[[е]]нь!","Стояло н[[е]]бо, дивн[[е]] та сумн[[е]]."], a:1},
+  {q:"Однаковий звук позначають усі підкреслені букви в реченні", opts:["Не знаю я, що буде пі[[с]]ля на[[с]], в які природа убереть[[с]]я шати.","[[Ш]]аліє любові тропічна злива — землі і неба [[ш]]алений [[ш]]люб.","Пр[[о]]зрінь не бійся, б[[о]] в[[о]]ни як ліки.","Єдиний, х[[т]]о не в[[т]]омлюється, — час."], a:1},
+  {q:"Однаковий звук позначають усі підкреслені букви в реченні", opts:["Життя ішло, м[[и]]нуло той перон, гукала т[[и]]ша рупором вокзальним.","[[О]]черети із ч[[о]]рними свічками ідуть уздовж к[[о]]лишніх берегів.","Так багато на с[[в]]іті горя, люди, будьте [[в]]заємно краси[[в]]ими.","Душа с[[к]]ладала свій тяж[[к]]ий е[[к]]замен."], a:1},
+  {q:"Однаковий звук позначають усі підкреслені букви в реченні", opts:["Це так пр[[и]]родно — муз[[и]]ка і час, і Ваша скрізь присутність невлов[[и]]ма.","Ти про[[с]]то мені дивиш[[с]]я услід і трохи любиш [[с]]ни свої про мене?","Немає ж[[о]]дних звершень, а тільки [[о]]дні п[[о]]ривання.","Світ, надзвичайно широкий, має укла[[д]]исті [[д]]алі."], a:3},
+  {q:"За алфавітом записано всі слова рядка", opts:["ранок, ракурс, радість, розумний","обличчя, облік, опера, окружний","мереживо, місяць, морква, молодь","палітра, праска, проба, програма","тарілка, талант, телефон, тривога"], a:4},
+  {q:"Букви я, ю, є позначають по два звуки в кожному слові рядка", opts:["юний, нюанс, браконьєр, єресь","зграя, різьбяр, черв'як, мільярд","ялина, бюджет, п'ять, боснієць","кар'єра, ювілей, сузір'я, пюре","зв'язок, ярлик, маєток, в'юнець"], a:4},
+  {q:"Звук [й] є в кожному слові рядка", opts:["ярус, лінія, юність, боєць","буря, кальцій, мрія, єдність","іній, сюжет, більярд, клятва","поет, історія, сяйво, юрмитися","ювілей, літній, узлісся, в'ється"], a:0},
+  {q:"Звук [д] є в кожному слові рядка", opts:["родина, погода, депутат, молодість","здоровий, джаз, одержати, думка","футбол, град, Данило, надписати","далина, відійти, домисел, надріз","адреса, дзеркало, дріт, відплата"], a:2},
+  {q:"Звук [з] є в кожному слові рядка", opts:["зустріч, зірка, приказка, Різдво","знахідка, слизько, дзвіночок, зона","фазан, резюме, азимут, привозити","з'явитися, Зоя, Страсбург, аналіз","князь, березень, зрости, вазон"], a:3},
+  {q:"Звук [ш] є в кожному слові рядка", opts:["шедевр, сушити, щока, книжка","щедрівка, довший, хрущ, арешт","вищий, помічник, проща, щебет","кришталь, молодший, шанс, ніж","мурашка, муштра, душа, нижче"], a:1},
+  {q:"Звук [ж] є в кожному слові рядка", opts:["джура, пожовклий, журба, жменька","розчин, доріжка, Ашгабад, безчестя","подружці, жоржини, ажур, подорож","зважся, журі, роздоріжжя, кинджал","погодження, жати, жалюзі, жульєн"], a:1},
+  {q:"Звук [ч] є в кожному слові рядка", opts:["борщ, чипси, яєчня, сердечний","лічба, щавель, чорниця, череда","онучці, чемпіон, чугайстр, Чилі","сердешний, тітчин, вічний, човен","черешня, узбіччя, зустріч, чайник"], a:0},
+  {q:"Звук [с] є в кожному слові рядка", opts:["захоплюється, морс, сюжет, казка","колос, сталь, хвилюєшся, панський","перенісши, щастя, схвалити, сувій","скоротити, ласка, століття, праліс","світати, волосся, срібло, соняшник"], a:3},
+  {q:"Звук [т] є в кожному слові рядка", opts:["отже, потреба, трембіта, свято","терен, табір, баскетбол, трава","тривога, вітчим, стовбур, дятел","майбутнє, світло, потік, секрет","темрява, митець, питання, цвіт"], a:4},
+  {q:"Звук [т] треба вимовляти на місці пропуску в усіх словах рядка", opts:["[..]епло, час[..]о, соло[..]ко, намис[..]о","лис[..]ок, суцві[..]тя, с[..]ебло, с[..]орона","лі[..]о, [..]равень, щебе[..]ання, концер[..]","жи[..]о, с[..]ежка, живе[..]ься, час[..]ина","паль[..]о, невіс[..]ці, блаки[..]ь, с[..]річка"], a:2},
+  {q:"Звук [д] треба вимовляти на місці пропуску в усіх словах рядка", opts:["коля[..]ка, на[..]бання, наро[..], [..]унай","рі[..]ний, проїз[..]ний, [..]ивак, лю[..]ство","пі[..]земний, прила[..]дя, [..]жміль, і[..]ея","[..]вері, боро[..]ьба, безла[..], [..]ністер","приро[..]а, сього[..]ні, ра[..]жу, пі[..]йом"], a:0},
+  {q:"Звук [з] треба вимовляти на місці пропуску в усіх словах рядка", opts:["ку[..]ня, [..]тертий, [..]елень, галу[..]зя","[..]чистити, [..]ів'ялий, [..]ерно, [..]ілля","про[..]ьба, бе[..]хмарно, [..]аява, ве[..]ти","гуд[..]ик, ро[..]бити, [..]вичай, боя[..]нь","прика[..]ка, моро[..], моту[..]ка, [..]в'язок"], a:4}
+];
 
-const TOPICS = {
-  voice: {
-    label: "Голосні",
-    subs: [
-      {
-        id: "v-always2", tab: "Завжди 2 звуки", dot: "1", type: "cards",
-        title: "Ї",
-        intro: "Буква ї завжди позначає два звуки — [йі], незалежно від позиції в слові.",
-        cards: [
-          {rule: "<div style=\"text-align:center;\">Буква ї</div>", desc: "<div style=\"text-align:center;font-size:16px;font-weight:800;color:var(--c1-b);margin-top:6px;\">[йі]</div>", examples: [{word: "їжак", ipa: "[йі]жак"}, {word: "поїзд", ipa: "по[йі]зд"}]}
-        ]
-      },
-      {
-        id: "v-oneortwo", tab: "Один або два звуки", dot: "2", type: "cards",
-        title: "Я, ю, є",
-        intro: "Букви я, ю, є можуть позначати один звук або два.",
-        cards: [
-          {rule: "Після приголосного — 1 звук", desc: "", examples: [{word: "сяду", ipa: "[с’аду]"}]},
-          {rule: "На початку слова — 2 звуки", desc: "", examples: [{word: "яблуко", ipa: "[йа]блуко"}]},
-          {rule: "Після голосного — 2 звуки", desc: "", examples: [{word: "Марія", ipa: "Марі[йа]"}]},
-          {rule: "Після апострофа — 2 звуки", desc: "", examples: [{word: "сім’я", ipa: "сім’[йа]"}]},
-          {rule: "Після ь — 2 звуки", desc: "", examples: [{word: "ательє", ipa: "ател’[йе]"}]}
-        ]
-      },
-      {
-        id: "v-approx", tab: "Наближення", dot: "3", type: "cards",
-        title: "Наближення голосних",
-        intro: "У ненаголошеній позиції деякі голосні вимовляються нечітко — з наближенням до сусіднього звука.",
-        cards: [
-          {rule: "Е наближається до И", desc: "у ненаголошеній позиції", examples: [{word: "весна", ipa: "[веи]сна"}]},
-          {rule: "И наближається до Е", desc: "у ненаголошеній позиції", examples: [{word: "диван", ipa: "[деи]ван"}]},
-          {rule: "О наближається до У", desc: "перед складом з наголошеним у та і", examples: [{word: "зозуля", ipa: "з[оу]зуля"}]}
-        ]
-      }
-    ]
-  },
-  consonant: {
-    label: "Приголосні",
-    subs: [
-      {
-        id: "c-class", tab: "Класифікація приголосних", dot: "1", type: "cards",
-        title: "Класифікація приголосних звуків",
-        intro: "Приголосні звуки поділяються на кілька груп одночасно — за дзвінкістю, твердістю і місцем творення.",
-        cards: [
-          {rule: "Глухі — к, п, т, ф, х, ц, с, ч, ш", desc: "«уСе Це КаФе ПТаХ і ЧаШа»", examples: [{word: "кіт", ipa: "[кіт]"}]},
-          {rule: "Мʼякі — д, т, з, с, ц, л, н, р, й, дз", desc: "усі інші приголосні бувають лише пом’якшеними", examples: [{word: "сіль", ipa: "[с’іл’]"}]},
-          {rule: "Шиплячі — ж, ч, ш", desc: "", examples: [{word: "шум", ipa: "[шум]"}]},
-          {rule: "Свистячі — з, ц, с", desc: "", examples: [{word: "сонце", ipa: "[сонце]"}]},
-          {rule: "Губні — б, п, в, м, ф", desc: "", examples: [{word: "мама", ipa: "[мама]"}]}
-        ]
-      },
-      {
-        id: "c-always2", tab: "Завжди 2 звуки", dot: "2", type: "cards",
-        title: "Щ",
-        intro: "Щ завжди позначає два звуки, незалежно від позиції в слові.",
-        cards: [
-          {rule: "<div style=\"text-align:center;\">Буква щ</div>", desc: "<div style=\"text-align:center;font-size:16px;font-weight:800;color:var(--c1-b);margin-top:6px;\">[шч]</div>", examples: [{word: "щастя", ipa: "[шч]астя"}]}
-        ]
-      },
-      {
-        id: "c-dzdzh", tab: "Дж, дз", dot: "3", type: "cards",
-        title: "Дж, дз: один чи два звуки",
-        intro: "Дж і дз — то один злитий звук, то два окремих, залежно від того, де вони стоять.",
-        cards: [
-          {rule: "У корені слова", desc: "один злитий звук", examples: [{word: "джміль", ipa: "[джміль]"}, {word: "дзвін", ipa: "[дзвін]"}]},
-          {rule: "На межі морфем", desc: "два окремих звуки", examples: [{word: "відзвук", ipa: "ві[д-з]вук"}]}
-        ]
-      },
-      {
-        id: "c-assim", tab: "Уподібнення приголосних", dot: "4", type: "nested",
-        subsubs: [
-          {
-            id: "groups", tab: "Групи звуків", dot: "1", type: "cards",
-            title: "Уподібнення приголосних звуків",
-            intro: "Приголосні при вимові часто <b>уподібнюються</b> — підлаштовуються під сусідній звук. Тисни на картку, щоб побачити приклад.",
-            mnemo: "<b>Глухі приголосні</b> (к, п, т, ф, х, ц, с, ч, ш): «у<b>С</b>е <b>Ц</b>е <b>К</b>а<b>Ф</b>е <b>П</b>та<b>Х</b> і <b>Ч</b>а<b>Ш</b>а».",
-            cards: [
-              {rule: "Глухі → дзвінкі", desc: "т’, с’, к переходять у д’, з’, ґ’ перед дзвінким приголосним", examples: [{word: "молотьба", ipa: "моло[д’]ьба", note: "від молотити"}, {word: "просьба", ipa: "про[з’]ба", note: "від просити"}]},
-              {rule: "Дзвінкі → глухі", desc: "з переходить у с перед глухим — але лише в префіксах", examples: [{word: "розпис", ipa: "ро[с]пис", note: "префікс роз-"}]},
-              {rule: "Г → Х", desc: "г переходить у х перед глухим приголосним", examples: [{word: "кігті", ipa: "[к’іхт’і]"}, {word: "нігті", ipa: "[н’іхт’і]"}, {word: "легко", ipa: "[ле́хко]"}, {word: "вогко", ipa: "[во́хко]"}, {word: "дьогтю", ipa: "[д’о́хт’у]"}]},
-              {rule: "Тверді → мʼякі", desc: "д, т, з, с, ц, л, н пом’якшуються перед мʼяким приголосним", examples: [{word: "пісня", ipa: "[п’іс’н’а]"}, {word: "кузня", ipa: "[куз’н’я]"}]},
-              {rule: "Шиплячі + свистячі", desc: "ж, ч, ш зливаються з наступним з, ц, с в один подовжений звук", examples: [{word: "розжувати", ipa: "ро[ж:]увати"}]}
-            ]
-          },
-          {
-            id: "combos", tab: "Буквосполучення", dot: "2", type: "table",
-            title: "Вимова буквосполучень на межі морфем",
-            intro: "Ці буквосполучення на межі кореня й суфікса чи префікса зливаються в один звук. Тисни на рядок, щоб перевірити себе.",
-            rows: [
-              {write: "-ться", say: "[ц’:а]", example: "миються", ipa: "[ми́йуц’:а]"},
-              {write: "-шся", say: "[с’:а]", example: "дивишся", ipa: "[диви́с’:а]"},
-              {write: "-сши", say: "[ш:и]", example: "занісши", ipa: "[зан’іш:и]"},
-              {write: "-жці", say: "[з’ц’і]", example: "ніжці", ipa: "[н’із’ц’і]"},
-              {write: "-шці", say: "[с’ц’і]", example: "флешці", ipa: "[флес’ц’і]"},
-              {write: "-чці", say: "[ц’:і]", example: "річці", ipa: "[р’іц’:і]"},
-              {write: "-тч-", say: "[ч:]", example: "тітчин", ipa: "[т’іч:ин]"},
-              {write: "-тці", say: "[ц’:і]", example: "квітці", ipa: "[кв’іц’:і]"},
-              {write: "-зж-", say: "[ж:]", example: "розжуй", ipa: "[рож:у́й]"},
-              {write: "-зч-", say: "[жч]", example: "розчин", ipa: "[рожчин]"},
-              {write: "-зш-", say: "[жш]", example: "розший", ipa: "[рожший]"},
-              {write: "-жся", say: "[з’с’а]", example: "зважся", ipa: "[зва́з’с’а]"}
-            ]
-          },
-          {
-            id: "check", tab: "Перевір себе", dot: "✓", type: "quiz",
-            title: "Швидка перевірка",
-            intro: "5 запитань за матеріалом уроку.",
-            questions: [
-              {q: "Як правильно вимовити слово «косьба»?", opts: ["ко[с’]ба", "ко[з’]ба", "ко[з]ба", "ко[с]ба"], a: 1},
-              {q: "У якому слові т звучить як [т], а не [т’]?", opts: ["тюлень", "стіл", "штовхати", "тьмяний"], a: 2},
-              {q: "Оберіть правильну транскрипцію слова «кузня»", opts: ["[кузня]", "[кус’н’я]", "[куз:ня]", "[куз’н’я]"], a: 3},
-              {q: "Як вимовляється «-ться» у слові «миються»?", opts: ["[ц’:а]", "[тс’а]", "[ц’а]", "[чс’а]"], a: 0},
-              {q: "Слово «розжувати» вимовляється як", opts: ["ро[зж]увати", "ро[ж:]увати", "ро[жч]увати", "ро[з]увати"], a: 1}
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  other: {
-    label: "Ь і подвоєння",
-    subs: [
-      {
-        id: "letters-no-sound", tab: "У транскрипції", dot: "1", type: "cards",
-        title: "Букви без окремого звука",
-        intro: "Кількість букв і кількість звуків у слові не завжди збігається.",
-        cards: [
-          {rule: "Мʼякий знак", desc: "сам звука не позначає — лише показує мʼякість попереднього приголосного", examples: [{word: "кінь", ipa: "[кін’]"}]},
-          {rule: "Подвоєння нн", desc: "дві букви на письмі — один подовжений звук у вимові", examples: [{word: "ранній", ipa: "[ран’:ій]"}]}
-        ]
-      }
-    ]
-  }
-};
+const LETTERS = ["А","Б","В","Г","Д"];
 
-const LETTERS = ["А","Б","В","Г"];
-const TOPIC_ORDER = ["voice","consonant","other"];
+// --- Telegram reporting config ---
+const TG_BOT_TOKEN = "8859310874:AAEJoYfUnv54dLOqglpMk5yfi06zeZ2oc9Q";
+const TG_CHAT_ID = "7255798532";
+// Адреса вашого Apps Script веб-застосунку (закінчується на /exec).
+// Вставте сюди URL, який ви отримаєте після деплою Code.gs.
+const LOG_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyDGcDVtwD0L8WW0zDIsXwYwwf6zp4XzmofzdI0wU-AhhfZIXbH2lOHquNSHI8cKRc7/exec";
 
-let activeTopic = "voice";
-let activeSub = 0;
-let activeSubsub = 0;
-let quizIdx = 0;
-let quizAnswers = {};
-
-const topictoggle = document.getElementById('topictoggle');
-const subtabbar = document.getElementById('subtabbar');
-const subsubtabbar = document.getElementById('subsubtabbar');
-const lessonArea = document.getElementById('lessonArea');
-
-function resetNav(){ activeSub = 0; activeSubsub = 0; quizIdx = 0; quizAnswers = {}; }
-function resetQuiz(){ quizIdx = 0; quizAnswers = {}; }
-
-function currentSub(){ return TOPICS[activeTopic].subs[activeSub]; }
-function currentSection(){
-  const sub = currentSub();
-  if(sub.type === "nested") return sub.subsubs[activeSubsub];
-  return sub;
+// Тихо надсилає результат у Google-таблицю (для кнопок-учнів у боті).
+// Якщо це не спрацює — на роботу тесту й на сповіщення вчителю це не вплине.
+function logToSheet(payload){
+  try{
+    fetch(LOG_WEBAPP_URL, {
+      method: 'POST',
+      headers: {'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    }).catch(()=>{});
+  }catch(e){}
 }
 
-// ---- per-tab drawing storage: намальоване на кожній вкладці (і на кожному
-// питанні тесту) зберігається окремо, тож перехід на іншу вкладку й назад
-// не стирає написане, а показує саме те, що було на ній ----
-const drawStore = {};
-function sectionKey(){
-  const sec = currentSection();
-  let k = activeTopic + '__' + activeSub + '__' + activeSubsub;
-  if(sec.type === "quiz") k += '__q' + quizIdx;
-  return k;
-}
-function saveCurrentDrawing(){
-  if(window.getDrawingSnapshot) drawStore[sectionKey()] = window.getDrawingSnapshot();
-}
-function restoreCurrentDrawing(){
-  if(window.setDrawingSnapshot) window.setDrawingSnapshot(drawStore[sectionKey()] || null);
-}
+let qIdx = 0;
+let answers = {};
+let studentName = "";
+let started = false;
+let reportSent = false;
+let finished = false;
+let reviewMode = false; // true, коли сторінку відкрито за посиланням "розбір відповідей"
 
-function renderTopics(){
-  topictoggle.innerHTML = TOPIC_ORDER.map(key => `
-    <button class="${key===activeTopic?'active':''}" data-key="${key}">${TOPICS[key].label}</button>
-  `).join('');
-  topictoggle.querySelectorAll('button').forEach(btn=>{
-    const nav = ()=>{
-      saveCurrentDrawing();
-      activeTopic = btn.dataset.key;
-      resetNav();
-      renderAll();
-    };
-    attachTapToggle(btn, nav);
-  });
+const quizArea = document.getElementById('quizArea');
+document.getElementById('totalTag').textContent = QUESTIONS.length + " завдань";
+
+// [[текст]] у варіанті відповіді перетворюється на <u>текст</u>
+function renderOpt(o){
+  return o.replace(/\[\[([^\]]+)\]\]/g, '<u>$1</u>');
 }
 
-function renderSubs(){
-  const subs = TOPICS[activeTopic].subs;
-  subtabbar.innerHTML = subs.map((s,i)=>`
-    <button class="tab ${i===activeSub?'active':''}" data-i="${i}">
-      <span class="dot">${s.dot}</span>${s.tab}
-    </button>`).join('');
-  subtabbar.querySelectorAll('.tab').forEach(btn=>{
-    const nav = ()=>{
-      saveCurrentDrawing();
-      activeSub = +btn.dataset.i;
-      activeSubsub = 0;
-      resetQuiz();
-      renderAll();
-    };
-    attachTapToggle(btn, nav);
-  });
-}
-
-function renderSubSubs(){
-  const sub = currentSub();
-  if(sub.type !== "nested"){ subsubtabbar.innerHTML = ""; subsubtabbar.style.display = "none"; return; }
-  subsubtabbar.style.display = "flex";
-  subsubtabbar.innerHTML = sub.subsubs.map((s,i)=>`
-    <button class="tab ${i===activeSubsub?'active':''}" data-i="${i}">
-      <span class="dot">${s.dot}</span>${s.tab}
-    </button>`).join('');
-  subsubtabbar.querySelectorAll('.tab').forEach(btn=>{
-    const nav = ()=>{
-      saveCurrentDrawing();
-      activeSubsub = +btn.dataset.i;
-      resetQuiz();
-      renderSubSubs();
-      renderContent();
-    };
-    attachTapToggle(btn, nav);
-  });
-}
-
-function renderContent(){
-  const s = currentSection();
-  const secKey = sectionKey();
-  let html = `<p class="section-title">${s.title}</p><p class="section-intro">${s.intro}</p>`;
-  if(s.type === "cards"){
-    html += `<div class="cardgrid">${s.cards.map((c,idx)=>`
-      <div class="flip" data-kind="card" data-card-key="${secKey}__card${idx}">        <div class="flip-inner">
-          <div class="flip-face flip-front">
-            <div class="flip-rule">${c.rule}</div>
-            <div class="flip-desc">${c.desc||''}</div>
-            <div class="flip-hint">натисни →</div>
-          </div>
-          <div class="flip-face flip-back">
-            ${c.examples.map(e=>`<div class="flip-example">${e.word}${e.ipa?' '+e.ipa:''}</div>${e.note?`<div class="flip-note">${e.note}</div>`:''}`).join('')}
-          </div>
-        </div>
-      </div>`).join('')}</div>`;
-    if(s.mnemo) html += `<div class="mnemo">${s.mnemo}</div>`;
-  }
-
-  if(s.type === "exceptions"){
-    html += `<div class="chiprow">${s.words.map((w)=>`
-      <div class="chip" data-kind="chip">
-        <div class="w">${w.word}</div>
-        <div class="ipa">${w.ipa}</div>
-      </div>`).join('')}</div>`;
-  }
-
-  if(s.type === "table"){
-    html += `<div class="combo-table">${s.rows.map((r)=>`
-      <div class="combo-row" data-kind="row">
-        <span class="combo-write">${r.write}</span>
-        <span class="combo-say">${r.say}</span>
-        <span class="combo-example">${r.example}</span>
-        <span class="combo-ipa">${r.ipa}</span>
-      </div>`).join('')}</div>`;
-  }
-
-  if(s.type === "quiz"){
-    lessonArea.innerHTML = html;
-    renderQuiz(s);
-    syncCanvasAfterRender();
-    return;
-  }
-
-  lessonArea.innerHTML = html;
-  lessonArea.querySelectorAll('[data-kind="card"], [data-kind="chip"], [data-kind="row"]').forEach(el=>{
-    const toggle = ()=>{ el.classList.toggle('open'); };
-    attachTapToggle(el, toggle);
-  });
-  syncCanvasAfterRender();
-}
-
-function syncCanvasAfterRender(){
-  // дає верстці "осісти", а тоді підганяє розмір канвасу малювання під нову висоту сторінки,
-  // і відновлює те, що було намальоване саме на цій вкладці (якщо було)
-  if(window.resizeDrawCanvas){
-    requestAnimationFrame(()=> requestAnimationFrame(()=>{
-      window.resizeDrawCanvas();
-      restoreCurrentDrawing();
-    }));
-  }
-}
-
-function quizScore(qs){
+function scoreOverall(){
   let correct = 0, answered = 0;
-  qs.forEach((_,i)=>{ const r = quizAnswers[i]; if(r){ answered++; if(r.correct) correct++; } });
-  return {correct, answered, total: qs.length};
+  QUESTIONS.forEach((_,i)=>{
+    const rec = answers[i];
+    if(rec){ answered++; if(rec.correct) correct++; }
+  });
+  return {correct, answered, total: QUESTIONS.length};
 }
 
-function renderQuiz(s){
-  const total = s.questions.length;
+async function getStoredName(){
+  try{
+    const result = await window.storage.get('student_name');
+    return result ? result.value : null;
+  }catch(e){
+    return null;
+  }
+}
 
-  if(quizIdx >= total){
-    const {correct} = quizScore(s.questions);
-    const extra = document.createElement('div');
-    extra.innerHTML = `
+async function setStoredName(name){
+  try{
+    await window.storage.set('student_name', name);
+  }catch(e){
+    // сховище недоступне — ім'я просто не запам'ятається між сесіями
+  }
+}
+
+async function clearStoredName(){
+  try{
+    await window.storage.delete('student_name');
+  }catch(e){}
+}
+
+// ---- Посилання "розбір відповідей" ----
+// Кодує відповіді учня прямо в URL цієї ж сторінки: ?review=1&name=...&ans=0-0,2-1,5-3,...
+// У рядок ans потрапляють лише питання, на які учень ВІДПОВІВ (номер-вибір),
+// тож посилання лишається коротким, навіть якщо тест зі 49 питань, а відповіли на 7.
+function buildReviewLink(){
+  const pairs = [];
+  QUESTIONS.forEach((_,i)=>{
+    const rec = answers[i];
+    if(rec) pairs.push(i + '-' + rec.picked);
+  });
+  const ansStr = pairs.join(',');
+  const base = location.origin + location.pathname;
+  return `${base}?review=1&name=${encodeURIComponent(studentName)}&ans=${ansStr}`;
+}
+
+// Розпізнає посилання розбору й заповнює answers/studentName з нього
+function parseReviewParam(){
+  const params = new URLSearchParams(location.search);
+  if(params.get('review') !== '1') return false;
+  const name = params.get('name');
+  const ansParam = params.get('ans');
+  if(!ansParam) return false;
+
+  studentName = name || 'Учень';
+  answers = {};
+  ansParam.split(',').forEach(pair=>{
+    const [idxStr, valStr] = pair.split('-');
+    const i = Number(idxStr);
+    const picked = Number(valStr);
+    if(!Number.isNaN(i) && !Number.isNaN(picked) && i >= 0 && i < QUESTIONS.length){
+      answers[i] = {picked, correct: picked === QUESTIONS[i].a};
+    }
+  });
+
+  started = true;
+  reviewMode = true;
+  qIdx = 0;
+  return true;
+}
+
+function renderNameScreen(prefill){
+  quizArea.innerHTML = `
+    <div class="name-screen">
+      <label for="nameInput">Як тебе звати?</label>
+      <input type="text" id="nameInput" placeholder="Ім'я" autocomplete="off" value="${prefill ? prefill.replace(/"/g,'&quot;') : ''}">
+      <button class="btn primary" id="startBtn" style="width:100%;justify-content:center;">Почати тест</button>
+    </div>
+  `;
+  const input = document.getElementById('nameInput');
+  const startBtn = document.getElementById('startBtn');
+  input.focus();
+  const go = async ()=>{
+    const val = input.value.trim();
+    studentName = val || "Без імені";
+    await setStoredName(studentName);
+    started = true;
+    qIdx = 0;
+    renderQuiz();
+  };
+  startBtn.onclick = go;
+  input.addEventListener('keydown', (e)=>{ if(e.key==='Enter') go(); });
+}
+
+async function sendTelegramReport(){
+  const {correct, total, answered} = scoreOverall();
+  const wrongList = [];
+  QUESTIONS.forEach((_,i)=>{
+    const rec = answers[i];
+    if(rec && !rec.correct) wrongList.push(i+1);
+  });
+
+  let text = `📘 Фонетика · Тренажер\n`;
+  text += `Учень: ${studentName}\n`;
+  if(answered < total){
+    text += `Результат: ${correct}/${answered} (виконано ${answered} із ${total} завдань)\n`;
+  } else {
+    text += `Результат: ${correct}/${total}\n`;
+  }
+  if(wrongList.length){
+    text += `Помилки в завданнях: ${wrongList.join(', ')}`;
+  } else {
+    text += `Помилок немає 🎉`;
+  }
+
+  const reviewLink = buildReviewLink();
+
+  logToSheet({
+    type: "quiz_result",
+    student: studentName,
+    testName: "Фонетика",
+    correct, answered, total,
+    wrongList,
+    reviewLink
+  });
+
+  const statusEl = document.getElementById('sendStatus');
+  try{
+    const resp = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        chat_id: TG_CHAT_ID,
+        text,
+        reply_markup: {
+          inline_keyboard: [[
+            { text: "🔍 Переглянути розбір відповідей", url: reviewLink }
+          ]]
+        }
+      })
+    });
+    const data = await resp.json();
+    if(data.ok){
+      if(statusEl){ statusEl.textContent = 'Результат надіслано вчителю ✓'; statusEl.className = 'send-status ok'; }
+    } else {
+      if(statusEl){ statusEl.textContent = 'Не вдалося надіслати результат'; statusEl.className = 'send-status bad'; }
+    }
+  } catch(err){
+    if(statusEl){ statusEl.textContent = 'Не вдалося надіслати результат'; statusEl.className = 'send-status bad'; }
+  }
+}
+
+function renderQuiz(){
+  document.getElementById('reviewBanner').classList.toggle('show', reviewMode);
+
+  if(!started){ renderNameScreen(); return; }
+
+  const total = QUESTIONS.length;
+
+  if(qIdx >= total || finished){
+    const {correct, answered} = scoreOverall();
+    quizArea.innerHTML = `
       <div class="done-screen">
-        <div class="ring"><div class="big">${correct}/${total}</div></div>
-        <p class="section-intro" style="margin-top:10px;">${correct===total ? 'Ідеально! Матеріал засвоєно 🎉' : 'Непогано — можна ще раз пробігтись картками вище.'}</p>
-        <button class="btn primary" id="quizRestart" style="margin-top:6px;">Пройти ще раз</button>
+        <div class="ring"><div class="big">${correct}/${answered}</div></div>
+        <p class="sub" style="margin:0 auto 4px;">${studentName} · Фонетика · відповідано ${answered} з ${total}</p>
+        ${reviewMode ? '' : `<div class="send-status" id="sendStatus">Надсилаємо результат...</div>
+        <button class="btn primary" id="restartBtn" style="margin-top:14px;">Пройти ще раз</button>`}
       </div>`;
-    lessonArea.appendChild(extra);
-    attachTapToggle(document.getElementById('quizRestart'), ()=>{ resetQuiz(); renderContent(); });
+    if(!reviewMode){
+      document.getElementById('restartBtn').onclick = ()=>{
+        answers = {};
+        qIdx = 0; reportSent = false; finished = false;
+        renderQuiz();
+      };
+      if(!reportSent){
+        reportSent = true;
+        sendTelegramReport();
+      }
+    }
     return;
   }
 
-  const q = s.questions[quizIdx];
-  const rec = quizAnswers[quizIdx];
+  const q = QUESTIONS[qIdx];
+  const rec = answers[qIdx];
+  const {correct, answered} = scoreOverall();
 
-  const box = document.createElement('div');
-  box.innerHTML = `
-    <div class="qprog">Питання ${quizIdx+1} з ${total}</div>
+  let segs = '';
+  QUESTIONS.forEach((_,i)=>{
+    const r = answers[i];
+    let cls = i===qIdx ? 'current' : (r ? (r.correct?'done-correct':'done-wrong') : '');
+    segs += `<div class="seg ${cls}" data-i="${i}"></div>`;
+  });
+
+  const canGoNext = rec || reviewMode;
+
+  quizArea.innerHTML = `
+    <div class="progress-row">
+      <div class="qnum">${studentName} · Питання ${qIdx+1} з ${total}</div>
+      <div class="score">${correct}/${answered||0}</div>
+    </div>
+    <div class="segbar">${segs}</div>
     <p class="qtext">${q.q}</p>
     <div class="options">
       ${q.opts.map((o,i)=>`
-        <button class="opt" data-i="${i}" ${rec?'disabled':''}>
-          <span class="tile"><span>${LETTERS[i]}</span></span><span>${o}</span>
+        <button class="opt" data-i="${i}" ${(rec||reviewMode)?'disabled':''}>
+          <span class="tile"><span>${LETTERS[i]}</span></span><span>${renderOpt(o)}</span>
         </button>`).join('')}
     </div>
-    <div class="feedback ${rec?'show '+(rec.correct?'ok':'bad'):''}">
-      ${rec ? (rec.correct ? `<span><b>Правильно.</b></span>` : `<span>Правильна відповідь — ${LETTERS[q.a]}. ${q.opts[q.a]}</span>`) : ''}
+    <div class="feedback ${rec ? 'show '+(rec.correct?'ok':'bad') : (reviewMode ? 'show bad' : '')}" id="fb">
+      ${rec
+        ? (rec.correct ? `<span><b>Правильно.</b> Відповідь — ${LETTERS[q.a]}.</span>` : `<span>Правильна відповідь — ${LETTERS[q.a]}.</span>`)
+        : (reviewMode ? `<span>Учень не відповів. Правильна відповідь — ${LETTERS[q.a]}.</span>` : '')}
     </div>
     <div class="nav-row">
-      <button class="btn ghost" id="quizPrev" ${quizIdx===0?'disabled':''}>← Назад</button>
-      <button class="btn primary" id="quizNext" ${rec?'':'disabled'}>${quizIdx===total-1?'До результату':'Далі →'}</button>
-    </div>`;
-  lessonArea.appendChild(box);
+      <button class="btn ghost" id="prevBtn" ${qIdx===0?'disabled':''}>← Назад</button>
+      <button class="btn primary" id="nextBtn" ${canGoNext?'':'disabled'}>${qIdx===total-1?'До результату':'Далі →'}</button>
+    </div>
+    ${reviewMode ? '' : `
+    <div class="reset-row">
+      <button class="btn ghost small" id="finishBtn">Завершити і надіслати результат</button>
+      <button class="btn ghost small" id="changeNameBtn">Змінити ім'я</button>
+    </div>`}
+  `;
 
   if(rec){
-    box.querySelectorAll('.opt').forEach((btn,i)=>{
+    quizArea.querySelectorAll('.opt').forEach((btn,i)=>{
       const tile = btn.querySelector('.tile');
-      if(i===q.a){ btn.classList.add('correct'); tile.insertAdjacentHTML('beforeend','<span class="badge ok">✓</span>'); }
-      else if(i===rec.picked){ btn.classList.add('wrong'); tile.insertAdjacentHTML('beforeend','<span class="badge no">✕</span>'); }
-      else { btn.classList.add('dim'); }
+      if(i===q.a){
+        btn.classList.add('correct');
+        tile.insertAdjacentHTML('beforeend', '<span class="badge ok">✓</span>');
+      } else if(i===rec.picked){
+        btn.classList.add('wrong');
+        tile.insertAdjacentHTML('beforeend', '<span class="badge no">✕</span>');
+      } else {
+        btn.classList.add('dim');
+      }
+    });
+  } else if(reviewMode){
+    // учень не відповів на це питання — просто показуємо правильну відповідь
+    quizArea.querySelectorAll('.opt').forEach((btn,i)=>{
+      const tile = btn.querySelector('.tile');
+      if(i===q.a){
+        btn.classList.add('correct');
+        tile.insertAdjacentHTML('beforeend', '<span class="badge ok">✓</span>');
+      } else {
+        btn.classList.add('dim');
+      }
     });
   }
 
-  box.querySelectorAll('.opt').forEach(btn=>{
-    attachTapToggle(btn, ()=>{
-      if(quizAnswers[quizIdx]) return;
+  quizArea.querySelectorAll('.opt').forEach(btn=>{
+    btn.onclick = ()=>{
+      if(reviewMode) return;
+      if(answers[qIdx]) return;
       const picked = +btn.dataset.i;
-      quizAnswers[quizIdx] = {picked, correct: picked===q.a};
-      renderContent();
-    });
+      answers[qIdx] = {picked, correct: picked===q.a};
+      renderQuiz();
+    };
   });
-  const prevBtn = document.getElementById('quizPrev');
-  const nextBtn = document.getElementById('quizNext');
-  if(prevBtn) attachTapToggle(prevBtn, ()=>{ saveCurrentDrawing(); quizIdx--; renderContent(); });
-  if(nextBtn) attachTapToggle(nextBtn, ()=>{ saveCurrentDrawing(); quizIdx++; renderContent(); });
-}
-
-// ---- надійне розпізнавання "тапу", яке не залежить від click-події
-// (Safari може відкласти click після дотику, а поки триває малювання пером,
-// клацання по інтерфейсу взагалі не потрібні) — визначено тут, ЩЕ ДО
-// першого renderAll(), щоб картки з першого ж рендеру одразу
-// використовували цю логіку, а не тимчасовий запасний onclick ----
-function attachTapToggle(el, handler){
-  let sx = 0, sy = 0, penTap = false, tracking = false;
-  el.addEventListener('pointerdown', (e)=>{
-    tracking = true;
-    sx = e.clientX; sy = e.clientY;
-    penTap = e.pointerType === 'pen';
-  }, {passive:true});
-  el.addEventListener('pointerup', (e)=>{
-    if(!tracking) return;
-    tracking = false;
-    if(penTap && window.isDrawingActive && window.isDrawingActive()) return;
-    const dx = e.clientX - sx, dy = e.clientY - sy;
-    if(Math.hypot(dx,dy) > 10) return;
-    handler(e);
+  document.getElementById('prevBtn').onclick = ()=>{ qIdx--; renderQuiz(); };
+  document.getElementById('nextBtn').onclick = ()=>{ qIdx++; renderQuiz(); };
+  if(!reviewMode){
+    document.getElementById('finishBtn').onclick = ()=>{
+      const {answered} = scoreOverall();
+      const msg = answered===0
+        ? 'Ти ще не відповів на жодне питання. Завершити тест зараз?'
+        : `Завершити тест зараз і надіслати результат (відповідено на ${answered} із ${total})?`;
+      if(confirm(msg)){
+        finished = true;
+        renderQuiz();
+      }
+    };
+    document.getElementById('changeNameBtn').onclick = async ()=>{
+      await clearStoredName();
+      started = false;
+      renderNameScreen(studentName);
+    };
+  }
+  quizArea.querySelectorAll('.seg').forEach(d=>{
+    d.onclick = ()=>{ qIdx = +d.dataset.i; renderQuiz(); };
   });
 }
-window.attachTapToggle = attachTapToggle;
 
-function renderAll(){
-  renderTopics();
-  renderSubs();
-  renderSubSubs();
-  renderContent();
+async function init(){
+  if(parseReviewParam()){
+    renderQuiz();
+    return;
+  }
+  const fromUrl = new URLSearchParams(location.search).get('student');
+  if(fromUrl){
+    studentName = fromUrl;
+    started = true;
+    renderQuiz();
+    return;
+  }
+  const saved = await getStoredName();
+  if(saved){
+    studentName = saved;
+    started = true;
+  }
+  renderQuiz();
 }
-
-renderAll();
+init();
 
 // ======================================================================
 // МАЛЮВАННЯ ПОВЕРХ ЕКРАНА (режим "учитель")
-//
-// Ця версія навмисно побудована один в один за робочим прикладом, який
-// підтвердив, що пише без затримок і що кнопка з панеллю не зникають і не
-// роздуваються під час зуму. Різниця з попередніми спробами:
-//   • НІЯКОГО втручання в touch-action — воно завжди 'auto', як типово
-//     в браузері. preventDefault() на самому дотику пером і так гарантує,
-//     що перо не гортає й не зумить сторінку; більше нічого чіпати не
-//     треба, а зайві обмеження touch-action, судячи з усього, і були
-//     причиною затримки між буквами.
-//   • НІЯКОЇ JS-компенсації позиції/розміру кнопки й панелі під час
-//     pinch-zoom. Вони — звичайний CSS position:fixed. Раніше спроби
-//     "виправити" це власним кодом лише ламали те, що й так працювало.
-//   • Малювання — просте, пряме, растрове (як у прикладі), без черг і
-//     буферизації.
-// Єдине, що збережено понад приклад: чорнило кожної вкладки зберігається
-// окремо (бо в цьому уроці, на відміну від прикладу, є кілька вкладок) —
-// через ті самі getDrawingSnapshot/setDrawingSnapshot, які вже викликає
-// зовнішній скрипт при перемиканні вкладок.
 // ======================================================================
 (function(){
   const canvas = document.getElementById('drawCanvas');
   const ctx = canvas.getContext('2d');
   const toggleBtn = document.getElementById('drawToggleBtn');
   const toolbar = document.getElementById('drawToolbar');
-  const toolbarMini = document.getElementById('drawToolbarMini');
-  const minimizeBtn = document.getElementById('minimizeBtn');
-  const xthinBtn = document.getElementById('xthinBtn');
   const thinBtn = document.getElementById('thinBtn');
   const thickBtn = document.getElementById('thickBtn');
   const eraserBtn = document.getElementById('eraserBtn');
@@ -908,13 +932,11 @@ renderAll();
 
   let drawingActive = false;
   let isDrawing = false;
-  let currentColor = "#F5304A";
+  let currentColor = "#E5484D";
   let currentWidth = 4;
   let eraserMode = false;
   let lastX = 0, lastY = 0;
   let activePointerId = null;
-
-  window.isDrawingActive = function(){ return drawingActive; };
 
   function currentDocHeight(){
     return Math.max(
@@ -947,7 +969,6 @@ renderAll();
       ctx.drawImage(prev, 0, 0, prev.width / devicePixelRatio, prev.height / devicePixelRatio);
     }
   }
-  window.resizeDrawCanvas = resizeCanvas;
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
   window.addEventListener('orientationchange', resizeCanvas);
@@ -959,46 +980,14 @@ renderAll();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   };
 
-  // сумісний з рештою сторінки API: чорнило кожної вкладки зберігається й
-  // відновлюється окремо при перемиканні вкладок (викликається з
-  // зовнішнього скрипту через saveCurrentDrawing()/restoreCurrentDrawing())
-  window.getDrawingSnapshot = function(){
-    try{
-      return (canvas.width && canvas.height) ? canvas.toDataURL('image/png') : null;
-    }catch(e){ return null; }
-  };
-  window.setDrawingSnapshot = function(dataURL){
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if(!dataURL) return;
-    const img = new Image();
-    img.onload = function(){
-      ctx.drawImage(img, 0, 0, canvas.width / devicePixelRatio, canvas.height / devicePixelRatio);
-    };
-    img.src = dataURL;
-  };
-
   function setActive(on){
     drawingActive = on;
     toolbar.classList.toggle('show', on);
-    toolbar.classList.remove('mini');
-    if(toolbarMini) toolbarMini.classList.remove('show');
     toggleBtn.classList.toggle('on', on);
     toggleBtn.title = on ? 'Вимкнути малювання' : 'Малювати';
   }
-  toggleBtn.addEventListener('click', ()=> setActive(!drawingActive));
 
-  if(minimizeBtn && toolbarMini){
-    minimizeBtn.addEventListener('click', ()=>{
-      toolbar.classList.remove('show');
-      toolbar.classList.add('mini');
-      toolbarMini.classList.add('show');
-    });
-    toolbarMini.addEventListener('click', ()=>{
-      toolbar.classList.remove('mini');
-      toolbar.classList.add('show');
-      toolbarMini.classList.remove('show');
-    });
-  }
+  toggleBtn.addEventListener('click', ()=> setActive(!drawingActive));
 
   swatches.forEach(sw=>{
     sw.addEventListener('click', ()=>{
@@ -1010,22 +999,15 @@ renderAll();
     });
   });
 
-  if(xthinBtn){
-    xthinBtn.addEventListener('click', ()=>{
-      currentWidth = 2;
-      [xthinBtn,thinBtn,thickBtn].forEach(b=>b.classList.remove('selected'));
-      xthinBtn.classList.add('selected');
-    });
-  }
   thinBtn.addEventListener('click', ()=>{
-    currentWidth = xthinBtn ? 5 : 4;
-    [xthinBtn,thinBtn,thickBtn].forEach(b=>b&&b.classList.remove('selected'));
+    currentWidth = 4;
     thinBtn.classList.add('selected');
+    thickBtn.classList.remove('selected');
   });
   thickBtn.addEventListener('click', ()=>{
-    currentWidth = xthinBtn ? 11 : 12;
-    [xthinBtn,thinBtn,thickBtn].forEach(b=>b&&b.classList.remove('selected'));
+    currentWidth = 12;
     thickBtn.classList.add('selected');
+    thinBtn.classList.remove('selected');
   });
   eraserBtn.addEventListener('click', ()=>{
     eraserMode = !eraserMode;
@@ -1045,7 +1027,7 @@ renderAll();
   }
 
   function isOnControls(e){
-    return !!(e.target.closest && e.target.closest('#drawToolbar, #drawToolbarMini, #drawToggleBtn'));
+    return !!(e.target.closest && e.target.closest('#drawToolbar, #drawToggleBtn'));
   }
 
   document.addEventListener('pointerdown', (e)=>{
