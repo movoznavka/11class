@@ -754,13 +754,7 @@ function renderContent(){
 
   lessonArea.innerHTML = html;
   lessonArea.querySelectorAll('[data-kind="card"], [data-kind="chip"], [data-kind="row"]').forEach(el=>{
-    const toggle = ()=>{
-      el.classList.toggle('open');
-      // чорнило на картці прив'язане до конкретного боку (переднього чи
-      // заднього) — після перевертання просимо полотно перемалюватись, щоб
-      // показати лише те, що написано саме на видимому зараз боці
-      if(el.dataset.kind === 'card' && window.redrawInk) window.redrawInk();
-    };
+    const toggle = ()=>{ el.classList.toggle('open'); };
     attachTapToggle(el, toggle);
   });
   syncCanvasAfterRender();
@@ -880,23 +874,23 @@ renderAll();
 // ======================================================================
 // МАЛЮВАННЯ ПОВЕРХ ЕКРАНА (режим "учитель")
 //
-// Ця версія навмисно ПРОСТІША за попередню. Кожне попереднє "покращення"
-// (окреме чорнило на кожному боці картки, компенсація масштабу для кнопки
-// й панелі, гасіння кліку через таймер) додавало власний клас багів:
-// панель "губилася" при зумі, кнопка "тікала" не в той кут, картки й далі
-// перевертались, бо 300мс затримка кліку в Safari іноді довша за наш
-// таймер. Тому тут:
-//   • ОДНЕ спільне полотно на всю сторінку (в т.ч. поверх карток) —
-//     менше рухомих частин, менше місць для помилки;
-//   • перевертання картки більше НЕ залежить від того, чи встигне
-//     браузер сам згенерувати/скасувати клік — ми самі відстежуємо
-//     послідовність "дотик пальцем без зсуву" через pointerdown/pointerup
-//     і повністю ігноруємо перо, поки ввімкнено малювання;
-//   • кнопка й панель кольорів — звичайний CSS position:fixed, без жодного
-//     JS-перерахунку позиції під час зуму. Це означає, що під час
-//     збільшення вони поводяться як практично будь-який інший сайт (можуть
-//     трохи змінювати видиме положення разом зі сторінкою), але НІКОЛИ не
-//     зникають і не "тікають" — а це важливіше.
+// Ця версія навмисно побудована один в один за робочим прикладом, який
+// підтвердив, що пише без затримок і що кнопка з панеллю не зникають і не
+// роздуваються під час зуму. Різниця з попередніми спробами:
+//   • НІЯКОГО втручання в touch-action — воно завжди 'auto', як типово
+//     в браузері. preventDefault() на самому дотику пером і так гарантує,
+//     що перо не гортає й не зумить сторінку; більше нічого чіпати не
+//     треба, а зайві обмеження touch-action, судячи з усього, і були
+//     причиною затримки між буквами.
+//   • НІЯКОЇ JS-компенсації позиції/розміру кнопки й панелі під час
+//     pinch-zoom. Вони — звичайний CSS position:fixed. Раніше спроби
+//     "виправити" це власним кодом лише ламали те, що й так працювало.
+//   • Малювання — просте, пряме, растрове (як у прикладі), без черг і
+//     буферизації.
+// Єдине, що збережено понад приклад: чорнило кожної вкладки зберігається
+// окремо (бо в цьому уроці, на відміну від прикладу, є кілька вкладок) —
+// через ті самі getDrawingSnapshot/setDrawingSnapshot, які вже викликає
+// зовнішній скрипт при перемиканні вкладок.
 // ======================================================================
 (function(){
   const canvas = document.getElementById('drawCanvas');
@@ -915,223 +909,96 @@ renderAll();
   let drawingActive = false;
   let isDrawing = false;
   let currentColor = "#F5304A";
-  let currentWidth = 2;      // за замовчуванням — тонкий
+  let currentWidth = 4;
   let eraserMode = false;
   let lastX = 0, lastY = 0;
-  let strokeMoved = false;
-  let currentStroke = null;
-  const ERASE_RADIUS = 20;  // px — наскільки близько треба торкнутись штриха, щоб стерти його цілком
+  let activePointerId = null;
 
   window.isDrawingActive = function(){ return drawingActive; };
 
-  // ---- штрихи поточної вкладки (векторні, не пікселі — це дозволяє
-  // ластику видаляти цілий штрих одним дотиком) ----
-  const strokeStore = {};   // sectionKey -> [strokes]
-  let strokes = strokeStore[sectionKey()] || (strokeStore[sectionKey()] = []);
-
-  function docSize(){
-    return {
-      w: document.documentElement.clientWidth,
-      h: Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
-    };
-  }
-
-  // якщо штрих був намальований на картці (є cardKey), він видимий лише
-  // тоді, коли ЗАРАЗ показано той самий бік картки, на якому його писали;
-  // штрихи поза картками (без cardKey) видимі завжди
-  function strokeVisible(s){
-    if(!s.cardKey) return true;
-    const el = document.querySelector('[data-card-key="' + s.cardKey + '"]');
-    if(!el) return true;
-    const face = el.classList.contains('open') ? 'back' : 'front';
-    return face === s.face;
-  }
-
-  function drawStrokeFull(s){
-    if(!s.points || !s.points.length) return;
-    ctx.strokeStyle = s.color;
-    ctx.fillStyle = s.color;
-    if(s.points.length === 1){
-      ctx.beginPath();
-      ctx.arc(s.points[0].x, s.points[0].y, (s.points[0].w || currentWidth) / 2, 0, Math.PI*2);
-      ctx.fill();
-      return;
-    }
-    for(let i=1;i<s.points.length;i++){
-      ctx.beginPath();
-      ctx.moveTo(s.points[i-1].x, s.points[i-1].y);
-      ctx.lineTo(s.points[i].x, s.points[i].y);
-      ctx.lineWidth = s.points[i].w || currentWidth;
-      ctx.stroke();
-    }
-  }
-
-  function redrawAll(){
-    ctx.save();
-    ctx.setTransform(1,0,0,1,0,0);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.restore();
-    strokes.forEach(s=>{ if(strokeVisible(s)) drawStrokeFull(s); });
-    // якщо ця функція раптом викликається ПОСЕРЕД мазка (напр. відкладений
-    // resize, що таки спрацював одразу після підняття пера) — мазок, який
-    // ще не потрапив у "strokes", теж домальовуємо, щоб він візуально не
-    // зникав ні за яких обставин
-    if(currentStroke) drawStrokeFull(currentStroke);
+  function currentDocHeight(){
+    return Math.max(
+      document.documentElement.scrollHeight,
+      document.body.scrollHeight,
+      window.innerHeight
+    );
   }
 
   function resizeCanvas(){
-    const dpr = window.devicePixelRatio || 1;
-    const {w, h} = docSize();
-    canvas.style.width = w + 'px';
-    canvas.style.height = h + 'px';
-    canvas.width = Math.max(1, Math.round(w * dpr));
-    canvas.height = Math.max(1, Math.round(h * dpr));
-    ctx.setTransform(dpr,0,0,dpr,0,0);
+    const docWidth = document.documentElement.clientWidth;
+    const docHeight = currentDocHeight();
+
+    const prev = document.createElement('canvas');
+    prev.width = canvas.width;
+    prev.height = canvas.height;
+    if(canvas.width && canvas.height){
+      prev.getContext('2d').drawImage(canvas, 0, 0);
+    }
+
+    canvas.width = docWidth * devicePixelRatio;
+    canvas.height = docHeight * devicePixelRatio;
+    canvas.style.width = docWidth + 'px';
+    canvas.style.height = docHeight + 'px';
+    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    redrawAll();
+
+    if(prev.width && prev.height){
+      ctx.drawImage(prev, 0, 0, prev.width / devicePixelRatio, prev.height / devicePixelRatio);
+    }
   }
   window.resizeDrawCanvas = resizeCanvas;
-  window.redrawInk = redrawAll;
   resizeCanvas();
-  // ВАЖЛИВО: якщо resize спрацює ПОКИ триває мазок пера (на iOS таке
-  // трапляється, коли під час скролу ховається/зʼявляється панель адреси),
-  // відкладаємо саму зміну розміру до підняття пера (щоб не смикати полотно
-  // просто в процесі письма), але НЕ губимо подію — вона виконається одразу
-  // після stopDrawing(). redrawAll() вище й так намальовує поточний мазок,
-  // тож навіть якби ми не відкладали, лінія б не зникла — це подвійний
-  // захист.
-  let resizePending = false;
-  function handleResize(){
-    if(isDrawing){ resizePending = true; return; }
-    resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+  window.addEventListener('orientationchange', resizeCanvas);
+  if(window.ResizeObserver){
+    new ResizeObserver(()=> resizeCanvas()).observe(document.body);
   }
-  window.addEventListener('resize', handleResize);
-  window.addEventListener('orientationchange', ()=> setTimeout(handleResize, 200));
-  window.addEventListener('load', resizeCanvas);
 
   window.clearDrawing = function(){
-    strokes.length = 0;
-    redrawAll();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
   };
 
-  // сумісний з рештою сторінки API: збереження/відновлення чорнила поточної
-  // вкладки при переключенні між вкладками (викликається з зовнішнього
-  // скрипту через saveCurrentDrawing()/restoreCurrentDrawing())
+  // сумісний з рештою сторінки API: чорнило кожної вкладки зберігається й
+  // відновлюється окремо при перемиканні вкладок (викликається з
+  // зовнішнього скрипту через saveCurrentDrawing()/restoreCurrentDrawing())
   window.getDrawingSnapshot = function(){
-    return JSON.stringify(strokes);
+    try{
+      return (canvas.width && canvas.height) ? canvas.toDataURL('image/png') : null;
+    }catch(e){ return null; }
   };
-  window.setDrawingSnapshot = function(json){
-    let arr = [];
-    if(json){ try{ arr = JSON.parse(json) || []; }catch(e){ arr = []; } }
-    strokeStore[sectionKey()] = arr;
-    strokes = arr;
-    redrawAll();
+  window.setDrawingSnapshot = function(dataURL){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if(!dataURL) return;
+    const img = new Image();
+    img.onload = function(){
+      ctx.drawImage(img, 0, 0, canvas.width / devicePixelRatio, canvas.height / devicePixelRatio);
+    };
+    img.src = dataURL;
   };
 
   function setActive(on){
     drawingActive = on;
-    canvas.classList.toggle('active', on);
     toolbar.classList.toggle('show', on);
     toolbar.classList.remove('mini');
-    toolbarMini.classList.remove('show');
+    if(toolbarMini) toolbarMini.classList.remove('show');
     toggleBtn.classList.toggle('on', on);
     toggleBtn.title = on ? 'Вимкнути малювання' : 'Малювати';
-    debugEl.classList.toggle('show', on);
-    if(!on) debugEl.textContent = '';
-    lastLiftTime = null;
-    // Поки малюємо — блокуємо однопальцеве смикання й подвійний тап (щоб
-    // випадкова долоня не гортала сторінку), але двома пальцями масштабувати
-    // можна й далі — пера це не стосується, preventDefault() нижче й так
-    // гарантує, що сам дотик пером ніколи не піде на скрол/зум.
-    document.documentElement.style.touchAction = on ? 'pinch-zoom' : 'auto';
-    document.body.style.touchAction = on ? 'pinch-zoom' : 'auto';
-    document.documentElement.style.webkitUserSelect = on ? 'none' : '';
-    document.body.style.webkitUserSelect = on ? 'none' : '';
-    document.documentElement.style.userSelect = on ? 'none' : '';
-    document.body.style.userSelect = on ? 'none' : '';
-    document.body.style.webkitTouchCallout = on ? 'none' : '';
-    if(on) resizeCanvas();
   }
   toggleBtn.addEventListener('click', ()=> setActive(!drawingActive));
 
-  // ======================================================================
-  // Утримання кнопки-олівця й панелі кольорів у видимій області ПІД ЧАС
-  // pinch-zoom, і завжди звичайного розміру (а не роздутих разом зі
-  // сторінкою). Працює завжди, незалежно від того, чи ввімкнено малювання.
-  //
-  // Дві окремі речі:
-  //  1) ПОЗИЦІЯ (left/top) — рахуємо з visualViewport.offsetLeft/offsetTop/
-  //     width/height і РЕАЛЬНОГО розміру самого елемента, без жодних
-  //     припущень про window.innerWidth/innerHeight.
-  //  2) РОЗМІР — pinch-zoom в Safari масштабує взагалі все на сторінці,
-  //     включно з "fixed"-елементами, тож саму лише позицію без компенсації
-  //     розміру не досить: кнопка лишається на місці, але виглядає
-  //     роздутою. CSS-властивість "zoom" (не transform!) із коефіцієнтом
-  //     1/scale повертає їй нормальний видимий розмір, і, на відміну від
-  //     transform, ніяк не конфліктує з transform-анімацією показу/
-  //     приховування панелі кольорів.
-  // ======================================================================
-  let lastVVKey = '';
-  function repositionForZoom(){
-    const vv = window.visualViewport;
-    if(!vv) return;
-    const scale = vv.scale || 1;
-    const inv = 1 / scale;
-    const margin = 20;
-
-    const btnRect = toggleBtn.getBoundingClientRect();
-    const btnLeft = Math.round(vv.offsetLeft + vv.width - margin - btnRect.width);
-    const btnTop = Math.round(vv.offsetTop + vv.height - margin - btnRect.height);
-
-    const centerX = Math.round(vv.offsetLeft + vv.width / 2);
-    const toolbarRect = toolbar.getBoundingClientRect();
-    const toolbarTop = Math.round(vv.offsetTop + vv.height - 22 - toolbarRect.height);
-    const miniRect = toolbarMini.getBoundingClientRect();
-    const miniTop = Math.round(vv.offsetTop + vv.height - margin - miniRect.height);
-
-    const key = [btnLeft, btnTop, centerX, toolbarTop, miniTop, scale.toFixed(3)].join(',');
-    if(key === lastVVKey) return; // нічого не змінилось — не чіпаємо стилі дарма
-    lastVVKey = key;
-
-    toggleBtn.style.right = 'auto';
-    toggleBtn.style.bottom = 'auto';
-    toggleBtn.style.left = btnLeft + 'px';
-    toggleBtn.style.top = btnTop + 'px';
-    toggleBtn.style.zoom = inv;
-
-    toolbar.style.bottom = 'auto';
-    toolbar.style.left = centerX + 'px';
-    toolbar.style.top = toolbarTop + 'px';
-    toolbar.style.zoom = inv;
-
-    toolbarMini.style.bottom = 'auto';
-    toolbarMini.style.left = centerX + 'px';
-    toolbarMini.style.top = miniTop + 'px';
-    toolbarMini.style.zoom = inv;
+  if(minimizeBtn && toolbarMini){
+    minimizeBtn.addEventListener('click', ()=>{
+      toolbar.classList.remove('show');
+      toolbar.classList.add('mini');
+      toolbarMini.classList.add('show');
+    });
+    toolbarMini.addEventListener('click', ()=>{
+      toolbar.classList.remove('mini');
+      toolbar.classList.add('show');
+      toolbarMini.classList.remove('show');
+    });
   }
-  let vvRafScheduled = false;
-  function scheduleReposition(){
-    if(vvRafScheduled) return;
-    vvRafScheduled = true;
-    requestAnimationFrame(()=>{ vvRafScheduled = false; repositionForZoom(); });
-  }
-  if(window.visualViewport){
-    window.visualViewport.addEventListener('resize', scheduleReposition);
-    window.visualViewport.addEventListener('scroll', scheduleReposition);
-    scheduleReposition();
-  }
-
-  minimizeBtn.addEventListener('click', ()=>{
-    toolbar.classList.remove('show');
-    toolbar.classList.add('mini');
-    toolbarMini.classList.add('show');
-  });
-  toolbarMini.addEventListener('click', ()=>{
-    toolbar.classList.remove('mini');
-    toolbar.classList.add('show');
-    toolbarMini.classList.remove('show');
-  });
 
   swatches.forEach(sw=>{
     sw.addEventListener('click', ()=>{
@@ -1143,133 +1010,87 @@ renderAll();
     });
   });
 
-  function selectWidth(btn, width){
-    [xthinBtn, thinBtn, thickBtn].forEach(b=>b.classList.remove('selected'));
-    btn.classList.add('selected');
-    currentWidth = width;
+  if(xthinBtn){
+    xthinBtn.addEventListener('click', ()=>{
+      currentWidth = 2;
+      [xthinBtn,thinBtn,thickBtn].forEach(b=>b.classList.remove('selected'));
+      xthinBtn.classList.add('selected');
+    });
   }
-  xthinBtn.addEventListener('click', ()=> selectWidth(xthinBtn, 2));
-  thinBtn.addEventListener('click', ()=> selectWidth(thinBtn, 5));
-  thickBtn.addEventListener('click', ()=> selectWidth(thickBtn, 11));
-
+  thinBtn.addEventListener('click', ()=>{
+    currentWidth = xthinBtn ? 5 : 4;
+    [xthinBtn,thinBtn,thickBtn].forEach(b=>b&&b.classList.remove('selected'));
+    thinBtn.classList.add('selected');
+  });
+  thickBtn.addEventListener('click', ()=>{
+    currentWidth = xthinBtn ? 11 : 12;
+    [xthinBtn,thinBtn,thickBtn].forEach(b=>b&&b.classList.remove('selected'));
+    thickBtn.classList.add('selected');
+  });
   eraserBtn.addEventListener('click', ()=>{
     eraserMode = !eraserMode;
     eraserBtn.classList.toggle('selected', eraserMode);
   });
-  clearBtn.addEventListener('click', ()=> window.clearDrawing());
+  clearBtn.addEventListener('click', ()=>{
+    window.clearDrawing();
+  });
 
-  function isPen(e){ return e.pointerType === 'pen'; }
-
-  function dot(x, y, w){
-    ctx.fillStyle = currentColor;
-    ctx.beginPath();
-    ctx.arc(x, y, (w || currentWidth) / 2, 0, Math.PI*2);
-    ctx.fill();
+  function pointerPos(e){
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+      pressure: e.pressure || 0.5,
+    };
   }
 
-  function drawSegment(x, y){
+  function isOnControls(e){
+    return !!(e.target.closest && e.target.closest('#drawToolbar, #drawToolbarMini, #drawToggleBtn'));
+  }
+
+  document.addEventListener('pointerdown', (e)=>{
+    if(!drawingActive) return;
+    if(e.pointerType !== 'pen') return;
+    if(isOnControls(e)) return;
+
+    e.preventDefault();
+    isDrawing = true;
+    activePointerId = e.pointerId;
+    const p = pointerPos(e);
+    lastX = p.x; lastY = p.y;
+  }, { passive: false });
+
+  document.addEventListener('pointermove', (e)=>{
+    if(!drawingActive || !isDrawing) return;
+    if(e.pointerId !== activePointerId) return;
+
+    e.preventDefault();
+    const p = pointerPos(e);
+    ctx.globalCompositeOperation = eraserMode ? 'destination-out' : 'source-over';
     ctx.strokeStyle = currentColor;
-    ctx.lineWidth = currentWidth;
+    const pressureFactor = 0.6 + (p.pressure || 0.5) * 0.8;
+    ctx.lineWidth = (eraserMode ? currentWidth * 3 : currentWidth) * pressureFactor;
     ctx.beginPath();
     ctx.moveTo(lastX, lastY);
-    ctx.lineTo(x, y);
+    ctx.lineTo(p.x, p.y);
     ctx.stroke();
-    if(currentStroke) currentStroke.points.push({x, y, w: currentWidth});
-    lastX = x; lastY = y;
-    strokeMoved = true;
-  }
-
-  // ---- ластик "цілим словом" ----
-  function strokeHit(s, x, y){
-    for(const p of s.points){
-      if(Math.hypot(p.x - x, p.y - y) <= ERASE_RADIUS) return true;
-    }
-    return false;
-  }
-  let eraseChanged = false;
-  let eraseRafScheduled = false;
-  function eraseAt(x, y){
-    if(!strokes.length) return;
-    for(let i=strokes.length-1; i>=0; i--){
-      if(strokeVisible(strokes[i]) && strokeHit(strokes[i], x, y)){
-        strokes.splice(i,1);
-        eraseChanged = true;
-      }
-    }
-    if(eraseChanged && !eraseRafScheduled){
-      eraseRafScheduled = true;
-      requestAnimationFrame(()=>{
-        eraseRafScheduled = false;
-        if(eraseChanged){ eraseChanged = false; redrawAll(); }
-      });
-    }
-  }
-
-  const debugEl = document.getElementById('drawDebug');
-  let lastLiftTime = null;
-
-  window.addEventListener('pointerdown', (e)=>{
-    if(!drawingActive || !isPen(e)) return;
-    e.preventDefault();
-    // ДІАГНОСТИКА: скільки часу пройшло від моменту, коли перо підняли,
-    // до моменту, коли браузер доніс до нас ЦЕЙ pointerdown. Якщо число
-    // тут велике (сотні мс — секунди), затримка виникає ще ДО нашого
-    // коду, на рівні браузера/ОС, і виправити її з JS неможливо. Якщо
-    // число маленьке, а рука на екрані все одно "не реагує" помітно
-        // довше — проблема десь у нашому коді далі, і це вже можна шукати.
-    if(lastLiftTime !== null){
-      const gap = Math.round(performance.now() - lastLiftTime);
-      debugEl.textContent = 'затримка від підняття пера: ' + gap + ' мс';
-    }
-    isDrawing = true;
-    strokeMoved = false;
-    lastX = e.pageX; lastY = e.pageY;
-    if(eraserMode){
-      currentStroke = null;
-      eraseAt(lastX, lastY);
-    } else {
-      currentStroke = { color: currentColor, points: [{x:lastX, y:lastY, w: currentWidth}] };
-      const cardEl = e.target && e.target.closest ? e.target.closest('.flip[data-card-key]') : null;
-      if(cardEl){
-        currentStroke.cardKey = cardEl.dataset.cardKey;
-        currentStroke.face = cardEl.classList.contains('open') ? 'back' : 'front';
-      }
-    }
-  }, {passive:false});
-
-  window.addEventListener('pointermove', (e)=>{
-    if(!drawingActive || !isDrawing || !isPen(e)) return;
-    e.preventDefault();
-    const events = (typeof e.getCoalescedEvents === 'function' && e.getCoalescedEvents().length)
-      ? e.getCoalescedEvents()
-      : [e];
-    for(const ev of events){
-      const x = ev.pageX, y = ev.pageY;
-      if(eraserMode){
-        eraseAt(x, y);
-        lastX = x; lastY = y;
-      } else {
-        if(x === lastX && y === lastY) continue;
-        drawSegment(x, y);
-      }
-    }
-  }, {passive:false});
+    lastX = p.x; lastY = p.y;
+  }, { passive: false });
 
   function stopDrawing(e){
-    if(!isPen(e)) return;
-    if(!eraserMode && currentStroke){
-      if(!strokeMoved) dot(currentStroke.points[0].x, currentStroke.points[0].y, currentStroke.points[0].w);
-      strokes.push(currentStroke);
-    }
-    currentStroke = null;
+    if(e && e.pointerId !== undefined && e.pointerId !== activePointerId) return;
     isDrawing = false;
-    lastLiftTime = performance.now();
-    if(resizePending){ resizePending = false; resizeCanvas(); }
+    activePointerId = null;
   }
-  window.addEventListener('pointerup', stopDrawing);
-  window.addEventListener('pointercancel', stopDrawing);
+  document.addEventListener('pointerup', stopDrawing);
+  document.addEventListener('pointercancel', stopDrawing);
+
+  document.addEventListener('touchmove', function(e){
+    if(drawingActive && e.touches && e.touches[0] && e.touches[0].touchType === 'stylus'){
+      e.preventDefault();
+    }
+  }, { passive: false });
 })();
 </script>
 </body>
-
 </html>
