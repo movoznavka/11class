@@ -924,6 +924,13 @@ async function init(){
     renderQuiz();
     return;
   }
+  const fromUrl = new URLSearchParams(location.search).get('student');
+  if(fromUrl){
+    studentName = fromUrl;
+    started = true;
+    renderQuiz();
+    return;
+  }
   const saved = await getStoredName();
   if(saved){
     studentName = saved;
