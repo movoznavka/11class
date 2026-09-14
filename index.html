@@ -731,6 +731,10 @@ function applyAccessAndRender_(studentCode, allowed, displayName){
     if (card.getAttribute('href') !== '#') {
       card.setAttribute('href', appendStudentParam_(card.getAttribute('href'), displayName));
     }
+    const pill = wrap.querySelector('.test-pill');
+    if (pill && pill.getAttribute('href') !== '#') {
+      pill.setAttribute('href', appendStudentParam_(pill.getAttribute('href'), displayName));
+    }
   });
   document.querySelectorAll('.subgroup').forEach(function(sg){
     if (!sg.querySelector('.card')) sg.remove();
