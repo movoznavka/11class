@@ -635,8 +635,10 @@ renderBlocks_();
 // ============================================================
 const HOMEWORK_API_URL = "https://script.google.com/macros/s/AKfycbyDGcDVtwD0L8WW0zDIsXwYwwf6zp4XzmofzdI0wU-AhhfZIXbH2lOHquNSHI8cKRc7/exec";
 
+let _lastHomeworkMap = null;
 function applyHomework(map){
   map = map || {};
+  _lastHomeworkMap = map;
   document.querySelectorAll('[data-testkey]').forEach(function(el){
     const hw = map[el.getAttribute('data-testkey')];
     if(!hw) return;
@@ -773,7 +775,22 @@ function finishStudentView_(studentCode, allowedStatic, displayName){
   loadHomework(studentCode);
   applyAccessAndRender_(studentCode, allowedStatic, displayName);
 
-  if (!HOMEWORK_API_URL || HOMEWORK_API_URL.indexOf('ВСТАВТЕ') === 0) return;
+  const stillWaiting = HOMEWORK_API_URL && HOMEWORK_API_URL.indexOf('ВСТАВТЕ') !== 0;
+  const blocksEl = document.getElementById('blocks');
+
+  // Якщо після статичного списку карток узагалі не лишилось (весь доступ
+  // очікується від бота) — не лишаємо порожню сторінку, а пишемо, що йде
+  // завантаження, поки чекаємо відповідь.
+  let loadingEl = null;
+  if (stillWaiting && !document.querySelector('.card-wrap')) {
+    loadingEl = document.createElement('p');
+    loadingEl.className = 'sub';
+    loadingEl.id = 'accessLoading';
+    loadingEl.textContent = 'Завантажуємо ваші теми…';
+    document.querySelector('.wrap').insertBefore(loadingEl, blocksEl);
+  }
+
+  if (!stillWaiting) return;
 
   let resolved = false;
   window.applyAccess = function(dynamicList){
@@ -781,9 +798,23 @@ function finishStudentView_(studentCode, allowedStatic, displayName){
     resolved = true;
     dynamicList = dynamicList || [];
     const extra = dynamicList.filter(function(h){ return allowedStatic.indexOf(h) === -1; });
-    if (extra.length === 0) return; // нічого нового — DOM лишаємо як є, без перемальовування
-    renderBlocks_();
-    applyAccessAndRender_(studentCode, allowedStatic.concat(extra), displayName);
+    if (extra.length > 0) {
+      renderBlocks_();
+      applyAccessAndRender_(studentCode, allowedStatic.concat(extra), displayName);
+      // Перемальовування вище стирає картки разом з уже застосованими
+      // позначками ДЗ — застосовуємо їх ще раз на нових картках.
+      if (_lastHomeworkMap) applyHomework(_lastHomeworkMap);
+    }
+
+    const loader = document.getElementById('accessLoading');
+    if (loader) loader.remove();
+
+    if (!document.querySelector('.card-wrap')) {
+      const msg = document.createElement('p');
+      msg.className = 'sub';
+      msg.textContent = 'Поки для вас не відкрито жодної теми. Зверніться до вчительки.';
+      document.querySelector('.wrap').insertBefore(msg, blocksEl);
+    }
   };
 
   const sep = HOMEWORK_API_URL.indexOf('?') > -1 ? '&' : '?';
@@ -830,22 +861,42 @@ function showNamePicker_(studentCode, allowed, members){
 
   if (isTeacher) {
     document.body.classList.add('teacher-mode');
-    document.querySelectorAll('.card').forEach(function(card){
-      const key = card.getAttribute('data-key');
-      const openFor = Object.keys(STUDENT_ACCESS).filter(function(code){
-        return STUDENT_ACCESS[code].indexOf(key) !== -1;
+
+    function renderOpenBadges_(dynamicMap){
+      dynamicMap = dynamicMap || {};
+      document.querySelectorAll('.card').forEach(function(card){
+        const key = card.getAttribute('data-key');
+        const openFor = Object.keys(STUDENT_ACCESS).filter(function(code){
+          const staticOpen = STUDENT_ACCESS[code].indexOf(key) !== -1;
+          const dynOpen = (dynamicMap[normalizeCode(code)] || []).indexOf(key) !== -1;
+          return staticOpen || dynOpen;
+        });
+        let badge = card.querySelector('.open-badge');
+        if (!badge) {
+          badge = document.createElement('span');
+          card.appendChild(badge);
+        }
+        if (openFor.length) {
+          badge.className = 'open-badge open';
+          badge.textContent = '🔓 Відкрито · ' + openFor.length;
+          badge.title = openFor.join(', ');
+        } else {
+          badge.className = 'open-badge closed';
+          badge.textContent = '🔒 нікому не відкрито';
+          badge.title = '';
+        }
       });
-      const badge = document.createElement('span');
-      if (openFor.length) {
-        badge.className = 'open-badge open';
-        badge.textContent = '🔓 Відкрито · ' + openFor.length;
-        badge.title = openFor.join(', ');
-      } else {
-        badge.className = 'open-badge closed';
-        badge.textContent = '🔒 нікому не відкрито';
-      }
-      card.appendChild(badge);
-    });
+    }
+
+    renderOpenBadges_({});
+
+    if (HOMEWORK_API_URL && HOMEWORK_API_URL.indexOf('ВСТАВТЕ') !== 0) {
+      window.applyAllAccess = renderOpenBadges_;
+      const sep = HOMEWORK_API_URL.indexOf('?') > -1 ? '&' : '?';
+      const s = document.createElement('script');
+      s.src = HOMEWORK_API_URL + sep + 'mode=access_all&callback=applyAllAccess';
+      document.body.appendChild(s);
+    }
     return;
   }
 
