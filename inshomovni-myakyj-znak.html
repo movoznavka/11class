@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>М'який знак в іншомовних словах · Тренажер</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#D0E9FC;
+    --bg-soft:#E4F2FC;
+    --card:#FFFFFF;
+    --ink:#13213B;
+    --ink-soft:#6478A0;
+    --line: rgba(19,33,59,0.08);
+
+    --c1-a:#6C8CFF; --c1-b:#3355EE; --c1-sh: rgba(51,85,238,0.45);
+    --c3-a:#5FE0A8; --c3-b:#17A863; --c3-sh: rgba(23,168,99,0.4);
+    --c2-b:#E5484D;
+
+    --correct-bg:#E6F8EE;
+    --correct-ink:#128A54;
+    --wrong-bg:#FDECEC;
+    --wrong-ink:#D8393E;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    padding:28px 16px 64px;
+    position:relative;
+  }
+  .wrap{max-width:720px;margin:0 auto;}
+
+  .topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding-bottom:16px;
+    margin-bottom:22px;
+    border-bottom:1.5px solid rgba(19,33,59,0.14);
+  }
+  .kicker{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:12.5px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--ink);
+    opacity:.55;
+  }
+  .kicker.tag{opacity:.4;}
+
+  .review-banner{
+    display:none;
+    align-items:center;
+    gap:8px;
+    background:#FFF4E0;
+    color:#8A5A00;
+    font-family:'Manrope',sans-serif;
+    font-weight:700;
+    font-size:13px;
+    padding:10px 16px;
+    border-radius:14px;
+    margin-bottom:16px;
+  }
+  .review-banner.show{display:flex;}
+
+  h1{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:clamp(26px,6vw,38px);
+    line-height:1.05;
+    letter-spacing:-0.01em;
+    margin:0 0 8px;
+    text-transform:uppercase;
+  }
+  h1 .hl{color:var(--c1-b);}
+  .sub{color:var(--ink-soft);font-size:15px;max-width:50ch;margin:0 0 22px;font-weight:500;}
+
+  .card{
+    background:var(--card);
+    border-radius:28px;
+    padding:30px 26px;
+    box-shadow: 0 20px 44px -28px rgba(19,33,59,0.35);
+  }
+
+  .progress-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:16px;
+  }
+  .qnum{
+    font-family:'Manrope',sans-serif;
+    font-weight:700;
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+  .score{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:12.5px;
+    color:var(--c3-b);
+    background:var(--correct-bg);
+    padding:6px 13px;
+    border-radius:999px;
+  }
+
+  .segbar{display:flex;gap:3px;margin-bottom:22px;flex-wrap:wrap;}
+  .seg{
+    flex:1;
+    min-width:6px;
+    height:6px;
+    border-radius:999px;
+    background:var(--bg-soft);
+    cursor:pointer;
+  }
+  .seg.current{background:var(--c1-b);}
+  .seg.done-correct{background:var(--c3-b);}
+  .seg.done-wrong{background:var(--c2-b);}
+
+  .qtext{
+    font-family:'Manrope',sans-serif;
+    font-size:19px;
+    font-weight:700;
+    line-height:1.4;
+    margin:0 0 20px;
+    letter-spacing:-0.005em;
+  }
+  .qtext u{ text-decoration-thickness:2px; text-underline-offset:2px; }
+
+  .options{display:flex;flex-direction:column;gap:10px;}
+  .opt{
+    display:flex;
+    align-items:center;
+    gap:13px;
+    text-align:left;
+    width:100%;
+    padding:9px 14px 9px 9px;
+    border-radius:18px;
+    border:none;
+    background:var(--bg-soft);
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    font-weight:500;
+    color:var(--ink);
+    transition:transform .12s ease, background .15s ease;
+  }
+  .opt:hover{transform:translateY(-1px);}
+  .opt[disabled]{cursor:default;}
+  .opt[disabled]:hover{transform:none;}
+  .opt u{ text-decoration-thickness:2px; text-underline-offset:2px; }
+
+  /* --- glass letter tile: uniform accent color, translucent, blurred, like iOS icons --- */
+  .tile{
+    position:relative;
+    width:32px;height:32px;min-width:32px;
+    border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:13.5px;
+    color:var(--c1-b);
+    background: linear-gradient(150deg, rgba(255,255,255,0.75), rgba(108,140,255,0.22));
+    backdrop-filter: blur(6px) saturate(160%);
+    -webkit-backdrop-filter: blur(6px) saturate(160%);
+    border:1px solid rgba(255,255,255,0.7);
+    box-shadow: 0 4px 12px -7px var(--c1-sh), inset 0 1px 1px rgba(255,255,255,0.8);
+    overflow:visible;
+  }
+  .tile > span{position:relative;z-index:1;}
+
+  .badge{
+    position:absolute;
+    top:-5px;right:-5px;
+    width:16px;height:16px;
+    border-radius:50%;
+    border:2px solid var(--card);
+    display:flex;align-items:center;justify-content:center;
+    font-size:9.5px;
+    font-weight:800;
+    color:#fff;
+    z-index:2;
+  }
+  .badge.ok{background:var(--c3-b);}
+  .badge.no{background:var(--c2-b);}
+
+  .opt.correct{background:var(--correct-bg);}
+  .opt.wrong{background:var(--wrong-bg);}
+  .opt.dim{opacity:.5;}
+
+  .feedback{
+    margin-top:16px;
+    padding:13px 16px;
+    border-radius:16px;
+    font-size:14.5px;
+    font-weight:600;
+    display:none;
+    align-items:center;
+    gap:9px;
+  }
+  .feedback.show{display:flex;}
+  .feedback.ok{background:var(--correct-bg);color:var(--correct-ink);}
+  .feedback.bad{background:var(--wrong-bg);color:var(--wrong-ink);}
+  .feedback b{font-family:'Manrope',sans-serif;}
+
+  .nav-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:24px;
+  }
+  .btn{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:13px;
+    padding:12px 22px;
+    border-radius:999px;
+    border:none;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .btn.primary{
+    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));
+    color:#fff;
+    box-shadow:0 10px 20px -8px var(--c1-sh);
+  }
+  .btn.ghost{background:transparent;color:var(--ink-soft);}
+  .btn:disabled{opacity:.3;cursor:default;box-shadow:none;}
+  .btn.small{
+    font-size:12px;
+    padding:8px 4px;
+    opacity:.55;
+    text-decoration:underline;
+    text-underline-offset:2px;
+  }
+  .btn.small:hover{opacity:.85;}
+  .reset-row{
+    text-align:center;
+    margin-top:6px;
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+
+  .done-screen{text-align:center;padding:16px 0;}
+  .done-screen .ring{
+    width:120px;height:120px;
+    margin:0 auto 18px;
+    border-radius:50%;
+    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));
+    box-shadow:0 16px 30px -12px var(--c1-sh);
+    display:flex;align-items:center;justify-content:center;
+    position:relative;
+  }
+  .done-screen .ring::before{
+    content:'';
+    position:absolute;
+    top:6px;left:10px;right:10px;
+    height:46%;
+    border-radius:50% 50% 60% 60%;
+    background:linear-gradient(to bottom, rgba(255,255,255,0.5), rgba(255,255,255,0));
+  }
+  .done-screen .big{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:30px;
+    color:#fff;
+    position:relative;
+    z-index:1;
+  }
+  .done-screen .send-status{
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin-top:10px;
+    min-height:18px;
+  }
+  .done-screen .send-status.ok{color:var(--correct-ink);}
+  .done-screen .send-status.bad{color:var(--wrong-ink);}
+
+  .name-screen{padding:6px 0;}
+  .name-screen label{
+    display:block;
+    font-family:'Manrope',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    margin-bottom:10px;
+    color:var(--ink);
+  }
+  .name-screen input{
+    width:100%;
+    padding:14px 16px;
+    border-radius:16px;
+    border:1.5px solid var(--line);
+    background:var(--bg-soft);
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    font-weight:500;
+    color:var(--ink);
+    outline:none;
+    margin-bottom:18px;
+  }
+  .name-screen input:focus{border-color:var(--c1-b);}
+
+  footer{
+    text-align:center;
+    margin-top:22px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-weight:500;
+  }
+
+  /* ===================== DRAWING / TEACHER MODE ===================== */
+  #drawCanvas{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    z-index:9998;
+    pointer-events:none;
+  }
+
+  #drawToggleBtn{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    width:58px;height:58px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,0.5);
+    background:
+      linear-gradient(150deg, rgba(255,255,255,0.35), rgba(255,255,255,0) 60%),
+      linear-gradient(155deg,var(--c1-a),var(--c1-b));
+    backdrop-filter: blur(10px) saturate(160%);
+    -webkit-backdrop-filter: blur(10px) saturate(160%);
+    box-shadow:
+      0 14px 28px -10px var(--c1-sh),
+      inset 0 1px 1px rgba(255,255,255,0.6),
+      inset 0 -6px 10px -4px rgba(0,0,0,0.15);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    z-index:9999;
+    transition:transform .18s cubic-bezier(.34,1.56,.64,1), background .2s ease, box-shadow .2s ease;
+  }
+  #drawToggleBtn svg{
+    width:24px;height:24px;
+    display:block;
+    transition:transform .25s ease, opacity .15s ease;
+  }
+  #drawToggleBtn:active{transform:scale(0.90);}
+  #drawToggleBtn.on{
+    background:
+      linear-gradient(150deg, rgba(255,255,255,0.35), rgba(255,255,255,0) 60%),
+      linear-gradient(155deg,#FF8A65,var(--c2-b));
+    box-shadow:
+      0 14px 28px -10px rgba(229,72,77,0.55),
+      inset 0 1px 1px rgba(255,255,255,0.6),
+      inset 0 -6px 10px -4px rgba(0,0,0,0.15);
+  }
+  #drawToggleBtn.on svg{ transform:rotate(90deg); }
+
+  #drawToolbar{
+    position:fixed;
+    left:50%;
+    bottom:22px;
+    transform:translateX(-50%) translateY(130%) scale(0.94);
+    opacity:0;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:
+      linear-gradient(150deg, rgba(255,255,255,0.6), rgba(255,255,255,0.15));
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border:1px solid rgba(255,255,255,0.7);
+    padding:9px 16px;
+    border-radius:999px;
+    box-shadow:
+      0 24px 48px -20px rgba(19,33,59,0.45),
+      inset 0 1px 1px rgba(255,255,255,0.9);
+    z-index:9999;
+    transition:transform .25s cubic-bezier(.34,1.56,.64,1), opacity .2s ease;
+    pointer-events:none;
+  }
+  #drawToolbar.show{
+    transform:translateX(-50%) translateY(0) scale(1);
+    opacity:1;
+    pointer-events:auto;
+  }
+  .swatch{
+    position:relative;
+    width:25px;height:25px;
+    border-radius:50%;
+    border:none;
+    box-shadow:
+      0 3px 8px -2px rgba(19,33,59,0.35),
+      inset 0 1px 1px rgba(255,255,255,0.5);
+    cursor:pointer;
+    padding:0;
+    transition:transform .15s cubic-bezier(.34,1.56,.64,1);
+  }
+  .swatch::after{
+    content:'';
+    position:absolute;
+    inset:-4px;
+    border-radius:50%;
+    border:2px solid var(--ink);
+    opacity:0;
+    transform:scale(0.7);
+    transition:opacity .15s ease, transform .15s cubic-bezier(.34,1.56,.64,1);
+  }
+  .swatch.selected{ transform:scale(1.08); }
+  .swatch.selected::after{ opacity:1; transform:scale(1); }
+  .tool-btn{
+    width:34px;height:34px;
+    border-radius:50%;
+    border:none;
+    background:rgba(255,255,255,0.5);
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease, transform .15s cubic-bezier(.34,1.56,.64,1);
+  }
+  .tool-btn svg{ width:16px; height:16px; }
+  .tool-btn .dot{
+    border-radius:50%;
+    background:currentColor;
+  }
+  #thinBtn .dot{ width:6px; height:6px; }
+  #thickBtn .dot{ width:12px; height:12px; }
+  .tool-btn.selected{
+    background:var(--c1-b);
+    color:#fff;
+    transform:scale(1.06);
+  }
+  .tool-sep{
+    width:1px;
+    height:22px;
+    background:rgba(19,33,59,0.14);
+  }
+
+  @media (max-width:480px){
+    #drawToolbar{
+      max-width:94vw;
+      overflow-x:auto;
+      padding:8px 13px;
+      gap:9px;
+    }
+    .swatch{width:21px;height:21px;}
+    .tool-btn{width:30px;height:30px;}
+    .tool-btn svg{width:14px;height:14px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="kicker">Іншомовні слова</div>
+    <div class="kicker tag" id="totalTag">11 завдань</div>
+  </div>
+
+  <div class="review-banner" id="reviewBanner">👀 Режим перегляду відповідей учня</div>
+
+  <h1>Тренажер <span class="hl">м'якого знака в іншомовних словах</span></h1>
+  <p class="sub">Формат НМТ — правопис м'якого знака в запозичених словах. Обери правильний варіант, перевір відповідь одразу.</p>
+
+  <div class="card">
+    <div id="quizArea"></div>
+  </div>
+
+  <footer>@movoznavka</footer>
+</div>
+
+<!-- ==== Малювання поверх екрана (для вчителя) ==== -->
+<canvas id="drawCanvas"></canvas>
+<button id="drawToggleBtn" title="Малювати">
+  <svg id="drawIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4 20L4.6 16.6C4.7 15.9 5.03 15.26 5.55 14.79L15.3 5.7C16.09 4.96 17.34 4.99 18.09 5.78L18.34 6.04C19.08 6.83 19.04 8.08 18.25 8.81L8.5 17.9C8 18.37 7.37 18.66 6.7 18.75L4 20Z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/>
+    <path d="M13.5 7.5L16.5 10.3" stroke="white" stroke-width="1.7" stroke-linecap="round"/>
+  </svg>
+</button>
+<div id="drawToolbar">
+  <button class="swatch selected" style="background:#E5484D" data-color="#E5484D"></button>
+  <button class="swatch" style="background:#3355EE" data-color="#3355EE"></button>
+  <button class="swatch" style="background:#17A863" data-color="#17A863"></button>
+  <button class="swatch" style="background:#13213B" data-color="#13213B"></button>
+  <div class="tool-sep"></div>
+  <button class="tool-btn selected" id="thinBtn" title="Тонка лінія"><span class="dot"></span></button>
+  <button class="tool-btn" id="thickBtn" title="Товста лінія"><span class="dot"></span></button>
+  <div class="tool-sep"></div>
+  <button class="tool-btn" id="eraserBtn" title="Ластик">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M18.5 13.5L10.5 21.5H5.5L2.5 18.5C2.11 18.11 2.11 17.48 2.5 17.09L13.5 6.09C13.89 5.7 14.52 5.7 14.91 6.09L18.5 9.68C19.5 10.68 19.5 12.5 18.5 13.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M9 13.5L15 19.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <button class="tool-btn" id="clearBtn" title="Очистити все">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M5 7H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M9.5 7V4.8C9.5 4.36 9.86 4 10.3 4H13.7C14.14 4 14.5 4.36 14.5 4.8V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M7 7L7.7 18.6C7.75 19.42 8.42 20 9.24 20H14.76C15.58 20 16.25 19.42 16.3 18.6L17 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M10.3 10.5V16.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M13.7 10.5V16.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  </button>
+</div>
+
+<script>
+// Питання про розряди й правопис займенників (§31).
+// Слово в подвійних квадратних дужках, напр. [[а]] всередині опції, підкреслюється автоматично.
+const QUESTIONS = [
+  {q:"М'який знак на місці пропуску треба писати в слові", opts:["барел..єф","б..юлетень","б..юро","б..єф"], a:0},
+  {q:"М'який знак на місці пропуску треба писати в слові", opts:["Монтеск..є","К..єркегор","Мол..єр","Олів..є"], a:0},
+  {q:"М'який знак на місці пропуску треба писати в слові", opts:["мад..ярський","конферанс..є","сер..йозний","Х..юстон"], a:2},
+  {q:"М'який знак на місці пропуску треба писати в обох словах рядка", opts:["ател..є, деб..ют","модел..єр, кол..є","кал..ян, куп..юра","міл..йон, н..юанс"], a:1},
+  {q:"М'який знак на місці пропуску треба писати в обох словах рядка", opts:["ескадрил..я, міл..ярд","кастан..єти, фл..юс","бел..етаж, кур..йоз","асфал..т, л..юстра"], a:0},
+  {q:"М'який знак на місці пропуску треба писати в обох словах рядка", opts:["Пхен..ян, трил..йон","Рішел..є, М..юнхен","Джул..єтта, Барб..юс","бал..зам, пап..є-маше"], a:0},
+  {q:"М'який знак на місці пропуску треба писати в обох словах рядка", opts:["павіл..йон, інтер..єр","джентл..мен, фл..юс","бул..йон, кан..йон","рант..є, рай..он"], a:2},
+  {q:"М'який знак на місці пропуску треба писати в усіх словах рядка", opts:["рел..єф, ескадрил..я, п..єса","він..єтка, медал..йон, кол..є","бутон..єрка, вар..єте, фал..ш","монпанс..є, Н..ютон, м..юзикл"], a:1},
+  {q:"М'який знак на місці пропуску треба писати в усіх словах рядка", opts:["Сал..єрі, магістрал.., шприц..","ал..труїст, Севіл..я, бар..єр","Гот..є, кол..рабі, мін..йони","анал..гін, рел..єф, нокт..юрн"], a:2},
+  {q:"М'який знак на місці пропуску треба писати в усіх словах рядка", opts:["біл..ярд, шампін..йон, рант..є","мантил..я, сен..йор, рез..юме","дос..є, едел..вейс, сек..юриті","кабал..єро, лос..йон, кур..йоз"], a:0},
+  {q:"М'який знак на місці пропуску треба писати в усіх словах рядка", opts:["жул..єн, ідал..го, Рейк..явік","Марсел..єза, ал..бом, вар..єте","філ..м, мес..є, конферанс..є","вол..єр, ал..бінос, грав..юра"], a:2},
+  {q:"М'який знак треба писати на місці пропуску в обох словах рядка", opts:["ал..янс, с..юрреалізм","конс..єрж, б..ювет","рез..юме, т..юрбан","шифон..єр, ател..є"], a:0},
+  {q:"М'який знак треба писати на місці пропуску в обох словах рядка", opts:["кол..є, бракон..єр","він..єтка, мад..яр","пен..юар, дос..є","сен..йор, пол..юс"], a:3},
+  {q:"М'який знак треба писати на місці пропуску в обох словах рядка", opts:["бел..етаж, сер..йозно","шампін..йон, іл..юзія","Рішел..є, б..юлетень","міл..ярдер, Гот..є"], a:0},
+  {q:"М'який знак треба писати на місці пропуску в обох словах рядка", opts:["ал..труїзм, манік..юр","кал..ян, конферанс..є","порт..є, мал..ярія","рел..єф, н..юанс"], a:3},
+  {q:"М'який знак треба писати на місці пропуску в усіх словах рядка", opts:["Н..ю-Йорк, монпанс..є, порт..єра","міл..ярд, б..юрократ, бул..йонний","батал..йон, ком..юніке, нокт..юрн","бутон..єрка, м..юзикл, с..южетний"], a:2},
+  {q:"М'який знак треба писати на місці пропуску в усіх словах рядка", opts:["Н..ютон, дел..та, Ал..яска","пал..то, Рафаел.., Д..юма","жен..шен.., пас..янс, Мол..єр","біл..ярд, бал..зам, іл..юмінація"], a:0},
+  {q:"М'який знак треба писати на місці пропуску в усіх словах рядка", opts:["Севіл..я, д..юна, вексел..","мос..є, конс..єрж, Мал..та","павіл..йон, сер..йозний, сен..йор","компан..йон, М..юллер, лоял..ний"], a:1},
+  {q:"М'який знак треба писати на місці пропуску в усіх словах рядка", opts:["Пхен..ян, міл..йон, бракон..єр","грил..яж, т..юбик, модел..єр","кабал..єро, кр..юшон, лос..йон","барел..єф, л..юстра, едел..вейс"], a:0},
+  {q:"М'який знак треба писати на місці пропуску в усіх словах рядка", opts:["магістрал.., асфал..т, пап..є-маше","барел..єф, рел..єфний, п..єса","порт..єра, міл..ярдер, бал..зам","б..юлетень, грил..яж, Мол..єр","дос..є, мад..ярський, модел..єр"], a:2},
+  {q:"М'який знак треба писати на місці пропуску в усіх словах рядка", opts:["н..юанс, Пхен..ян, бутон..єрка","монпанс..є, біл..ярд, пас..янс","модел..єр, кан..йон, л..юстра","компан..йон, Н..ютон, кур..йоз","ател..є, конферанс..є, мал..ярія"], a:1},
+  {q:"М'який знак треба писати на місці пропуску в усіх словах рядка", opts:["рел..єф, мад..яр, шампін..йон","т..юрбан, мантил..я, Рішел..є","едел..вейс, бел..етаж, сен..йор","Мол..єр, ал..труїзм, куп..юра","ескадрил..я, дос..є, фл..юс"], a:2},
+  {q:"М'який знак треба писати на місці пропуску в усіх словах рядка", opts:["квінтил..йон, вол..єр, прес-пап..є","ал..фонс, гіл..йотина, сек..юриті","Джул..єтта, лос..йон, р..юш","він..єтка, бракон..єр, пен..юар","кабал..єро, кал..ян, рез..юме"], a:3}
+];
+
+const LETTERS = ["А","Б","В","Г","Д"];
+
+// --- Telegram reporting config ---
+const TG_BOT_TOKEN = "8859310874:AAEJoYfUnv54dLOqglpMk5yfi06zeZ2oc9Q";
+const TG_CHAT_ID = "7255798532";
+// Адреса вашого Apps Script веб-застосунку (закінчується на /exec).
+const LOG_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyDGcDVtwD0L8WW0zDIsXwYwwf6zp4XzmofzdI0wU-AhhfZIXbH2lOHquNSHI8cKRc7/exec";
+
+// Тихо надсилає результат у Google-таблицю (для кнопок-учнів у боті).
+// Якщо це не спрацює — на роботу тесту й на сповіщення вчителю це не вплине.
+function logToSheet(payload){
+  try{
+    fetch(LOG_WEBAPP_URL, {
+      method: 'POST',
+      headers: {'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    }).catch(()=>{});
+  }catch(e){}
+}
+
+let qIdx = 0;
+let answers = {};
+let studentName = "";
+let started = false;
+let reportSent = false;
+let finished = false;
+let reviewMode = false; // true, коли сторінку відкрито за посиланням "розбір відповідей"
+
+const quizArea = document.getElementById('quizArea');
+document.getElementById('totalTag').textContent = QUESTIONS.length + " завдань";
+
+// [[текст]] у варіанті відповіді перетворюється на <u>текст</u>
+function renderOpt(o){
+  return o.replace(/\[\[([^\]]+)\]\]/g, '<u>$1</u>');
+}
+
+function scoreOverall(){
+  let correct = 0, answered = 0;
+  QUESTIONS.forEach((_,i)=>{
+    const rec = answers[i];
+    if(rec){ answered++; if(rec.correct) correct++; }
+  });
+  return {correct, answered, total: QUESTIONS.length};
+}
+
+async function getStoredName(){
+  try{
+    const result = await window.storage.get('student_name');
+    return result ? result.value : null;
+  }catch(e){
+    return null;
+  }
+}
+
+async function setStoredName(name){
+  try{
+    await window.storage.set('student_name', name);
+  }catch(e){
+    // сховище недоступне — ім'я просто не запам'ятається між сесіями
+  }
+}
+
+async function clearStoredName(){
+  try{
+    await window.storage.delete('student_name');
+  }catch(e){}
+}
+
+// ---- Посилання "розбір відповідей" ----
+function buildReviewLink(){
+  const pairs = [];
+  QUESTIONS.forEach((_,i)=>{
+    const rec = answers[i];
+    if(rec) pairs.push(i + '-' + rec.picked);
+  });
+  const ansStr = pairs.join(',');
+  const base = location.origin + location.pathname;
+  return `${base}?review=1&name=${encodeURIComponent(studentName)}&ans=${ansStr}`;
+}
+
+// Розпізнає посилання розбору й заповнює answers/studentName з нього
+function parseReviewParam(){
+  const params = new URLSearchParams(location.search);
+  if(params.get('review') !== '1') return false;
+  const name = params.get('name');
+  const ansParam = params.get('ans');
+  if(!ansParam) return false;
+
+  studentName = name || 'Учень';
+  answers = {};
+  ansParam.split(',').forEach(pair=>{
+    const [idxStr, valStr] = pair.split('-');
+    const i = Number(idxStr);
+    const picked = Number(valStr);
+    if(!Number.isNaN(i) && !Number.isNaN(picked) && i >= 0 && i < QUESTIONS.length){
+      answers[i] = {picked, correct: picked === QUESTIONS[i].a};
+    }
+  });
+
+  started = true;
+  reviewMode = true;
+  qIdx = 0;
+  return true;
+}
+
+function renderNameScreen(prefill){
+  quizArea.innerHTML = `
+    <div class="name-screen">
+      <label for="nameInput">Як тебе звати?</label>
+      <input type="text" id="nameInput" placeholder="Ім'я" autocomplete="off" value="${prefill ? prefill.replace(/"/g,'&quot;') : ''}">
+      <button class="btn primary" id="startBtn" style="width:100%;justify-content:center;">Почати тест</button>
+    </div>
+  `;
+  const input = document.getElementById('nameInput');
+  const startBtn = document.getElementById('startBtn');
+  input.focus();
+  const go = async ()=>{
+    const val = input.value.trim();
+    studentName = val || "Без імені";
+    await setStoredName(studentName);
+    started = true;
+    qIdx = 0;
+    renderQuiz();
+  };
+  startBtn.onclick = go;
+  input.addEventListener('keydown', (e)=>{ if(e.key==='Enter') go(); });
+}
+
+async function sendTelegramReport(){
+  const {correct, total, answered} = scoreOverall();
+  const wrongList = [];
+  QUESTIONS.forEach((_,i)=>{
+    const rec = answers[i];
+    if(rec && !rec.correct) wrongList.push(i+1);
+  });
+
+  let text = `📚 М'який знак в іншомовних словах · Тренажер\n`;
+  text += `Учень: ${studentName}\n`;
+  if(answered < total){
+    text += `Результат: ${correct}/${answered} (виконано ${answered} із ${total} завдань)\n`;
+  } else {
+    text += `Результат: ${correct}/${total}\n`;
+  }
+  if(wrongList.length){
+    text += `Помилки в завданнях: ${wrongList.join(', ')}`;
+  } else {
+    text += `Помилок немає 🎉`;
+  }
+
+  const reviewLink = buildReviewLink();
+
+  logToSheet({
+    type: "quiz_result",
+    student: studentName,
+    testName: "М'який знак в іншомовних словах",
+    correct, answered, total,
+    wrongList,
+    reviewLink
+  });
+
+  const statusEl = document.getElementById('sendStatus');
+  try{
+    const resp = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        chat_id: TG_CHAT_ID,
+        text,
+        reply_markup: {
+          inline_keyboard: [[
+            { text: "🔍 Переглянути розбір відповідей", url: reviewLink }
+          ]]
+        }
+      })
+    });
+    const data = await resp.json();
+    if(data.ok){
+      if(statusEl){ statusEl.textContent = 'Результат надіслано вчителю ✓'; statusEl.className = 'send-status ok'; }
+    } else {
+      if(statusEl){ statusEl.textContent = 'Не вдалося надіслати результат'; statusEl.className = 'send-status bad'; }
+    }
+  } catch(err){
+    if(statusEl){ statusEl.textContent = 'Не вдалося надіслати результат'; statusEl.className = 'send-status bad'; }
+  }
+}
+
+function renderQuiz(){
+  document.getElementById('reviewBanner').classList.toggle('show', reviewMode);
+
+  if(!started){ renderNameScreen(); return; }
+
+  const total = QUESTIONS.length;
+
+  if(qIdx >= total || finished){
+    const {correct, answered} = scoreOverall();
+    quizArea.innerHTML = `
+      <div class="done-screen">
+        <div class="ring"><div class="big">${correct}/${answered}</div></div>
+        <p class="sub" style="margin:0 auto 4px;">${studentName} · Іншомовні слова · відповідано ${answered} з ${total}</p>
+        ${reviewMode ? '' : `<div class="send-status" id="sendStatus">Надсилаємо результат...</div>
+        <button class="btn primary" id="restartBtn" style="margin-top:14px;">Пройти ще раз</button>`}
+      </div>`;
+    if(!reviewMode){
+      document.getElementById('restartBtn').onclick = ()=>{
+        answers = {};
+        qIdx = 0; reportSent = false; finished = false;
+        renderQuiz();
+      };
+      if(!reportSent){
+        reportSent = true;
+        sendTelegramReport();
+      }
+    }
+    return;
+  }
+
+  const q = QUESTIONS[qIdx];
+  const rec = answers[qIdx];
+  const {correct, answered} = scoreOverall();
+
+  let segs = '';
+  QUESTIONS.forEach((_,i)=>{
+    const r = answers[i];
+    let cls = i===qIdx ? 'current' : (r ? (r.correct?'done-correct':'done-wrong') : '');
+    segs += `<div class="seg ${cls}" data-i="${i}"></div>`;
+  });
+
+  const canGoNext = rec || reviewMode;
+
+  quizArea.innerHTML = `
+    <div class="progress-row">
+      <div class="qnum">${studentName} · Питання ${qIdx+1} з ${total}</div>
+      <div class="score">${correct}/${answered||0}</div>
+    </div>
+    <div class="segbar">${segs}</div>
+    <p class="qtext">${q.q}</p>
+    <div class="options">
+      ${q.opts.map((o,i)=>`
+        <button class="opt" data-i="${i}" ${(rec||reviewMode)?'disabled':''}>
+          <span class="tile"><span>${LETTERS[i]}</span></span><span>${renderOpt(o)}</span>
+        </button>`).join('')}
+    </div>
+    <div class="feedback ${rec ? 'show '+(rec.correct?'ok':'bad') : (reviewMode ? 'show bad' : '')}" id="fb">
+      ${rec
+        ? (rec.correct ? `<span><b>Правильно.</b> Відповідь — ${LETTERS[q.a]}.</span>` : `<span>Правильна відповідь — ${LETTERS[q.a]}.</span>`)
+        : (reviewMode ? `<span>Учень не відповів. Правильна відповідь — ${LETTERS[q.a]}.</span>` : '')}
+    </div>
+    <div class="nav-row">
+      <button class="btn ghost" id="prevBtn" ${qIdx===0?'disabled':''}>← Назад</button>
+      <button class="btn primary" id="nextBtn" ${canGoNext?'':'disabled'}>${qIdx===total-1?'До результату':'Далі →'}</button>
+    </div>
+    ${reviewMode ? '' : `
+    <div class="reset-row">
+      <button class="btn ghost small" id="finishBtn">Завершити і надіслати результат</button>
+      <button class="btn ghost small" id="changeNameBtn">Змінити ім'я</button>
+    </div>`}
+  `;
+
+  if(rec){
+    quizArea.querySelectorAll('.opt').forEach((btn,i)=>{
+      const tile = btn.querySelector('.tile');
+      if(i===q.a){
+        btn.classList.add('correct');
+        tile.insertAdjacentHTML('beforeend', '<span class="badge ok">✓</span>');
+      } else if(i===rec.picked){
+        btn.classList.add('wrong');
+        tile.insertAdjacentHTML('beforeend', '<span class="badge no">✕</span>');
+      } else {
+        btn.classList.add('dim');
+      }
+    });
+  } else if(reviewMode){
+    quizArea.querySelectorAll('.opt').forEach((btn,i)=>{
+      const tile = btn.querySelector('.tile');
+      if(i===q.a){
+        btn.classList.add('correct');
+        tile.insertAdjacentHTML('beforeend', '<span class="badge ok">✓</span>');
+      } else {
+        btn.classList.add('dim');
+      }
+    });
+  }
+
+  quizArea.querySelectorAll('.opt').forEach(btn=>{
+    btn.onclick = ()=>{
+      if(reviewMode) return;
+      if(answers[qIdx]) return;
+      const picked = +btn.dataset.i;
+      answers[qIdx] = {picked, correct: picked===q.a};
+      renderQuiz();
+    };
+  });
+  document.getElementById('prevBtn').onclick = ()=>{ qIdx--; renderQuiz(); };
+  document.getElementById('nextBtn').onclick = ()=>{ qIdx++; renderQuiz(); };
+  if(!reviewMode){
+    document.getElementById('finishBtn').onclick = ()=>{
+      const {answered} = scoreOverall();
+      const msg = answered===0
+        ? 'Ти ще не відповів на жодне питання. Завершити тест зараз?'
+        : `Завершити тест зараз і надіслати результат (відповідено на ${answered} із ${total})?`;
+      if(confirm(msg)){
+        finished = true;
+        renderQuiz();
+      }
+    };
+    document.getElementById('changeNameBtn').onclick = async ()=>{
+      await clearStoredName();
+      started = false;
+      renderNameScreen(studentName);
+    };
+  }
+  quizArea.querySelectorAll('.seg').forEach(d=>{
+    d.onclick = ()=>{ qIdx = +d.dataset.i; renderQuiz(); };
+  });
+}
+
+async function init(){
+  if(parseReviewParam()){
+    renderQuiz();
+    return;
+  }
+  const fromUrl = new URLSearchParams(location.search).get('student');
+  if(fromUrl){
+    studentName = fromUrl;
+    started = true;
+    renderQuiz();
+    return;
+  }
+  const saved = await getStoredName();
+  if(saved){
+    studentName = saved;
+    started = true;
+  }
+  renderQuiz();
+}
+init();
+
+// ======================================================================
+// МАЛЮВАННЯ ПОВЕРХ ЕКРАНА (режим "учитель")
+// ======================================================================
+(function(){
+  const canvas = document.getElementById('drawCanvas');
+  const ctx = canvas.getContext('2d');
+  const toggleBtn = document.getElementById('drawToggleBtn');
+  const toolbar = document.getElementById('drawToolbar');
+  const thinBtn = document.getElementById('thinBtn');
+  const thickBtn = document.getElementById('thickBtn');
+  const eraserBtn = document.getElementById('eraserBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const swatches = document.querySelectorAll('.swatch');
+
+  let drawingActive = false;
+  let isDrawing = false;
+  let currentColor = "#E5484D";
+  let currentWidth = 4;
+  let eraserMode = false;
+  let lastX = 0, lastY = 0;
+  let activePointerId = null;
+
+  function currentDocHeight(){
+    return Math.max(
+      document.documentElement.scrollHeight,
+      document.body.scrollHeight,
+      window.innerHeight
+    );
+  }
+
+  function resizeCanvas(){
+    const docWidth = document.documentElement.clientWidth;
+    const docHeight = currentDocHeight();
+
+    const prev = document.createElement('canvas');
+    prev.width = canvas.width;
+    prev.height = canvas.height;
+    if(canvas.width && canvas.height){
+      prev.getContext('2d').drawImage(canvas, 0, 0);
+    }
+
+    canvas.width = docWidth * devicePixelRatio;
+    canvas.height = docHeight * devicePixelRatio;
+    canvas.style.width = docWidth + 'px';
+    canvas.style.height = docHeight + 'px';
+    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    if(prev.width && prev.height){
+      ctx.drawImage(prev, 0, 0, prev.width / devicePixelRatio, prev.height / devicePixelRatio);
+    }
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+  window.addEventListener('orientationchange', resizeCanvas);
+  if(window.ResizeObserver){
+    new ResizeObserver(()=> resizeCanvas()).observe(document.body);
+  }
+
+  window.clearDrawing = function(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  };
+
+  function setActive(on){
+    drawingActive = on;
+    toolbar.classList.toggle('show', on);
+    toggleBtn.classList.toggle('on', on);
+    toggleBtn.title = on ? 'Вимкнути малювання' : 'Малювати';
+  }
+
+  toggleBtn.addEventListener('click', ()=> setActive(!drawingActive));
+
+  swatches.forEach(sw=>{
+    sw.addEventListener('click', ()=>{
+      swatches.forEach(s=>s.classList.remove('selected'));
+      sw.classList.add('selected');
+      currentColor = sw.dataset.color;
+      eraserMode = false;
+      eraserBtn.classList.remove('selected');
+    });
+  });
+
+  thinBtn.addEventListener('click', ()=>{
+    currentWidth = 4;
+    thinBtn.classList.add('selected');
+    thickBtn.classList.remove('selected');
+  });
+  thickBtn.addEventListener('click', ()=>{
+    currentWidth = 12;
+    thickBtn.classList.add('selected');
+    thinBtn.classList.remove('selected');
+  });
+  eraserBtn.addEventListener('click', ()=>{
+    eraserMode = !eraserMode;
+    eraserBtn.classList.toggle('selected', eraserMode);
+  });
+  clearBtn.addEventListener('click', ()=>{
+    window.clearDrawing();
+  });
+
+  function pointerPos(e){
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+      pressure: e.pressure || 0.5,
+    };
+  }
+
+  function isOnControls(e){
+    return !!(e.target.closest && e.target.closest('#drawToolbar, #drawToggleBtn'));
+  }
+
+  document.addEventListener('pointerdown', (e)=>{
+    if(!drawingActive) return;
+    if(e.pointerType !== 'pen') return;
+    if(isOnControls(e)) return;
+
+    e.preventDefault();
+    isDrawing = true;
+    activePointerId = e.pointerId;
+    const p = pointerPos(e);
+    lastX = p.x; lastY = p.y;
+  }, { passive: false });
+
+  document.addEventListener('pointermove', (e)=>{
+    if(!drawingActive || !isDrawing) return;
+    if(e.pointerId !== activePointerId) return;
+
+    e.preventDefault();
+    const p = pointerPos(e);
+    ctx.globalCompositeOperation = eraserMode ? 'destination-out' : 'source-over';
+    ctx.strokeStyle = currentColor;
+    const pressureFactor = 0.6 + (p.pressure || 0.5) * 0.8;
+    ctx.lineWidth = (eraserMode ? currentWidth * 3 : currentWidth) * pressureFactor;
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+    lastX = p.x; lastY = p.y;
+  }, { passive: false });
+
+  function stopDrawing(e){
+    if(e && e.pointerId !== undefined && e.pointerId !== activePointerId) return;
+    isDrawing = false;
+    activePointerId = null;
+  }
+  document.addEventListener('pointerup', stopDrawing);
+  document.addEventListener('pointercancel', stopDrawing);
+
+  document.addEventListener('touchmove', function(e){
+    if(drawingActive && e.touches && e.touches[0] && e.touches[0].touchType === 'stylus'){
+      e.preventDefault();
+    }
+  }, { passive: false });
+})();
+</script>
+</body>
+</html>
