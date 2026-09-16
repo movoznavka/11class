@@ -522,7 +522,7 @@
 <script>
 // Усі питання об'єднано в один суцільний список (розділи більше не розділені вкладками)
 // Слово в подвійних квадратних дужках, напр. [[а]] всередині опції, підкреслюється автоматично.
-const QUESTIONS = [
+const ALL_QUESTIONS = [
   {q:"За алфавітом записано всі слова рядка", opts:["марка, марити, мастило, мафіозний","ожеледиця, ожеледь, ожити, ознака","яблучний, японський, ятрити, ясність","прірва, призначити, пружина, пташка"], a:1},
   {q:"За алфавітом записано всі слова рядка", opts:["Капріо, Кідман, Куніс, Клуні","Джоуль, Ейнштейн, Евклід, Піфагор","Шафаренко, Шевченко, Шевчук, Шумейко","Мазуренко, Матвієнко, Масенко, Мережко"], a:2},
   {q:"Букви я, ю, є позначають по два звуки в кожному слові рядка", opts:["пам'ять, Баюл, кольє, гравюра","в'юн, дзвякнути, В'єтнам, заява","каюк, ательє, Нью-Йорк, яшма","маяти, тюльпан, п'єш, Яготин"], a:2},
@@ -573,6 +573,52 @@ const QUESTIONS = [
   {q:"Звук [д] треба вимовляти на місці пропуску в усіх словах рядка", opts:["коля[..]ка, на[..]бання, наро[..], [..]унай","рі[..]ний, проїз[..]ний, [..]ивак, лю[..]ство","пі[..]земний, прила[..]дя, [..]жміль, і[..]ея","[..]вері, боро[..]ьба, безла[..], [..]ністер","приро[..]а, сього[..]ні, ра[..]жу, пі[..]йом"], a:0},
   {q:"Звук [з] треба вимовляти на місці пропуску в усіх словах рядка", opts:["ку[..]ня, [..]тертий, [..]елень, галу[..]зя","[..]чистити, [..]ів'ялий, [..]ерно, [..]ілля","про[..]ьба, бе[..]хмарно, [..]аява, ве[..]ти","гуд[..]ик, ро[..]бити, [..]вичай, боя[..]нь","прика[..]ка, моро[..], моту[..]ка, [..]в'язок"], a:4}
 ];
+
+// ============================================================
+// ДЗ: підтримує і "одне число" (?hw=35 — почати з №35 і до кінця,
+// як завжди було), і "список/діапазон" (?hw=22-28,36-46 — показати
+// ЛИШЕ ці завдання, під їхніми справжніми номерами).
+// ============================================================
+function parseHwSpec_(raw){
+  if(!raw) return null;
+  raw = raw.trim();
+  if(/^\d+$/.test(raw)){
+    return { type: 'from', start: parseInt(raw, 10) };
+  }
+  const set = new Set();
+  raw.split(',').forEach(function(part){
+    part = part.trim();
+    if(!part) return;
+    const m = part.match(/^(\d+)\s*-\s*(\d+)$/);
+    if(m){
+      let a = parseInt(m[1],10), b = parseInt(m[2],10);
+      if(a > b){ const t=a; a=b; b=t; }
+      for(let n=a; n<=b; n++) set.add(n);
+    } else {
+      const n = parseInt(part,10);
+      if(!isNaN(n)) set.add(n);
+    }
+  });
+  return set.size ? { type: 'subset', numbers: Array.from(set).sort(function(a,b){return a-b;}) } : null;
+}
+
+const _hwParam = new URLSearchParams(location.search).get('hw');
+const _hwSpec = parseHwSpec_(_hwParam);
+
+let QUESTIONS = ALL_QUESTIONS;
+let _hwStartIdx = 0;
+if(_hwSpec){
+  if(_hwSpec.type === 'subset'){
+    const filtered = _hwSpec.numbers
+      .map(function(n){ return ALL_QUESTIONS[n-1] ? Object.assign({origIndex: n-1}, ALL_QUESTIONS[n-1]) : null; })
+      .filter(Boolean);
+    if(filtered.length) QUESTIONS = filtered;
+  } else if(_hwSpec.type === 'from'){
+    if(_hwSpec.start >= 1 && _hwSpec.start <= ALL_QUESTIONS.length){
+      _hwStartIdx = _hwSpec.start - 1;
+    }
+  }
+}
 
 const LETTERS = ["А","Б","В","Г","Д"];
 
@@ -656,7 +702,9 @@ function buildReviewLink(){
   });
   const ansStr = pairs.join(',');
   const base = location.origin + location.pathname;
-  return `${base}?review=1&name=${encodeURIComponent(studentName)}&ans=${ansStr}`;
+    let url = `${base}?review=1&name=${encodeURIComponent(studentName)}&ans=${ansStr}`;
+  if(_hwParam) url += `&hw=${encodeURIComponent(_hwParam)}`;
+  return url;
 }
 
 // Розпізнає посилання розбору й заповнює answers/studentName з нього
@@ -712,7 +760,7 @@ async function sendTelegramReport(){
   const wrongList = [];
   QUESTIONS.forEach((_,i)=>{
     const rec = answers[i];
-    if(rec && !rec.correct) wrongList.push(i+1);
+    if(rec && !rec.correct) wrongList.push((QUESTIONS[i].origIndex !== undefined ? QUESTIONS[i].origIndex : i) + 1);
   });
 
   const reviewLink = buildReviewLink();
@@ -874,10 +922,7 @@ async function init(){
   if(fromUrl){
     studentName = fromUrl;
     started = true;
-    const hw = parseInt(urlParams.get('hw'), 10);
-    if(!isNaN(hw) && hw >= 1 && hw <= QUESTIONS.length){
-      qIdx = hw - 1;
-    }
+    qIdx = _hwStartIdx;
     renderQuiz();
     return;
   }

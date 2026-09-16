@@ -525,7 +525,7 @@
 <script>
 // Усі питання об'єднано в один суцільний список.
 // Слово в подвійних квадратних дужках, напр. [[а]] всередині опції, підкреслюється автоматично.
-const QUESTIONS = [
+const ALL_QUESTIONS = [
   {q:"НЕ потрібна жодна буква на місці пропуску в усіх словах рядка", opts:["корис..но, буревіс..ник, невіс..ці","прихвос..ні, тріс..нути, цінніс..ний","учас..ник, студен..ський, очис..ний","облес..ливий, шіс..надцять, піз..ній"], a:1},
   {q:"НЕ потрібна жодна буква на місці пропуску в усіх словах рядка", opts:["улес..ливий, щотиж..невик, якіс..ний","хрус..нути, турис..ці, окупан..ський","ненавмис..ний, ус..но, шіс..десят","капус..няк, чес..но, волейболіс..ці"], a:0},
   {q:"НЕ потрібна жодна буква на місці пропуску в усіх словах рядка", opts:["водоочис..ний, артис..ці, чес..но","радіс..но, шіс..надцятий, сер..це","тиж..ні, пес..ливий, перелес..ник","облас..ний, провіс..ник, піс..ний"], a:3},
@@ -580,6 +580,52 @@ const QUESTIONS = [
   {q:"Правильно написано всі слова рядка", opts:["журналістці, агенство, студентський","туристський, проїздний, хвастнути","форпостний, швидкістний, капосний","прихвосні, захисний, хворостняк"], a:3},
   {q:"Правильно написано всі слова рядка", opts:["тижневий, безвиїздний, докторантський","радісний, обласний, безпристрастний","артистці, кількісний, шістнадцятий","йодовмісний, цілістний, перехресний"], a:2}
 ];
+
+// ============================================================
+// ДЗ: підтримує і "одне число" (?hw=35 — почати з №35 і до кінця,
+// як завжди було), і "список/діапазон" (?hw=22-28,36-46 — показати
+// ЛИШЕ ці завдання, під їхніми справжніми номерами).
+// ============================================================
+function parseHwSpec_(raw){
+  if(!raw) return null;
+  raw = raw.trim();
+  if(/^\d+$/.test(raw)){
+    return { type: 'from', start: parseInt(raw, 10) };
+  }
+  const set = new Set();
+  raw.split(',').forEach(function(part){
+    part = part.trim();
+    if(!part) return;
+    const m = part.match(/^(\d+)\s*-\s*(\d+)$/);
+    if(m){
+      let a = parseInt(m[1],10), b = parseInt(m[2],10);
+      if(a > b){ const t=a; a=b; b=t; }
+      for(let n=a; n<=b; n++) set.add(n);
+    } else {
+      const n = parseInt(part,10);
+      if(!isNaN(n)) set.add(n);
+    }
+  });
+  return set.size ? { type: 'subset', numbers: Array.from(set).sort(function(a,b){return a-b;}) } : null;
+}
+
+const _hwParam = new URLSearchParams(location.search).get('hw');
+const _hwSpec = parseHwSpec_(_hwParam);
+
+let QUESTIONS = ALL_QUESTIONS;
+let _hwStartIdx = 0;
+if(_hwSpec){
+  if(_hwSpec.type === 'subset'){
+    const filtered = _hwSpec.numbers
+      .map(function(n){ return ALL_QUESTIONS[n-1] ? Object.assign({origIndex: n-1}, ALL_QUESTIONS[n-1]) : null; })
+      .filter(Boolean);
+    if(filtered.length) QUESTIONS = filtered;
+  } else if(_hwSpec.type === 'from'){
+    if(_hwSpec.start >= 1 && _hwSpec.start <= ALL_QUESTIONS.length){
+      _hwStartIdx = _hwSpec.start - 1;
+    }
+  }
+}
 
 const LETTERS = ["А","Б","В","Г","Д"];
 
@@ -663,7 +709,9 @@ function buildReviewLink(){
   });
   const ansStr = pairs.join(',');
   const base = location.origin + location.pathname;
-  return `${base}?review=1&name=${encodeURIComponent(studentName)}&ans=${ansStr}`;
+    let url = `${base}?review=1&name=${encodeURIComponent(studentName)}&ans=${ansStr}`;
+  if(_hwParam) url += `&hw=${encodeURIComponent(_hwParam)}`;
+  return url;
 }
 
 // Розпізнає посилання розбору й заповнює answers/studentName з нього
@@ -719,7 +767,7 @@ async function sendTelegramReport(){
   const wrongList = [];
   QUESTIONS.forEach((_,i)=>{
     const rec = answers[i];
-    if(rec && !rec.correct) wrongList.push(i+1);
+    if(rec && !rec.correct) wrongList.push((QUESTIONS[i].origIndex !== undefined ? QUESTIONS[i].origIndex : i) + 1);
   });
 
   const reviewLink = buildReviewLink();
@@ -878,10 +926,7 @@ async function init(){
   if(fromUrl){
     studentName = fromUrl;
     started = true;
-    const hw = parseInt(urlParams.get('hw'), 10);
-    if(!isNaN(hw) && hw >= 1 && hw <= QUESTIONS.length){
-      qIdx = hw - 1;
-    }
+    qIdx = _hwStartIdx;
     renderQuiz();
     return;
   }

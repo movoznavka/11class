@@ -522,7 +522,7 @@
 <script>
 // Питання про розряди й правопис займенників (§31).
 // Слово в подвійних квадратних дужках, напр. [[а]] всередині опції, підкреслюється автоматично.
-const QUESTIONS = [
+const ALL_QUESTIONS = [
   {q:"М'який знак на місці пропуску треба писати в слові", opts:["барел..єф","б..юлетень","б..юро","б..єф"], a:0},
   {q:"М'який знак на місці пропуску треба писати в слові", opts:["Монтеск..є","К..єркегор","Мол..єр","Олів..є"], a:0},
   {q:"М'який знак на місці пропуску треба писати в слові", opts:["мад..ярський","конферанс..є","сер..йозний","Х..юстон"], a:2},
@@ -548,24 +548,71 @@ const QUESTIONS = [
   {q:"М'який знак треба писати на місці пропуску в усіх словах рядка", opts:["квінтил..йон, вол..єр, прес-пап..є","ал..фонс, гіл..йотина, сек..юриті","Джул..єтта, лос..йон, р..юш","він..єтка, бракон..єр, пен..юар","кабал..єро, кал..ян, рез..юме"], a:3}
 ];
 
+// ============================================================
+// ДЗ: підтримує і "одне число" (?hw=35 — почати з №35 і до кінця,
+// як завжди було), і "список/діапазон" (?hw=22-28,36-46 — показати
+// ЛИШЕ ці завдання, під їхніми справжніми номерами).
+// ============================================================
+function parseHwSpec_(raw){
+  if(!raw) return null;
+  raw = raw.trim();
+  if(/^\d+$/.test(raw)){
+    return { type: 'from', start: parseInt(raw, 10) };
+  }
+  const set = new Set();
+  raw.split(',').forEach(function(part){
+    part = part.trim();
+    if(!part) return;
+    const m = part.match(/^(\d+)\s*-\s*(\d+)$/);
+    if(m){
+      let a = parseInt(m[1],10), b = parseInt(m[2],10);
+      if(a > b){ const t=a; a=b; b=t; }
+      for(let n=a; n<=b; n++) set.add(n);
+    } else {
+      const n = parseInt(part,10);
+      if(!isNaN(n)) set.add(n);
+    }
+  });
+  return set.size ? { type: 'subset', numbers: Array.from(set).sort(function(a,b){return a-b;}) } : null;
+}
+
+const _hwParam = new URLSearchParams(location.search).get('hw');
+const _hwSpec = parseHwSpec_(_hwParam);
+
+let QUESTIONS = ALL_QUESTIONS;
+let _hwStartIdx = 0;
+if(_hwSpec){
+  if(_hwSpec.type === 'subset'){
+    const filtered = _hwSpec.numbers
+      .map(function(n){ return ALL_QUESTIONS[n-1] ? Object.assign({origIndex: n-1}, ALL_QUESTIONS[n-1]) : null; })
+      .filter(Boolean);
+    if(filtered.length) QUESTIONS = filtered;
+  } else if(_hwSpec.type === 'from'){
+    if(_hwSpec.start >= 1 && _hwSpec.start <= ALL_QUESTIONS.length){
+      _hwStartIdx = _hwSpec.start - 1;
+    }
+  }
+}
+
 const LETTERS = ["А","Б","В","Г","Д"];
 
 // --- Telegram reporting config ---
-const TG_BOT_TOKEN = "8859310874:AAEJoYfUnv54dLOqglpMk5yfi06zeZ2oc9Q";
-const TG_CHAT_ID = "7255798532";
 // Адреса вашого Apps Script веб-застосунку (закінчується на /exec).
+// Через нього результат одразу і зберігається в таблицю, і надсилається
+// вчителю в Telegram (див. Code.gs) — сама сторінка тесту в бот більше
+// напряму не пише.
 const LOG_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyDGcDVtwD0L8WW0zDIsXwYwwf6zp4XzmofzdI0wU-AhhfZIXbH2lOHquNSHI8cKRc7/exec";
 
-// Тихо надсилає результат у Google-таблицю (для кнопок-учнів у боті).
-// Якщо це не спрацює — на роботу тесту й на сповіщення вчителю це не вплине.
 function logToSheet(payload){
   try{
-    fetch(LOG_WEBAPP_URL, {
+    return fetch(LOG_WEBAPP_URL, {
       method: 'POST',
       headers: {'Content-Type':'text/plain;charset=utf-8'},
       body: JSON.stringify(payload)
-    }).catch(()=>{});
-  }catch(e){}
+    }).then(resp => resp.ok).catch(()=>false);
+  }catch(e){
+    return Promise.resolve(false);
+  }
 }
 
 let qIdx = 0;
@@ -625,7 +672,9 @@ function buildReviewLink(){
   });
   const ansStr = pairs.join(',');
   const base = location.origin + location.pathname;
-  return `${base}?review=1&name=${encodeURIComponent(studentName)}&ans=${ansStr}`;
+    let url = `${base}?review=1&name=${encodeURIComponent(studentName)}&ans=${ansStr}`;
+  if(_hwParam) url += `&hw=${encodeURIComponent(_hwParam)}`;
+  return url;
 }
 
 // Розпізнає посилання розбору й заповнює answers/studentName з нього
@@ -681,56 +730,24 @@ async function sendTelegramReport(){
   const wrongList = [];
   QUESTIONS.forEach((_,i)=>{
     const rec = answers[i];
-    if(rec && !rec.correct) wrongList.push(i+1);
+    if(rec && !rec.correct) wrongList.push((QUESTIONS[i].origIndex !== undefined ? QUESTIONS[i].origIndex : i) + 1);
   });
 
-  let text = `📚 М'який знак в іншомовних словах · Тренажер\n`;
-  text += `Учень: ${studentName}\n`;
-  if(answered < total){
-    text += `Результат: ${correct}/${answered} (виконано ${answered} із ${total} завдань)\n`;
-  } else {
-    text += `Результат: ${correct}/${total}\n`;
-  }
-  if(wrongList.length){
-    text += `Помилки в завданнях: ${wrongList.join(', ')}`;
-  } else {
-    text += `Помилок немає 🎉`;
-  }
-
   const reviewLink = buildReviewLink();
+  const statusEl = document.getElementById('sendStatus');
 
-  logToSheet({
+  const ok = await logToSheet({
     type: "quiz_result",
     student: studentName,
-    testName: "М'який знак в іншомовних словах",
+    testName: "Іншомовні слова · М'який знак",
     correct, answered, total,
     wrongList,
     reviewLink
   });
 
-  const statusEl = document.getElementById('sendStatus');
-  try{
-    const resp = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        chat_id: TG_CHAT_ID,
-        text,
-        reply_markup: {
-          inline_keyboard: [[
-            { text: "🔍 Переглянути розбір відповідей", url: reviewLink }
-          ]]
-        }
-      })
-    });
-    const data = await resp.json();
-    if(data.ok){
-      if(statusEl){ statusEl.textContent = 'Результат надіслано вчителю ✓'; statusEl.className = 'send-status ok'; }
-    } else {
-      if(statusEl){ statusEl.textContent = 'Не вдалося надіслати результат'; statusEl.className = 'send-status bad'; }
-    }
-  } catch(err){
-    if(statusEl){ statusEl.textContent = 'Не вдалося надіслати результат'; statusEl.className = 'send-status bad'; }
+  if(statusEl){
+    if(ok){ statusEl.textContent = 'Результат надіслано вчителю ✓'; statusEl.className = 'send-status ok'; }
+    else { statusEl.textContent = 'Не вдалося надіслати результат'; statusEl.className = 'send-status bad'; }
   }
 }
 
@@ -873,6 +890,7 @@ async function init(){
   if(fromUrl){
     studentName = fromUrl;
     started = true;
+    qIdx = _hwStartIdx;
     renderQuiz();
     return;
   }

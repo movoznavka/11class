@@ -559,7 +559,7 @@
 <script>
 // Усі питання підтеми "Правопис НЕ з різними частинами мови" зібрано в один список.
 // Слово в подвійних квадратних дужках, напр. [[а]] всередині опції, підкреслюється автоматично.
-const QUESTIONS = [
+const ALL_QUESTIONS = [
   {q:"Частку <b>не</b> треба писати окремо з наступним словом у реченні", opts:["Справжня дружба ціни не/має.","Де є любов, там темряви не/має.","Україна — це ексклюзив, їй не/має ціни.","Життя людського строки стислі. Не/має часу на поразку."], a:0},
   {q:"Частку <b>не</b> треба писати разом із кожним наступним словом у рядку", opts:["не/свіжі квіти, не/моя історія","не/помитий посуд, не/чіпай його","не/чотири відсотки, чекати не/довго","не/навидіти брехню, сталося не/щастя"], a:3},
   {q:"Частку <b>не</b> треба писати разом із кожним наступним словом у рядку", opts:["не/волити, не/чайка","не/мовля, не/свій","не/ук, не/восьмий","нехотя, не/дбальство"], a:3},
@@ -623,6 +623,52 @@ const QUESTIONS = [
   {q:"Прочитайте уривок із поезії (цифра в дужках позначає наступне слово):<br><i>Минуле (1)не/вернуть, (2)не/виправить минуле.<br>Вчорашнє — ніби сон, що випурхнув з очей...<br>Але воно живе — забуте й (3)не/забуте,<br>а час (4)не/зупиняється, а молодість біжить.<br>І миті жодної (5)не/можна повернути,<br>щоб заново, по-іншому прожить.</i><br>Частку <b>не</b> треба писати окремо з усіма словами, ОКРІМ позначеного у варіанті", opts:["1","2","3","4","5"], a:2},
   {q:"Прочитайте уривок із поезії (цифра в дужках позначає наступне слово):<br><i>Я хочу буть (1)не/самовитим,<br>Я хочу в полум'ї згоріть,<br>Щоб (2)не/жаліти за прожитим,<br>Димком на світі (3)не/чадіть.<br>Щоб (4)не/пекли дрібні образи<br>Дрібненьку душу день при дні,<br>Я згоден вибухнуть відразу,<br>(5)Не/наче бомба на війні.<br>І диву дивному даюся,<br>Що з того користі катма:<br>Чомусь (6)не/лопаюсь, (7)не/рвуся —<br>Напевне, капсуля (8)не/ма.</i><br>Усі цифри на позначення написання <b>не</b> разом із наступним словом правильно наведено у варіанті", opts:["1, 3, 5","2, 5, 8","3, 4, 8","1, 5, 8","5, 6, 7"], a:3}
 ];
+
+// ============================================================
+// ДЗ: підтримує і "одне число" (?hw=35 — почати з №35 і до кінця,
+// як завжди було), і "список/діапазон" (?hw=22-28,36-46 — показати
+// ЛИШЕ ці завдання, під їхніми справжніми номерами).
+// ============================================================
+function parseHwSpec_(raw){
+  if(!raw) return null;
+  raw = raw.trim();
+  if(/^\d+$/.test(raw)){
+    return { type: 'from', start: parseInt(raw, 10) };
+  }
+  const set = new Set();
+  raw.split(',').forEach(function(part){
+    part = part.trim();
+    if(!part) return;
+    const m = part.match(/^(\d+)\s*-\s*(\d+)$/);
+    if(m){
+      let a = parseInt(m[1],10), b = parseInt(m[2],10);
+      if(a > b){ const t=a; a=b; b=t; }
+      for(let n=a; n<=b; n++) set.add(n);
+    } else {
+      const n = parseInt(part,10);
+      if(!isNaN(n)) set.add(n);
+    }
+  });
+  return set.size ? { type: 'subset', numbers: Array.from(set).sort(function(a,b){return a-b;}) } : null;
+}
+
+const _hwParam = new URLSearchParams(location.search).get('hw');
+const _hwSpec = parseHwSpec_(_hwParam);
+
+let QUESTIONS = ALL_QUESTIONS;
+let _hwStartIdx = 0;
+if(_hwSpec){
+  if(_hwSpec.type === 'subset'){
+    const filtered = _hwSpec.numbers
+      .map(function(n){ return ALL_QUESTIONS[n-1] ? Object.assign({origIndex: n-1}, ALL_QUESTIONS[n-1]) : null; })
+      .filter(Boolean);
+    if(filtered.length) QUESTIONS = filtered;
+  } else if(_hwSpec.type === 'from'){
+    if(_hwSpec.start >= 1 && _hwSpec.start <= ALL_QUESTIONS.length){
+      _hwStartIdx = _hwSpec.start - 1;
+    }
+  }
+}
 
 const LETTERS = ["А","Б","В","Г","Д"];
 
@@ -706,7 +752,9 @@ function buildReviewLink(){
   });
   const ansStr = pairs.join(',');
   const base = location.origin + location.pathname;
-  return `${base}?review=1&name=${encodeURIComponent(studentName)}&ans=${ansStr}`;
+    let url = `${base}?review=1&name=${encodeURIComponent(studentName)}&ans=${ansStr}`;
+  if(_hwParam) url += `&hw=${encodeURIComponent(_hwParam)}`;
+  return url;
 }
 
 // Розпізнає посилання розбору й заповнює answers/studentName з нього
@@ -762,7 +810,7 @@ async function sendTelegramReport(){
   const wrongList = [];
   QUESTIONS.forEach((_,i)=>{
     const rec = answers[i];
-    if(rec && !rec.correct) wrongList.push(i+1);
+    if(rec && !rec.correct) wrongList.push((QUESTIONS[i].origIndex !== undefined ? QUESTIONS[i].origIndex : i) + 1);
   });
 
   const reviewLink = buildReviewLink();
@@ -921,10 +969,7 @@ async function init(){
   if(fromUrl){
     studentName = fromUrl;
     started = true;
-    const hw = parseInt(urlParams.get('hw'), 10);
-    if(!isNaN(hw) && hw >= 1 && hw <= QUESTIONS.length){
-      qIdx = hw - 1;
-    }
+    qIdx = _hwStartIdx;
     renderQuiz();
     return;
   }

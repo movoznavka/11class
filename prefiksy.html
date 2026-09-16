@@ -505,7 +505,7 @@
 <script>
 // Усі питання об'єднано в один суцільний список (розділи більше не розділені вкладками)
 // Слово в подвійних квадратних дужках, напр. [[а]] всередині опції, підкреслюється автоматично.
-const QUESTIONS = [
+const ALL_QUESTIONS = [
   {q:"Букву и треба писати на місці пропуску в обох словах рядка", opts:["пр..кордонник, пр..мудрість","пр..велебний, пр..чарувати","пр..своїти, пр..будинковий","пр..смак, пр..непорочний"], a:2},
   {q:"Букву и треба писати на місці пропуску в обох словах рядка", opts:["пр..тихнути, Пр..дніпров'я","пр..зирливий, пр..чахати","пр..гіркий, пр..земкуватий","пр..святий, Пр..карпаття"], a:0},
   {q:"Букву е треба писати на місці пропуску в обох словах рядка", opts:["пр..світлий, пр..подобний","пр..солений, пр..черствий","пр..міцний, пр..світити","пр..чал, пр..освячений"], a:0},
@@ -577,6 +577,52 @@ const QUESTIONS = [
   {q:"Помилку в правописі префікса допущено в рядку", opts:["надхмарний, оббити, розплющити","міжсудинний, передплата, відчинити","обшукати, безслідно, зфальшивити","зіпсувати, безтурботний, обпекти","розхвалити, підкласти, зжалитися"], a:2},
   {q:"Правильно написано всі слова в рядку", opts:["віддячити, призвище, безпорадний","премружений, примчати, обходити","причепити, оттягти, примудритися","розтягти, прекумедний, приборкати","спалах, прекметний, передбачення"], a:3}
 ];
+
+// ============================================================
+// ДЗ: підтримує і "одне число" (?hw=35 — почати з №35 і до кінця,
+// як завжди було), і "список/діапазон" (?hw=22-28,36-46 — показати
+// ЛИШЕ ці завдання, під їхніми справжніми номерами).
+// ============================================================
+function parseHwSpec_(raw){
+  if(!raw) return null;
+  raw = raw.trim();
+  if(/^\d+$/.test(raw)){
+    return { type: 'from', start: parseInt(raw, 10) };
+  }
+  const set = new Set();
+  raw.split(',').forEach(function(part){
+    part = part.trim();
+    if(!part) return;
+    const m = part.match(/^(\d+)\s*-\s*(\d+)$/);
+    if(m){
+      let a = parseInt(m[1],10), b = parseInt(m[2],10);
+      if(a > b){ const t=a; a=b; b=t; }
+      for(let n=a; n<=b; n++) set.add(n);
+    } else {
+      const n = parseInt(part,10);
+      if(!isNaN(n)) set.add(n);
+    }
+  });
+  return set.size ? { type: 'subset', numbers: Array.from(set).sort(function(a,b){return a-b;}) } : null;
+}
+
+const _hwParam = new URLSearchParams(location.search).get('hw');
+const _hwSpec = parseHwSpec_(_hwParam);
+
+let QUESTIONS = ALL_QUESTIONS;
+let _hwStartIdx = 0;
+if(_hwSpec){
+  if(_hwSpec.type === 'subset'){
+    const filtered = _hwSpec.numbers
+      .map(function(n){ return ALL_QUESTIONS[n-1] ? Object.assign({origIndex: n-1}, ALL_QUESTIONS[n-1]) : null; })
+      .filter(Boolean);
+    if(filtered.length) QUESTIONS = filtered;
+  } else if(_hwSpec.type === 'from'){
+    if(_hwSpec.start >= 1 && _hwSpec.start <= ALL_QUESTIONS.length){
+      _hwStartIdx = _hwSpec.start - 1;
+    }
+  }
+}
 
 const LETTERS = ["А","Б","В","Г","Д"];
 
@@ -674,7 +720,7 @@ async function sendTelegramReport(){
   const wrongList = [];
   QUESTIONS.forEach((_,i)=>{
     const rec = answers[i];
-    if(rec && !rec.correct) wrongList.push(i+1);
+    if(rec && !rec.correct) wrongList.push((QUESTIONS[i].origIndex !== undefined ? QUESTIONS[i].origIndex : i) + 1);
   });
 
   const reviewLink = buildReviewLink();
@@ -809,10 +855,7 @@ async function init(){
   if(fromUrl){
     studentName = fromUrl;
     started = true;
-    const hw = parseInt(urlParams.get('hw'), 10);
-    if(!isNaN(hw) && hw >= 1 && hw <= QUESTIONS.length){
-      qIdx = hw - 1;
-    }
+    qIdx = _hwStartIdx;
     renderQuiz();
     return;
   }
