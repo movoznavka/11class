@@ -117,6 +117,14 @@
 
   .subgroup{ margin-bottom:26px; margin-top:24px; }
   .subgroup:first-of-type{ margin-top:22px; }
+  .subgroup-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
+    margin:0 0 14px 2px;
+  }
   .subgroup-title{
     font-family:'Manrope',sans-serif;
     font-weight:800;
@@ -124,7 +132,7 @@
     letter-spacing:.04em;
     text-transform:uppercase;
     color:var(--c1-b);
-    margin:0 0 14px 2px;
+    margin:0;
     display:inline-flex;
     align-items:center;
     gap:8px;
@@ -137,6 +145,36 @@
     width:6px;height:6px;
     border-radius:50%;
     background:var(--c1-b);
+  }
+  .subgroup-test-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    text-decoration:none;
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:11.5px;
+    letter-spacing:.01em;
+    padding:7px 13px;
+    border-radius:999px;
+    white-space:nowrap;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .subgroup-test-pill.ready{
+    color:var(--c3-b);
+    background:var(--correct-bg);
+    cursor:pointer;
+  }
+  .subgroup-test-pill.ready:hover{
+    transform:translateY(-2px);
+    box-shadow: 0 10px 20px -14px var(--c3-sh);
+  }
+  .subgroup-test-pill.soon{
+    color:var(--ink-soft);
+    background:var(--bg-soft);
+    opacity:.7;
+    cursor:default;
+    pointer-events:none;
   }
 
   .grid{
@@ -256,7 +294,7 @@
   }
 
   /* --- ДЗ: яскраве світіння --- */
-  .test-pill.homework, .block-test-pill.homework{
+  .test-pill.homework, .block-test-pill.homework, .subgroup-test-pill.homework{
     color:#7A3B00 !important;
     background: linear-gradient(135deg, #FFE27A, #FF9A3D) !important;
     animation: hwGlow 1.6s ease-in-out infinite;
@@ -349,6 +387,8 @@
    плашка тесту однаково буде клікабельною.
 
    Щоб додати підрозділ — скопіюй { title: "...", items: [...] }.
+   Підрозділ теж може мати свій "загальний тест" — додай йому generalTest
+   (той самий формат, що й у блока): { title: "...", generalTest: {...}, items: [...] }.
    Щоб додати розділ — скопіюй { name: "...", subgroups: [...] } у BLOCKS.
    ============================================================ */
 
@@ -407,7 +447,7 @@ const BLOCKS = [
         {icon: "А", status: "soon", title: "Апостроф", href: "urok-inshomovni-apostrof.html",
           test: {status: "ready", href: "inshomovni-apostrof.html"}}
       ]},
-      { title: "Складні слова", items: [
+      { title: "Складні слова", generalTest: {status: "soon", href: "skladni-slova-zagalnyi.html"}, items: [
         {icon: "С", status: "ready", title: "Складні іменники",
           href: "https://movoznavka.github.io/11class/urok-skladni-imennyky.html",
           test: {status: "ready", href: "skladni-imennyky.html"}},
@@ -424,6 +464,8 @@ const BLOCKS = [
     name: "Лексикологія",
     subgroups: [
       { title: null, items: [
+        {icon: "Л", status: "soon", title: "Лексикологія", href: "urok-leksykologiya.html",
+          test: {status: "soon", href: "leksykologiya.html"}},
         {icon: "Л", status: "soon", title: "Лексичні помилки", href: "urok-leksychni-pomylky.html",
           test: {status: "soon", href: "leksychni-pomylky.html"}},
         {icon: "Ф", status: "soon", title: "Фразеологія", href: "urok-frazeologiya.html",
@@ -610,6 +652,13 @@ function generalTestPillHtml(test){
   return `<a class="block-test-pill ${test.status}" href="${clickable ? test.href : '#'}" data-testkey="${test.href}">${label}</a>`;
 }
 
+function subgroupTestPillHtml(test){
+  if(!test) return '';
+  const clickable = test.status === 'ready';
+  const label = "📝 Загальний тест";
+  return `<a class="subgroup-test-pill ${test.status}" href="${clickable ? test.href : '#'}" data-testkey="${test.href}">${label}</a>`;
+}
+
 function renderBlocks_(){
   blocksEl.innerHTML = BLOCKS.map(block => `
     <div class="block">
@@ -619,7 +668,11 @@ function renderBlocks_(){
       </div>
       ${block.subgroups.map(sg => `
         <div class="subgroup">
-          ${sg.title ? `<div class="subgroup-title">${sg.title}</div>` : ''}
+          ${(sg.title || sg.generalTest) ? `
+            <div class="subgroup-header">
+              ${sg.title ? `<div class="subgroup-title">${sg.title}</div>` : '<span></span>'}
+              ${subgroupTestPillHtml(sg.generalTest)}
+            </div>` : ''}
           <div class="grid">
             ${sg.items.map(it => `
               <div class="card-wrap">
