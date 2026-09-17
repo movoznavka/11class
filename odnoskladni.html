@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Односкладні речення · Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EAF0E1;
+    --bg-soft:#DCE8CC;
+    --card:#FFFFFF;
+    --ink:#20301B;
+    --ink-soft:#69795C;
+
+    --c1-a:#96D33C; --c1-b:#4C7A1F; --c1-sh: rgba(76,122,31,0.42);
+    --c3-a:#FFC24B; --c3-b:#C77D00; --c3-sh: rgba(199,125,0,0.4);
+    --c2-b:#E5484D;
+
+    --correct-bg:#FFF3D9;
+    --correct-ink:#A9660A;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    padding:28px 16px 64px;
+  }
+  .wrap{max-width:760px;margin:0 auto;}
+
+  .topbar{
+    display:flex;justify-content:space-between;align-items:center;
+    padding-bottom:16px;margin-bottom:22px;
+    border-bottom:1.5px solid rgba(32,48,27,0.14);
+  }
+  .kicker{
+    font-family:'Manrope',sans-serif;font-weight:800;font-size:12.5px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--ink);opacity:.55;
+  }
+  .kicker.tag{opacity:.4;}
+
+  h1{
+    font-family:'Manrope',sans-serif;font-weight:800;
+    font-size:clamp(22px,5.4vw,34px);line-height:1.1;letter-spacing:-0.01em;
+    margin:0 0 8px;text-transform:uppercase;
+  }
+  h1 .hl{color:var(--c1-b);}
+  .sub{color:var(--ink-soft);font-size:15px;max-width:56ch;margin:0 0 22px;font-weight:500;}
+
+  .topictoggle{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;}
+  .topictoggle button{
+    flex:1 1 auto;min-width:132px;padding:14px;border-radius:20px;border:none;background:var(--card);
+    font-family:'Manrope',sans-serif;font-weight:800;font-size:12.5px;color:var(--ink-soft);
+    cursor:pointer;box-shadow:0 8px 18px -14px rgba(32,48,27,.3);
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .topictoggle button.active{
+    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));color:#fff;
+    box-shadow:0 10px 20px -10px var(--c1-sh);
+  }
+
+  .tabbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    padding:10px 15px 10px 10px;border-radius:999px;border:none;background:var(--card);
+    color:var(--ink-soft);font-family:'Manrope',sans-serif;font-weight:800;font-size:12.5px;
+    cursor:pointer;display:flex;align-items:center;gap:8px;
+    box-shadow: 0 8px 18px -14px rgba(32,48,27,0.3);
+  }
+  .tab .dot{
+    width:22px;height:22px;border-radius:8px;background:rgba(76,122,31,.12);color:var(--c1-b);
+    display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;
+  }
+  .tab.active{
+    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));color:#fff;
+    box-shadow:0 10px 20px -10px var(--c1-sh);
+  }
+  .tab.active .dot{background:rgba(255,255,255,.25);color:#fff;}
+
+  .card{
+    background:var(--card);border-radius:28px;padding:28px 24px;
+    box-shadow: 0 20px 44px -28px rgba(32,48,27,0.35);
+  }
+
+  .section-title{font-family:'Manrope',sans-serif;font-weight:800;font-size:20px;letter-spacing:-0.005em;margin:0 0 8px;}
+  .section-intro{color:var(--ink-soft);font-size:14.5px;line-height:1.6;margin:0 0 18px;}
+
+  .callout{
+    background:linear-gradient(155deg, rgba(255,194,75,.28), rgba(199,125,0,.12));
+    border-radius:18px;padding:14px 18px;margin-top:16px;font-size:13.5px;line-height:1.55;color:var(--ink);
+  }
+  .callout b{color:var(--c3-b);font-family:'Manrope',sans-serif;}
+
+  /* flip cards */
+  .cardgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:560px){.cardgrid{grid-template-columns:1fr;}}
+  .flip{perspective:1200px;height:168px;cursor:pointer;position:relative;}
+  .flip-inner{position:relative;width:100%;height:100%;transition:transform .5s cubic-bezier(.4,.2,.2,1);transform-style:preserve-3d;}
+  .flip.open .flip-inner{transform:rotateY(180deg);}
+  .flip-face{position:absolute;inset:0;border-radius:20px;padding:16px 18px;backface-visibility:hidden;display:flex;flex-direction:column;justify-content:center;}
+  .flip-front{background:var(--bg-soft);}
+  .flip-back{background:linear-gradient(155deg,var(--c1-a),var(--c1-b));color:#fff;transform:rotateY(180deg);align-items:center;text-align:center;}
+  .flip-rule{font-family:'Manrope',sans-serif;font-weight:800;font-size:16px;line-height:1.32;}
+  .flip-desc{font-size:12.5px;margin-top:7px;opacity:.85;line-height:1.42;}
+  .flip-example{font-size:14px;font-weight:700;margin-bottom:4px;line-height:1.4;}
+  .flip-example:last-child{margin-bottom:0;}
+  .flip-hint{position:absolute;bottom:9px;right:14px;font-size:10px;font-weight:700;opacity:.4;}
+
+  /* steps */
+  .steplist{display:flex;flex-direction:column;gap:12px;}
+  .step{display:flex;gap:14px;background:var(--bg-soft);border-radius:18px;padding:15px 17px;}
+  .step-num{
+    font-family:'Manrope',sans-serif;font-weight:800;font-size:14px;color:#fff;
+    width:30px;height:30px;min-width:30px;border-radius:50%;
+    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));
+    display:flex;align-items:center;justify-content:center;
+  }
+  .step-title{font-family:'Manrope',sans-serif;font-weight:800;font-size:14.5px;margin-bottom:4px;}
+  .step-desc{font-size:13.5px;color:var(--ink-soft);line-height:1.5;}
+  .step-desc b{color:var(--ink);}
+
+  /* mini quiz */
+  .qtext{font-family:'Manrope',sans-serif;font-size:18px;font-weight:700;line-height:1.4;margin:0 0 18px;}
+  .options{display:flex;flex-direction:column;gap:10px;}
+  .opt{
+    display:flex;align-items:center;gap:13px;text-align:left;width:100%;
+    padding:9px 14px 9px 9px;border-radius:18px;border:none;background:var(--bg-soft);
+    cursor:pointer;font-family:'Inter',sans-serif;font-size:14.5px;font-weight:500;color:var(--ink);
+    transition:transform .12s ease, background .15s ease;
+  }
+  .opt:hover{transform:translateY(-1px);}
+  .opt[disabled]{cursor:default;}
+  .opt[disabled]:hover{transform:none;}
+  .tile{
+    position:relative;width:30px;height:30px;min-width:30px;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Manrope',sans-serif;font-weight:800;font-size:13px;color:var(--c1-b);
+    background: linear-gradient(150deg, rgba(255,255,255,0.75), rgba(150,211,60,0.25));
+    backdrop-filter: blur(6px) saturate(160%);
+    border:1px solid rgba(255,255,255,0.7);
+    box-shadow: 0 4px 12px -7px var(--c1-sh), inset 0 1px 1px rgba(255,255,255,0.8);
+  }
+  .badge{
+    position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;
+    border:2px solid var(--card);display:flex;align-items:center;justify-content:center;
+    font-size:9.5px;font-weight:800;color:#fff;
+  }
+  .badge.ok{background:var(--c3-b);}
+  .badge.no{background:var(--c2-b);}
+  .opt.correct{background:var(--correct-bg);}
+  .opt.wrong{background:#FDECEC;}
+  .opt.dim{opacity:.5;}
+  .feedback{margin-top:16px;padding:13px 16px;border-radius:16px;font-size:14px;font-weight:600;display:none;align-items:center;gap:9px;}
+  .feedback.show{display:flex;}
+  .feedback.ok{background:var(--correct-bg);color:var(--correct-ink);}
+  .feedback.bad{background:#FDECEC;color:#D8393E;}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:22px;}
+  .btn{
+    font-family:'Manrope',sans-serif;font-weight:800;font-size:13px;padding:12px 22px;
+    border-radius:999px;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;
+  }
+  .btn.primary{background:linear-gradient(155deg,var(--c1-a),var(--c1-b));color:#fff;box-shadow:0 10px 20px -8px var(--c1-sh);}
+  .btn.ghost{background:transparent;color:var(--ink-soft);}
+  .btn:disabled{opacity:.3;cursor:default;box-shadow:none;}
+  .qprog{font-family:'Manrope',sans-serif;font-weight:700;font-size:13px;color:var(--ink-soft);margin-bottom:14px;}
+
+  .done-screen{text-align:center;padding:16px 0;}
+  .done-screen .ring{
+    width:110px;height:110px;margin:0 auto 16px;border-radius:50%;
+    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));
+    box-shadow:0 16px 30px -12px var(--c1-sh);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .done-screen .big{font-family:'Manrope',sans-serif;font-weight:800;font-size:28px;color:#fff;}
+
+  footer{text-align:center;margin-top:22px;font-size:12.5px;color:var(--ink-soft);font-weight:500;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="kicker">Синтаксис · Урок</div>
+    <div class="kicker tag">головні члени в одному складі</div>
+  </div>
+
+  <h1>Одно<span class="hl">складні</span> речення</h1>
+  <p class="sub">Прості речення, граматична основа яких складається лише з одного головного члена.</p>
+
+  <div class="topictoggle" id="topictoggle"></div>
+  <div class="tabbar" id="subtabbar"></div>
+
+  <div class="card" id="lessonArea"></div>
+
+  <footer>@movoznavka</footer>
+</div>
+
+<script>
+const TOPICS = {
+  oznacheno: {
+    label: "Означено-особові",
+    subs: [{
+      id:"o1", tab:"Означено-особові", dot:"1", type:"cards",
+      title:"Означено-особові речення",
+      intro:"Присудок — дієслово 1-ї або 2-ї особи однини чи множини (дійсного або наказового способу). Особу видно з форми дієслова, тому підмет не потрібен.",
+      cards:[
+        {rule:"Люблю осінь.", desc:"дієслово 1-ї особи однини — «я» зрозуміло без слова", examples:[{word:"Ознака: я, ти, ми, ви"}]},
+        {rule:"Ходімо до лісу.", desc:"наказовий спосіб, 1-ша особа множини", examples:[{word:"Ознака: я, ти, ми, ви"}]}
+      ]
+    }]
+  },
+  neoznacheno: {
+    label: "Неозначено-особові",
+    subs: [{
+      id:"n1", tab:"Неозначено-особові", dot:"2", type:"cards",
+      title:"Неозначено-особові речення",
+      intro:"Присудок — дієслово 3-ї особи множини теперішнього/майбутнього часу або множини минулого часу. Діяча не названо, бо він невідомий або неважливий.",
+      cards:[
+        {rule:"Двері відчинили.", desc:"хто саме — не важливо", examples:[{word:"Ознака: вони"}]},
+        {rule:"У класі говорять.", desc:"дія важливіша за виконавця", examples:[{word:"Ознака: вони"}]}
+      ]
+    }]
+  },
+  uzagalneno: {
+    label: "Узагальнено-особові",
+    subs: [{
+      id:"u1", tab:"Узагальнено-особові", dot:"3", type:"cards",
+      title:"Узагальнено-особові речення",
+      intro:"Дія стосується будь-кого, узагальнено — часто в прислів'ях і приказках. Присудок — дієслово 2-ї особи однини або 3-ї особи множини.",
+      cards:[
+        {rule:"Що посієш, те й пожнеш.", desc:"стосується кожного, без винятку", examples:[{word:"Ознака: всіх і завжди"}]},
+        {rule:"Без труда не виловиш і рибку з ставка.", desc:"узагальнене судження", examples:[{word:"Ознака: всіх і завжди"}]}
+      ]
+    }]
+  },
+  bezosobovi: {
+    label: "Безособові",
+    subs: [{
+      id:"b1", tab:"Безособові", dot:"4", type:"cards",
+      title:"Безособові речення",
+      intro:"Позначають дію або стан без дійової особи — підмет підставити неможливо. Присудок — безособове дієслово, слова на -но/-то, «нема(є)», інфінітив тощо. Часто про стан природи або людини.",
+      cards:[
+        {rule:"Смеркає. Вечоріло.", desc:"стан природи", examples:[{word:"Ознака: но, то, ло, ти"}]},
+        {rule:"Мені холодно.", desc:"стан людини", examples:[{word:"Ознака: но, то, ло, ти"}]},
+        {rule:"Вікно зачинено.", desc:"форма на -но/-то", examples:[{word:"Ознака: но, то, ло, ти"}]}
+      ]
+    }]
+  },
+  nazyvni: {
+    label: "Називні",
+    subs: [{
+      id:"z1", tab:"Називні", dot:"5", type:"cards",
+      title:"Називні (номінативні) речення",
+      intro:"Лише стверджують наявність предмета чи явища в теперішньому часі. Граматична основа — тільки підмет (іменник у Н. в.), можливо з означенням. Присудка немає й не мало бути.",
+      cards:[
+        {rule:"Зима.", desc:"просто називає явище — і все", examples:[{word:"Односкладне називне"}]},
+        {rule:"Тиха, зоряна ніч.", desc:"підмет з означеннями, присудка нема", examples:[{word:"Односкладне називне"}]}
+      ]
+    }]
+  },
+  algorithm: {
+    label: "Алгоритм",
+    subs: [{
+      id:"a1", tab:"Як визначити вид", dot:"?", type:"steps",
+      title:"Алгоритм визначення виду односкладного речення",
+      intro:"Постав ці три питання по черзі — і вид речення визначиться сам.",
+      steps:[
+        {title:"Чи це називне?", desc:"У реченні є тільки підмет (іменник у Н. в.) без присудка — воно лише називає предмет чи явище? Якщо так — <b>називне</b>."},
+        {title:"Шукаємо особу, перевіряємо зміст", desc:"<b>Я, ти, ми, ви</b> — означено-особове · <b>вони</b> — неозначено-особове · <b>всіх і завжди</b> — узагальнено-особове."},
+        {title:"Нічого не підходить?", desc:"Якщо підмет підставити неможливо взагалі (мова про стан природи чи людини) — це <b>безособове</b> речення."}
+      ]
+    }]
+  },
+  check: {
+    label: "Перевір себе",
+    subs: [{
+      id:"c1", tab:"Тест", dot:"✓", type:"quiz",
+      title:"Швидка перевірка",
+      intro:"5 запитань за матеріалом уроку.",
+      questions:[
+        {q:"«Ходімо до лісу.» — це речення", opts:["неозначено-особове","означено-особове","узагальнено-особове","безособове"], a:1},
+        {q:"«Двері відчинили.» — присудок якої особи?", opts:["1-ї особи однини","2-ї особи множини","3-ї особи множини","1-ї особи множини"], a:2},
+        {q:"«Що посієш, те й пожнеш.» — вид речення", opts:["означено-особове","узагальнено-особове","безособове","називне"], a:1},
+        {q:"«Мені холодно.» — присудок підставити підмет", opts:["можна («я» холодний)","неможливо — це стан","можна («холод» діє)","речення двоскладне"], a:1},
+        {q:"Речення «Зима.» — це", opts:["безособове","неозначено-особове","називне","узагальнено-особове"], a:2}
+      ]
+    }]
+  }
+};
+
+const LETTERS = ["А","Б","В","Г"];
+const TOPIC_ORDER = ["oznacheno","neoznacheno","uzagalneno","bezosobovi","nazyvni","algorithm","check"];
+
+let activeTopic = "oznacheno";
+let activeSub = 0;
+let quizIdx = 0;
+let quizAnswers = {};
+
+const topictoggle = document.getElementById('topictoggle');
+const subtabbar = document.getElementById('subtabbar');
+const lessonArea = document.getElementById('lessonArea');
+
+function resetNav(){ activeSub = 0; quizIdx = 0; quizAnswers = {}; }
+function resetQuiz(){ quizIdx = 0; quizAnswers = {}; }
+function currentSection(){ return TOPICS[activeTopic].subs[activeSub]; }
+
+function renderTopics(){
+  topictoggle.innerHTML = TOPIC_ORDER.map(key => `
+    <button class="${key===activeTopic?'active':''}" data-key="${key}">${TOPICS[key].label}</button>
+  `).join('');
+  topictoggle.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      activeTopic = btn.dataset.key;
+      resetNav();
+      renderAll();
+    });
+  });
+}
+
+function renderSubs(){
+  const subs = TOPICS[activeTopic].subs;
+  if(subs.length <= 1){ subtabbar.innerHTML = ""; subtabbar.style.display = "none"; return; }
+  subtabbar.style.display = "flex";
+  subtabbar.innerHTML = subs.map((s,i)=>`
+    <button class="tab ${i===activeSub?'active':''}" data-i="${i}">
+      <span class="dot">${s.dot}</span>${s.tab}
+    </button>`).join('');
+  subtabbar.querySelectorAll('.tab').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      activeSub = +btn.dataset.i;
+      resetQuiz();
+      renderSubs();
+      renderContent();
+    });
+  });
+}
+
+function renderContent(){
+  const s = currentSection();
+  let html = `<p class="section-title">${s.title}</p><p class="section-intro">${s.intro}</p>`;
+
+  if(s.type === "cards"){
+    html += `<div class="cardgrid">${s.cards.map((c)=>`
+      <div class="flip" data-kind="card">
+        <div class="flip-inner">
+          <div class="flip-face flip-front">
+            <div class="flip-rule">${c.rule}</div>
+            <div class="flip-desc">${c.desc||''}</div>
+            <div class="flip-hint">натисни →</div>
+          </div>
+          <div class="flip-face flip-back">
+            ${c.examples.map(e=>`<div class="flip-example">${e.word}</div>`).join('')}
+          </div>
+        </div>
+      </div>`).join('')}</div>`;
+  }
+
+  if(s.type === "steps"){
+    html += `<div class="steplist">${s.steps.map((st,i)=>`
+      <div class="step">
+        <div class="step-num">${i+1}</div>
+        <div>
+          <div class="step-title">${st.title}</div>
+          <div class="step-desc">${st.desc}</div>
+        </div>
+      </div>`).join('')}</div>
+      <div class="callout"><b>Підказка.</b> Якщо після називання предмета є обставина місця чи часу («За вікном ліс.»), це вже вважають двоскладним реченням із пропущеним присудком «є», а не односкладним називним.</div>`;
+  }
+
+  if(s.type === "quiz"){
+    lessonArea.innerHTML = html;
+    renderQuiz(s);
+    return;
+  }
+
+  lessonArea.innerHTML = html;
+  lessonArea.querySelectorAll('[data-kind="card"]').forEach(el=>{
+    el.addEventListener('click', ()=> el.classList.toggle('open'));
+  });
+}
+
+function quizScore(qs){
+  let correct = 0;
+  qs.forEach((_,i)=>{ const r = quizAnswers[i]; if(r && r.correct) correct++; });
+  return correct;
+}
+
+function renderQuiz(s){
+  const total = s.questions.length;
+
+  if(quizIdx >= total){
+    const correct = quizScore(s.questions);
+    const extra = document.createElement('div');
+    extra.innerHTML = `
+      <div class="done-screen">
+        <div class="ring"><div class="big">${correct}/${total}</div></div>
+        <p class="section-intro" style="margin-top:10px;">${correct===total ? 'Ідеально! Матеріал засвоєно 🎉' : 'Непогано — можна ще раз пробігтись картками вище.'}</p>
+        <button class="btn primary" id="quizRestart" style="margin-top:6px;">Пройти ще раз</button>
+      </div>`;
+    lessonArea.appendChild(extra);
+    document.getElementById('quizRestart').addEventListener('click', ()=>{ resetQuiz(); renderContent(); });
+    return;
+  }
+
+  const q = s.questions[quizIdx];
+  const rec = quizAnswers[quizIdx];
+
+  const box = document.createElement('div');
+  box.innerHTML = `
+    <div class="qprog">Питання ${quizIdx+1} з ${total}</div>
+    <p class="qtext">${q.q}</p>
+    <div class="options">
+      ${q.opts.map((o,i)=>`
+        <button class="opt" data-i="${i}" ${rec?'disabled':''}>
+          <span class="tile"><span>${LETTERS[i]}</span></span><span>${o}</span>
+        </button>`).join('')}
+    </div>
+    <div class="feedback ${rec?'show '+(rec.correct?'ok':'bad'):''}">
+      ${rec ? (rec.correct ? `<span><b>Правильно.</b></span>` : `<span>Правильна відповідь — ${LETTERS[q.a]}. ${q.opts[q.a]}</span>`) : ''}
+    </div>
+    <div class="nav-row">
+      <button class="btn ghost" id="quizPrev" ${quizIdx===0?'disabled':''}>← Назад</button>
+      <button class="btn primary" id="quizNext" ${rec?'':'disabled'}>${quizIdx===total-1?'До результату':'Далі →'}</button>
+    </div>`;
+  lessonArea.appendChild(box);
+
+  if(rec){
+    box.querySelectorAll('.opt').forEach((btn,i)=>{
+      const tile = btn.querySelector('.tile');
+      if(i===q.a){ btn.classList.add('correct'); tile.insertAdjacentHTML('beforeend','<span class="badge ok">✓</span>'); }
+      else if(i===rec.picked){ btn.classList.add('wrong'); tile.insertAdjacentHTML('beforeend','<span class="badge no">✕</span>'); }
+      else { btn.classList.add('dim'); }
+    });
+  }
+
+  box.querySelectorAll('.opt').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(quizAnswers[quizIdx]) return;
+      const picked = +btn.dataset.i;
+      quizAnswers[quizIdx] = {picked, correct: picked===q.a};
+      renderContent();
+    });
+  });
+  const prevBtn = document.getElementById('quizPrev');
+  const nextBtn = document.getElementById('quizNext');
+  if(prevBtn) prevBtn.addEventListener('click', ()=>{ quizIdx--; renderContent(); });
+  if(nextBtn) nextBtn.addEventListener('click', ()=>{ quizIdx++; renderContent(); });
+}
+
+function renderAll(){
+  renderTopics();
+  renderSubs();
+  renderContent();
+}
+
+renderAll();
+</script>
+</body>
+</html>
