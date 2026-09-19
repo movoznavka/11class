@@ -437,17 +437,14 @@ const BLOCKS = [
           test: {status: "ready", href: "velyka-bukva.html"}}
       ]},
       { title: "Написання іншомовних слів", items: [
-        {icon: "И", status: "ready", title: "Букви и, і",
-         href: "https://movoznavka.github.io/11class/urok-inshomovni-y-i.html",
+        {icon: "И", status: "soon", title: "Букви и, і", href: "urok-inshomovni-y-i.html",
           test: {status: "ready", href: "inshomovni-y-i.html"}},
         {icon: "П", status: "ready", title: "Подвоєні букви",
           href: "https://movoznavka.github.io/11class/urok-inshomovni-podvoiennya.html",
           test: {status: "ready", href: "inshomovni-podvoiennya.html"}},
-        {icon: "М", status: "ready", title: "М'який знак", 
-         href: "https://movoznavka.github.io/11class/urok-inshomovni-myakyj-znak.html",
+        {icon: "М", status: "soon", title: "М'який знак", href: "urok-inshomovni-myakyj-znak.html",
           test: {status: "ready", href: "inshomovni-myakyj-znak.html"}},
-        {icon: "А", status: "ready", title: "Апостроф", 
-         href: "https://movoznavka.github.io/11class/urok-inshomovni-apostrof.html",
+        {icon: "А", status: "soon", title: "Апостроф", href: "urok-inshomovni-apostrof.html",
           test: {status: "ready", href: "inshomovni-apostrof.html"}}
       ]},
       { title: "Складні слова", generalTest: {status: "soon", href: "skladni-slova-zagalnyi.html"}, items: [
@@ -467,11 +464,9 @@ const BLOCKS = [
     name: "Лексикологія",
     subgroups: [
       { title: null, items: [
-        {icon: "Л", status: "ready", title: "Лексикологія", 
-         href: "https://movoznavka.github.io/11class/urok-leksykologiya.html",
+        {icon: "Л", status: "soon", title: "Лексикологія", href: "urok-leksykologiya.html",
           test: {status: "soon", href: "leksykologiya.html"}},
-        {icon: "Л", status: "ready", title: "Лексичні помилки", 
-         href: "https://movoznavka.github.io/11class/urok-leksychni-pomylky.html",
+        {icon: "Л", status: "soon", title: "Лексичні помилки", href: "urok-leksychni-pomylky.html",
           test: {status: "soon", href: "leksychni-pomylky.html"}},
         {icon: "Ф", status: "soon", title: "Фразеологія", href: "urok-frazeologiya.html",
           test: {status: "soon", href: "frazeologiya.html"}}
@@ -723,10 +718,9 @@ function applyHomework(map){
       span.textContent = ' · ДЗ ' + hw.number;
       el.appendChild(span);
     }
-    const hwNum = parseInt(hw.number, 10);
-    if (!isNaN(hwNum) && el.getAttribute('href') !== '#') {
+    if (hw.number && el.getAttribute('href') !== '#') {
       const sep = el.getAttribute('href').indexOf('?') > -1 ? '&' : '?';
-      el.setAttribute('href', el.getAttribute('href') + sep + 'hw=' + hwNum);
+      el.setAttribute('href', el.getAttribute('href') + sep + 'hw=' + encodeURIComponent(hw.number));
     }
   });
 }

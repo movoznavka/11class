@@ -559,7 +559,7 @@
 <script>
 // Усі питання підтеми "Кличний відмінок" зібрано в один список.
 // Слово в подвійних квадратних дужках, напр. [[а]] всередині опції, підкреслюється автоматично.
-const QUESTIONS = [
+const ALL_QUESTIONS = [
   {q:"Подвоєння літер на місці пропуску відбувається в слові", opts:["кас..а","тон..а","тен..іс","груп..а"], a:1},
   {q:"Подвоєння літер на місці пропуску відбувається у варіанті", opts:["мір..а покарання","розкішна віл..а","гарна ал..ея","мас..а тіла"], a:1},
   {q:"Подвоєння літер на місці пропуску НЕ ВІДБУВАЄТЬСЯ у варіанті", opts:["досвідчена бон..а","білосніжна ван..а","кольорова гам..а","ароматна мір..а"], a:2},
@@ -609,21 +609,115 @@ const QUESTIONS = [
   {q:"Подвоєння літер НЕ ВІДБУВАЄТЬСЯ на місці пропуску в усіх словах рядка", opts:["міс..урійський, компрес.., п'єс..а","телеграм..а, крос..ворд, оперет..а","ван..а, кор..екція, профес..ор","а..симетрія, еф..ект, Дарданел..и","шил..інг, мас..аж, арк..отангенс"], a:1},
   {q:"Подвоєння літер НЕ ВІДБУВАЄТЬСЯ на місці пропуску в усіх словах рядка", opts:["ап..етит, ас..орті, брюс..ельський","ас..истент, кол..ектив, мадон..а","гал..юцинація, кас..ета, тон..а","ал..ергія, Одіс..ей, а..моральний","конгрес.., ак..ордеон, експрес.."], a:4},
   {q:"Подвоєння літер НЕ ВІДБУВАЄТЬСЯ на місці пропуску в усіх словах рядка", opts:["інкас..атор, клас..ицизм, ал..о","проблем..а, парал..ель, пен..і","прес..а, ексцес.., калькут..ський","ком..ентар, кол..екція, кол..ега","міс..іонер, ак..омпанемент, пан..о"], a:3}
-]
+];
+
+// ============================================================
+// ДЗ: підтримує і "одне число" (?hw=35 — почати з №35 і до кінця,
+// як завжди було), і "список/діапазон" (?hw=22-28,36-46 — показати
+// ЛИШЕ ці завдання, під їхніми справжніми номерами).
+// ============================================================
+function parseHwSpec_(raw){
+  if(!raw) return null;
+  raw = raw.trim()
+    .replace(/[\u2010-\u2015\u2212]/g, '-')
+    .replace(/[\u00A0\u202F]/g, ' ');
+  if(/^\d+$/.test(raw)){
+    return { type: 'from', start: parseInt(raw, 10) };
+  }
+  const set = new Set();
+  raw.split(',').forEach(function(part){
+    part = part.trim();
+    if(!part) return;
+    const m = part.match(/^(\d+)\s*-\s*(\d+)$/);
+    if(m){
+      let a = parseInt(m[1],10), b = parseInt(m[2],10);
+      if(a > b){ const t=a; a=b; b=t; }
+      for(let n=a; n<=b; n++) set.add(n);
+    } else {
+      const n = parseInt(part,10);
+      if(!isNaN(n)) set.add(n);
+    }
+  });
+  return set.size ? { type: 'subset', numbers: Array.from(set).sort(function(a,b){return a-b;}) } : null;
+}
+
+const _hwParam = new URLSearchParams(location.search).get('hw');
+const _hwSpec = parseHwSpec_(_hwParam);
+
+let QUESTIONS = ALL_QUESTIONS;
+let _hwStartIdx = 0;
+if(_hwSpec){
+  if(_hwSpec.type === 'subset'){
+    const filtered = _hwSpec.numbers
+      .map(function(n){ return ALL_QUESTIONS[n-1] ? Object.assign({origIndex: n-1}, ALL_QUESTIONS[n-1]) : null; })
+      .filter(Boolean);
+    if(filtered.length) QUESTIONS = filtered;
+  } else if(_hwSpec.type === 'from'){
+    if(_hwSpec.start >= 1 && _hwSpec.start <= ALL_QUESTIONS.length){
+      _hwStartIdx = _hwSpec.start - 1;
+    }
+  }
+}
 
 const LETTERS = ["А","Б","В","Г","Д"];
 
 // --- Telegram reporting config ---
-const TG_BOT_TOKEN = "8859310874:AAEJoYfUnv54dLOqglpMk5yfi06zeZ2oc9Q";
-const TG_CHAT_ID = "7255798532";
+// Адреса вашого Apps Script веб-застосунку (закінчується на /exec).
+// Через нього результат одразу і зберігається в таблицю, і надсилається
+// вчителю в Telegram (див. Code.gs) — сама сторінка тесту в бот більше
+// напряму не пише.
+const LOG_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyDGcDVtwD0L8WW0zDIsXwYwwf6zp4XzmofzdI0wU-AhhfZIXbH2lOHquNSHI8cKRc7/exec";
+
+function logToSheet(payload){
+  try{
+    return fetch(LOG_WEBAPP_URL, {
+      method: 'POST',
+      headers: {'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    }).then(resp => resp.ok).catch(()=>false);
+  }catch(e){
+    return Promise.resolve(false);
+  }
+}
 
 let qIdx = 0;
 let answers = {};
+let flags = {}; // { questionIndex: true } — учень позначив питання як незрозуміле
 let studentName = "";
 let started = false;
 let reportSent = false;
 let finished = false;
 let reviewMode = false; // true, коли сторінку відкрито за посиланням "розбір відповідей"
+
+// ============================================================
+// ЗБЕРЕЖЕННЯ ПРОГРЕСУ (щоб не пропадало, якщо зникне інтернет)
+// Пишемо у звичайний localStorage браузера (не window.storage —
+// той працює лише в превʼю Claude, а не на реальному сайті).
+// Ключ прив'язаний до сторінки й імені учня, тож прогрес з одного
+// тесту не змішається з іншим.
+// ============================================================
+function progressKey_(){
+  return 'quizProgress::' + location.pathname + '::' + studentName;
+}
+function saveProgress_(){
+  try{
+    localStorage.setItem(progressKey_(), JSON.stringify({
+      answers, flags, qIdx, finished, hwParam: _hwParam || '', ts: Date.now()
+    }));
+  }catch(e){ /* сховище недоступне (приватний режим тощо) — просто не збережеться */ }
+}
+function loadProgress_(){
+  try{
+    const raw = localStorage.getItem(progressKey_());
+    if(!raw) return null;
+    const data = JSON.parse(raw);
+    if((data.hwParam || '') !== (_hwParam || '')) return null; // інше завдання — не відновлюємо
+    return data;
+  }catch(e){ return null; }
+}
+function clearProgress_(){
+  try{ localStorage.removeItem(progressKey_()); }catch(e){}
+}
 
 const quizArea = document.getElementById('quizArea');
 document.getElementById('totalTag').textContent = QUESTIONS.length + " завдань";
@@ -677,8 +771,12 @@ function buildReviewLink(){
     if(rec) pairs.push(i + '-' + rec.picked);
   });
   const ansStr = pairs.join(',');
+  const flagStr = Object.keys(flags).filter(i=>flags[i]).join(',');
   const base = location.origin + location.pathname;
-  return `${base}?review=1&name=${encodeURIComponent(studentName)}&ans=${ansStr}`;
+    let url = `${base}?review=1&name=${encodeURIComponent(studentName)}&ans=${ansStr}`;
+  if(flagStr) url += `&flags=${flagStr}`;
+  if(_hwParam) url += `&hw=${encodeURIComponent(_hwParam)}`;
+  return url;
 }
 
 // Розпізнає посилання розбору й заповнює answers/studentName з нього
@@ -699,6 +797,15 @@ function parseReviewParam(){
       answers[i] = {picked, correct: picked === QUESTIONS[i].a};
     }
   });
+
+  flags = {};
+  const flagsParam = params.get('flags');
+  if(flagsParam){
+    flagsParam.split(',').forEach(s=>{
+      const i = Number(s);
+      if(!Number.isNaN(i)) flags[i] = true;
+    });
+  }
 
   started = true;
   reviewMode = true;
@@ -732,49 +839,40 @@ function renderNameScreen(prefill){
 async function sendTelegramReport(){
   const {correct, total, answered} = scoreOverall();
   const wrongList = [];
+  const flaggedList = [];
   QUESTIONS.forEach((_,i)=>{
     const rec = answers[i];
-    if(rec && !rec.correct) wrongList.push(i+1);
+    const num = (QUESTIONS[i].origIndex !== undefined ? QUESTIONS[i].origIndex : i) + 1;
+    if(rec && !rec.correct) wrongList.push(num);
+    if(flags[i]) flaggedList.push(num);
   });
 
-  let text = `📕 Орфографія · Подвоєння в іншомовних словах · Тренажер\n`;
-  text += `Учень: ${studentName}\n`;
-  if(answered < total){
-    text += `Результат: ${correct}/${answered} (виконано ${answered} із ${total} завдань)\n`;
-  } else {
-    text += `Результат: ${correct}/${total}\n`;
-  }
-  if(wrongList.length){
-    text += `Помилки в завданнях: ${wrongList.join(', ')}`;
-  } else {
-    text += `Помилок немає 🎉`;
-  }
-
   const reviewLink = buildReviewLink();
-
   const statusEl = document.getElementById('sendStatus');
-  try{
-    const resp = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        chat_id: TG_CHAT_ID,
-        text,
-        reply_markup: {
-          inline_keyboard: [[
-            { text: "🔍 Переглянути розбір відповідей", url: reviewLink }
-          ]]
-        }
-      })
-    });
-    const data = await resp.json();
-    if(data.ok){
-      if(statusEl){ statusEl.textContent = 'Результат надіслано вчителю ✓'; statusEl.className = 'send-status ok'; }
-    } else {
-      if(statusEl){ statusEl.textContent = 'Не вдалося надіслати результат'; statusEl.className = 'send-status bad'; }
-    }
-  } catch(err){
-    if(statusEl){ statusEl.textContent = 'Не вдалося надіслати результат'; statusEl.className = 'send-status bad'; }
+
+  const ok = await logToSheet({
+    type: "quiz_result",
+    student: studentName,
+    testName: "Іншомовні слова · Подвоєні букви",
+    correct, answered, total,
+    wrongList,
+    flaggedList,
+    reviewLink
+  });
+
+  if(ok){
+    reportSent = true;
+    clearProgress_();
+    if(statusEl){ statusEl.textContent = 'Результат надіслано вчителю ✓'; statusEl.className = 'send-status ok'; }
+  } else if(statusEl){
+    statusEl.innerHTML = 'Не вдалося надіслати результат (перевірте інтернет). Прогрес збережено, спробуйте ще раз.<br><button class="btn ghost small" id="retrySendBtn" style="margin-top:8px;">Спробувати ще раз</button>';
+    statusEl.className = 'send-status bad';
+    const retryBtn = document.getElementById('retrySendBtn');
+    if(retryBtn) retryBtn.onclick = ()=>{
+      statusEl.textContent = 'Надсилаємо результат...';
+      statusEl.className = 'send-status';
+      sendTelegramReport();
+    };
   }
 }
 
@@ -796,12 +894,13 @@ function renderQuiz(){
       </div>`;
     if(!reviewMode){
       document.getElementById('restartBtn').onclick = ()=>{
-        answers = {};
+        answers = {}; flags = {};
         qIdx = 0; reportSent = false; finished = false;
+        clearProgress_();
         renderQuiz();
       };
+      saveProgress_();
       if(!reportSent){
-        reportSent = true;
         sendTelegramReport();
       }
     }
@@ -811,6 +910,7 @@ function renderQuiz(){
   const q = QUESTIONS[qIdx];
   const rec = answers[qIdx];
   const {correct, answered} = scoreOverall();
+  const isFlagged = !!flags[qIdx];
 
   let segs = '';
   QUESTIONS.forEach((_,i)=>{
@@ -822,8 +922,12 @@ function renderQuiz(){
   quizArea.innerHTML = `
     <div class="progress-row">
       <div class="qnum">${studentName} · Питання ${qIdx+1} з ${total}</div>
-      <div class="score">${correct}/${answered||0}</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        ${!reviewMode ? `<button id="flagBtn" type="button" title="Позначити, якщо незрозуміло" style="background:${isFlagged?'#FFE27A':'none'};border:none;cursor:pointer;font-size:13px;line-height:1;padding:4px 7px;border-radius:8px;opacity:${isFlagged?'1':'0.3'};">❓</button>` : ''}
+        <div class="score">${correct}/${answered||0}</div>
+      </div>
     </div>
+    ${reviewMode && isFlagged ? `<p class="sub" style="color:#B8860B;font-weight:700;margin:0 0 6px;">❓ Учень позначив це питання як незрозуміле</p>` : ''}
     <div class="segbar">${segs}</div>
     <p class="qtext">${q.q}</p>
     <div class="options">
@@ -879,12 +983,19 @@ function renderQuiz(){
       if(answers[qIdx]) return;
       const picked = +btn.dataset.i;
       answers[qIdx] = {picked, correct: picked===q.a};
+      saveProgress_();
       renderQuiz();
     };
   });
   document.getElementById('prevBtn').onclick = ()=>{ qIdx--; clearDrawing(); renderQuiz(); };
   document.getElementById('nextBtn').onclick = ()=>{ qIdx++; clearDrawing(); renderQuiz(); };
   if(!reviewMode){
+    const flagBtn = document.getElementById('flagBtn');
+    if(flagBtn) flagBtn.onclick = ()=>{
+      flags[qIdx] = !flags[qIdx];
+      saveProgress_();
+      renderQuiz();
+    };
     document.getElementById('finishBtn').onclick = ()=>{
       const {answered} = scoreOverall();
       const msg = answered===0
@@ -892,6 +1003,7 @@ function renderQuiz(){
         : `Завершити тест зараз і надіслати результат (відповідено на ${answered} із ${total})?`;
       if(confirm(msg)){
         finished = true;
+        saveProgress_();
         renderQuiz();
       }
     };
@@ -902,12 +1014,28 @@ function renderQuiz(){
     };
   }
   quizArea.querySelectorAll('.seg').forEach(d=>{
-    d.onclick = ()=>{ qIdx = +d.dataset.i; renderQuiz(); };
+    d.onclick = ()=>{ qIdx = +d.dataset.i; saveProgress_(); renderQuiz(); };
   });
 }
 
 async function init(){
   if(parseReviewParam()){
+    renderQuiz();
+    return;
+  }
+  const fromUrl = new URLSearchParams(location.search).get('student');
+  if(fromUrl){
+    studentName = fromUrl;
+    started = true;
+    const saved = loadProgress_();
+    if(saved){
+      answers = saved.answers || {};
+      flags = saved.flags || {};
+      qIdx = typeof saved.qIdx === 'number' ? saved.qIdx : _hwStartIdx;
+      finished = !!saved.finished;
+    } else {
+      qIdx = _hwStartIdx;
+    }
     renderQuiz();
     return;
   }
