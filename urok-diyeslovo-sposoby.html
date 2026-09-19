@@ -495,20 +495,25 @@ const TOPICS = {
       }
     ]
   },
-  other: {
-    label: "Умовний і наказовий",
+  umovnyi: {
+    label: "Умовний спосіб",
     subs: [
       {
-        id: "o-umov", tab: "Умовний спосіб", dot: "1", type: "cards",
+        id: "u-info", tab: "Умовний спосіб", dot: "1", type: "cards",
         title: "Умовний спосіб",
         intro: "Умовний спосіб виражає бажану чи можливу за певної умови дію. Утворюється додаванням частки <b>б</b> або <b>би</b> до форми минулого часу.",
         cards: [
           {rule: "б", desc: "додається після голосного звука", examples: [{word: "написав би → сказав б", ipa: ""}]},
           {rule: "би", desc: "додається після приголосного звука", examples: [{word: "я написав би листа", ipa: ""}]}
         ]
-      },
+      }
+    ]
+  },
+  nakazovyi: {
+    label: "Наказовий спосіб",
+    subs: [
       {
-        id: "o-nakaz", tab: "Наказовий спосіб", dot: "2", type: "cards",
+        id: "n-info", tab: "Наказовий спосіб", dot: "1", type: "cards",
         title: "Наказовий спосіб",
         intro: "Наказовий спосіб виражає прохання, побажання, наказ чи спонукання до дії.",
         cards: [
@@ -521,7 +526,7 @@ const TOPICS = {
 };
 
 const LETTERS = ["А","Б","В","Г"];
-const TOPIC_ORDER = ["diysnyi","other"];
+const TOPIC_ORDER = ["diysnyi","umovnyi","nakazovyi"];
 
 let activeTopic = "diysnyi";
 let activeSub = 0;
