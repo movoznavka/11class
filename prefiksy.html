@@ -654,6 +654,7 @@ let studentName = "";
 let started = false;
 let reportSent = false;
 let finished = false;
+let reviewMode = false; // true, коли сторінку відкрито за посиланням-розбором для вчительки
 
 // ============================================================
 // ЗБЕРЕЖЕННЯ ПРОГРЕСУ (щоб не пропадало, якщо зникне інтернет)
@@ -662,6 +663,7 @@ function progressKey_(){
   return 'quizProgress::' + location.pathname + '::' + studentName;
 }
 function saveProgress_(){
+  if(reviewMode) return;
   try{
     localStorage.setItem(progressKey_(), JSON.stringify({
       answers, flags, qIdx, finished, hwParam: _hwParam || '', ts: Date.now()
@@ -744,6 +746,22 @@ function renderNameScreen(prefill){
   input.addEventListener('keydown', (e)=>{ if(e.key==='Enter') go(); });
 }
 
+// Пакує поточні відповіді/позначки в саме посилання (без бекенда),
+// щоб кнопка "Переглянути розбір відповідей" в Telegram відкривала
+// цю ж сторінку в режимі перегляду (reviewMode) з готовими відповідями.
+function buildReviewLink(){
+  try{
+    const payload = JSON.stringify({ n: studentName, a: answers, f: flags });
+    const encoded = btoa(unescape(encodeURIComponent(payload)));
+    const params = new URLSearchParams();
+    if(_hwParam) params.set('hw', _hwParam);
+    params.set('review', encoded);
+    return location.origin + location.pathname + '?' + params.toString();
+  }catch(e){
+    return '';
+  }
+}
+
 async function sendTelegramReport(){
   const {correct, total, answered} = scoreOverall();
   const wrongList = [];
@@ -805,7 +823,7 @@ function renderQuiz(){
       renderQuiz();
     };
     saveProgress_();
-    if(!reportSent){
+    if(!reportSent && !reviewMode){
       sendTelegramReport();
     }
     return;
@@ -845,12 +863,12 @@ function renderQuiz(){
     </div>
     <div class="nav-row">
       <button class="btn ghost" id="prevBtn" ${qIdx===0?'disabled':''}>← Назад</button>
-      <button class="btn primary" id="nextBtn" ${rec?'':'disabled'}>${qIdx===total-1?'До результату':'Далі →'}</button>
+      <button class="btn primary" id="nextBtn" ${(reviewMode && qIdx===total-1) ? 'disabled' : (rec?'':'disabled')}>${qIdx===total-1?'До результату':'Далі →'}</button>
     </div>
-    <div class="reset-row">
+    ${reviewMode ? '' : `<div class="reset-row">
       <button class="btn ghost small" id="finishBtn">Завершити і надіслати результат</button>
       <button class="btn ghost small" id="changeNameBtn">Змінити ім'я</button>
-    </div>
+    </div>`}
   `;
 
   if(rec){
@@ -870,7 +888,7 @@ function renderQuiz(){
 
   quizArea.querySelectorAll('.opt').forEach(btn=>{
     btn.onclick = ()=>{
-      if(answers[qIdx]) return;
+      if(reviewMode || answers[qIdx]) return;
       const picked = +btn.dataset.i;
       answers[qIdx] = {picked, correct: picked===q.a};
       saveProgress_();
@@ -878,14 +896,15 @@ function renderQuiz(){
     };
   });
   document.getElementById('prevBtn').onclick = ()=>{ qIdx--; saveProgress_(); renderQuiz(); };
-  document.getElementById('nextBtn').onclick = ()=>{ qIdx++; saveProgress_(); renderQuiz(); };
+  document.getElementById('nextBtn').onclick = ()=>{ if(document.getElementById('nextBtn').disabled) return; qIdx++; saveProgress_(); renderQuiz(); };
   const flagBtn = document.getElementById('flagBtn');
   if(flagBtn) flagBtn.onclick = ()=>{
     flags[qIdx] = !flags[qIdx];
     saveProgress_();
     renderQuiz();
   };
-  document.getElementById('finishBtn').onclick = ()=>{
+  const finishBtn = document.getElementById('finishBtn');
+  if(finishBtn) finishBtn.onclick = ()=>{
     const {answered} = scoreOverall();
     const msg = answered===0
       ? 'Ти ще не відповів на жодне питання. Завершити тест зараз?'
@@ -896,7 +915,8 @@ function renderQuiz(){
       renderQuiz();
     }
   };
-  document.getElementById('changeNameBtn').onclick = async ()=>{
+  const changeNameBtn = document.getElementById('changeNameBtn');
+  if(changeNameBtn) changeNameBtn.onclick = async ()=>{
     await clearStoredName();
     started = false;
     renderNameScreen(studentName);
@@ -908,6 +928,23 @@ function renderQuiz(){
 
 async function init(){
   const urlParams = new URLSearchParams(location.search);
+  const reviewParam = urlParams.get('review');
+  if(reviewParam){
+    try{
+      const decoded = JSON.parse(decodeURIComponent(escape(atob(reviewParam))));
+      reviewMode = true;
+      studentName = decoded.n || '';
+      answers = decoded.a || {};
+      flags = decoded.f || {};
+      started = true;
+      finished = false;
+      qIdx = 0;
+      renderQuiz();
+      return;
+    }catch(e){
+      // посилання пошкоджене — ідемо звичайним шляхом нижче
+    }
+  }
   const fromUrl = urlParams.get('student');
   if(fromUrl){
     studentName = fromUrl;
