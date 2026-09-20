@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Відокремлені обставини · Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#D0E9FC;
+    --bg-soft:#E4F2FC;
+    --card:#FFFFFF;
+    --ink:#13213B;
+    --ink-soft:#6478A0;
+    --line: rgba(19,33,59,0.08);
+
+    --c1-a:#FDA4AF; --c1-b:#9F1239; --c1-sh: rgba(159,18,57,0.45);
+    --c3-a:#5FE0A8; --c3-b:#17A863; --c3-sh: rgba(23,168,99,0.4);
+    --c2-b:#E5484D;
+    --c4-a:#FFB86C; --c4-b:#F5820D;
+
+    --correct-bg:#E6F8EE;
+    --correct-ink:#128A54;
+    --wrong-bg:#FDECEC;
+    --wrong-ink:#D8393E;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    padding:28px 16px 64px;
+    position:relative;
+  }
+  .wrap{max-width:760px;margin:0 auto;}
+
+  .topbar{
+    display:flex;justify-content:space-between;align-items:center;
+    padding-bottom:16px;margin-bottom:22px;
+    border-bottom:1.5px solid rgba(19,33,59,0.14);
+  }
+  .kicker{
+    font-family:'Manrope',sans-serif;font-weight:800;font-size:12.5px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--ink);opacity:.55;
+  }
+  .kicker.tag{opacity:.4;}
+
+  h1{
+    font-family:'Manrope',sans-serif;font-weight:800;
+    font-size:clamp(22px,5.2vw,34px);line-height:1.1;letter-spacing:-0.01em;
+    margin:0 0 8px;text-transform:uppercase;
+  }
+  h1 .hl{color:var(--c1-b);}
+  .sub{color:var(--ink-soft);font-size:15px;max-width:56ch;margin:0 0 22px;font-weight:500;}
+
+  /* tabs */
+  .tabbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+  .tab{
+    padding:10px 15px 10px 10px;border-radius:999px;border:none;background:var(--card);
+    color:var(--ink-soft);font-family:'Manrope',sans-serif;font-weight:800;font-size:12.5px;
+    cursor:pointer;display:flex;align-items:center;gap:8px;
+    box-shadow: 0 8px 18px -14px rgba(19,33,59,0.3);
+  }
+  .tab .dot{
+    width:22px;height:22px;border-radius:8px;background:rgba(159,18,57,.1);color:var(--c1-b);
+    display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;
+  }
+  .tab.active{
+    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));color:#fff;
+    box-shadow:0 10px 20px -10px var(--c1-sh);
+  }
+  .tab.active .dot{background:rgba(255,255,255,.25);color:#fff;}
+
+  .card{
+    background:var(--card);border-radius:28px;padding:28px 24px;
+    box-shadow: 0 20px 44px -28px rgba(19,33,59,0.35);
+  }
+
+  .section-title{font-family:'Manrope',sans-serif;font-weight:800;font-size:20px;letter-spacing:-0.005em;margin:0 0 8px;}
+  .section-intro{color:var(--ink-soft);font-size:14.5px;line-height:1.6;margin:0 0 18px;}
+  .section-intro b{color:var(--ink);}
+
+  .callout{
+    background:linear-gradient(155deg, rgba(255,184,108,.22), rgba(245,130,13,.10));
+    border-radius:18px;padding:14px 18px;margin-bottom:20px;font-size:13.5px;line-height:1.55;color:var(--ink);
+  }
+  .callout b{color:var(--c4-b);font-family:'Manrope',sans-serif;}
+
+  /* flip cards */
+  .cardgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:640px){.cardgrid{grid-template-columns:1fr;}}
+  .flip{perspective:1200px;height:230px;cursor:pointer;}
+  .flip-inner{position:relative;width:100%;height:100%;transition:transform .5s cubic-bezier(.4,.2,.2,1);transform-style:preserve-3d;}
+  .flip.open .flip-inner{transform:rotateY(180deg);}
+  .flip-face{position:absolute;inset:0;border-radius:20px;padding:16px 18px;backface-visibility:hidden;display:flex;flex-direction:column;justify-content:center;overflow:hidden;}
+  .flip-front{background:var(--bg-soft);}
+  .flip-back{background:linear-gradient(155deg,var(--c1-a),var(--c1-b));color:#fff;transform:rotateY(180deg);align-items:center;text-align:center;justify-content:center;overflow-y:auto;}
+  .flip-rule{font-family:'Manrope',sans-serif;font-weight:800;font-size:15px;line-height:1.32;}
+  .flip-desc{font-size:12.5px;margin-top:7px;opacity:.8;line-height:1.4;}
+  .flip-example{font-size:13.5px;font-weight:700;margin-bottom:4px;line-height:1.3;}
+  .flip-example:last-child{margin-bottom:0;}
+  .flip-note{font-size:10.5px;opacity:.75;font-weight:500;line-height:1.35;}
+  .flip-hint{position:absolute;bottom:9px;right:14px;font-size:10px;font-weight:700;opacity:.4;}
+
+  /* exceptions chips */
+  .group-title{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:13px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:var(--c1-b);
+    margin:22px 0 12px;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:5px 14px 5px 12px;
+    border-radius:999px;
+    background: rgba(159,18,57,0.10);
+  }
+  .group-title:first-child{margin-top:0;}
+  .group-title::before{
+    content:'';
+    width:6px;height:6px;
+    border-radius:50%;
+    background:var(--c1-b);
+  }
+  .chiprow{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:6px;}
+  .chip{background:var(--bg-soft);border-radius:16px;padding:13px 18px;cursor:pointer;min-width:126px;transition:background .2s;}
+  .chip .w{font-family:'Manrope',sans-serif;font-weight:800;font-size:14.5px;}
+  .chip .ipa{font-size:12.5px;color:#fff;font-weight:700;margin-top:5px;display:none;}
+  .chip.open{background:linear-gradient(155deg, var(--c4-a), var(--c4-b));}
+  .chip.open .w{color:#fff;}
+  .chip.open .ipa{display:block;}
+
+  /* mini quiz */
+  .qtext{font-family:'Manrope',sans-serif;font-size:18px;font-weight:700;line-height:1.4;margin:0 0 18px;}
+  .options{display:flex;flex-direction:column;gap:10px;}
+  .opt{
+    display:flex;align-items:center;gap:13px;text-align:left;width:100%;
+    padding:9px 14px 9px 9px;border-radius:18px;border:none;background:var(--bg-soft);
+    cursor:pointer;font-family:'Inter',sans-serif;font-size:14.5px;font-weight:500;color:var(--ink);
+    transition:transform .12s ease, background .15s ease;
+  }
+  .opt:hover{transform:translateY(-1px);}
+  .opt[disabled]{cursor:default;}
+  .opt[disabled]:hover{transform:none;}
+  .tile{
+    position:relative;width:30px;height:30px;min-width:30px;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Manrope',sans-serif;font-weight:800;font-size:13px;color:var(--c1-b);
+    background: linear-gradient(150deg, rgba(255,255,255,0.75), rgba(253,164,175,0.22));
+    backdrop-filter: blur(6px) saturate(160%);
+    border:1px solid rgba(255,255,255,0.7);
+    box-shadow: 0 4px 12px -7px var(--c1-sh), inset 0 1px 1px rgba(255,255,255,0.8);
+  }
+  .badge{
+    position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;
+    border:2px solid var(--card);display:flex;align-items:center;justify-content:center;
+    font-size:9.5px;font-weight:800;color:#fff;
+  }
+  .badge.ok{background:var(--c3-b);}
+  .badge.no{background:var(--c2-b);}
+  .opt.correct{background:var(--correct-bg);}
+  .opt.wrong{background:var(--wrong-bg);}
+  .opt.dim{opacity:.5;}
+  .feedback{margin-top:16px;padding:13px 16px;border-radius:16px;font-size:14px;font-weight:600;display:none;align-items:center;gap:9px;}
+  .feedback.show{display:flex;}
+  .feedback.ok{background:var(--correct-bg);color:var(--correct-ink);}
+  .feedback.bad{background:var(--wrong-bg);color:var(--wrong-ink);}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:22px;}
+  .btn{
+    font-family:'Manrope',sans-serif;font-weight:800;font-size:13px;padding:12px 22px;
+    border-radius:999px;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;
+  }
+  .btn.primary{background:linear-gradient(155deg,var(--c1-a),var(--c1-b));color:#fff;box-shadow:0 10px 20px -8px var(--c1-sh);}
+  .btn.ghost{background:transparent;color:var(--ink-soft);}
+  .btn:disabled{opacity:.3;cursor:default;box-shadow:none;}
+  .qprog{font-family:'Manrope',sans-serif;font-weight:700;font-size:13px;color:var(--ink-soft);margin-bottom:14px;}
+
+  .done-screen{text-align:center;padding:16px 0;}
+  .done-screen .ring{
+    width:110px;height:110px;margin:0 auto 16px;border-radius:50%;
+    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));
+    box-shadow:0 16px 30px -12px var(--c1-sh);
+    display:flex;align-items:center;justify-content:center;position:relative;
+  }
+  .done-screen .big{font-family:'Manrope',sans-serif;font-weight:800;font-size:28px;color:#fff;}
+
+  footer{text-align:center;margin-top:22px;font-size:12.5px;color:var(--ink-soft);font-weight:500;}
+
+  /* ===================== DRAWING / TEACHER MODE ===================== */
+  #drawCanvas{ position:absolute; top:0; left:0; z-index:9998; pointer-events:none; }
+
+  #drawToggleBtn{
+    position:fixed; right:20px; bottom:20px; width:58px;height:58px; border-radius:50%;
+    border:1px solid rgba(255,255,255,0.5);
+    background:
+      linear-gradient(150deg, rgba(255,255,255,0.35), rgba(255,255,255,0) 60%),
+      linear-gradient(155deg,var(--c1-a),var(--c1-b));
+    backdrop-filter: blur(10px) saturate(160%);
+    -webkit-backdrop-filter: blur(10px) saturate(160%);
+    box-shadow: 0 14px 28px -10px var(--c1-sh), inset 0 1px 1px rgba(255,255,255,0.6), inset 0 -6px 10px -4px rgba(0,0,0,0.15);
+    color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:9999;
+    transition:transform .18s cubic-bezier(.34,1.56,.64,1), background .2s ease, box-shadow .2s ease;
+  }
+  #drawToggleBtn svg{ width:24px;height:24px; display:block; transition:transform .25s ease, opacity .15s ease; }
+  #drawToggleBtn:active{transform:scale(0.90);}
+  #drawToggleBtn.on{
+    background:
+      linear-gradient(150deg, rgba(255,255,255,0.35), rgba(255,255,255,0) 60%),
+      linear-gradient(155deg,#FF8A65,var(--c2-b));
+    box-shadow: 0 14px 28px -10px rgba(229,72,77,0.55), inset 0 1px 1px rgba(255,255,255,0.6), inset 0 -6px 10px -4px rgba(0,0,0,0.15);
+  }
+  #drawToggleBtn.on svg{ transform:rotate(90deg); }
+
+  #drawToolbar{
+    position:fixed; left:50%; bottom:22px; transform:translateX(-50%) translateY(130%) scale(0.94); opacity:0;
+    display:flex; align-items:center; gap:12px;
+    background: linear-gradient(150deg, rgba(255,255,255,0.6), rgba(255,255,255,0.15));
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border:1px solid rgba(255,255,255,0.7);
+    padding:9px 16px; border-radius:999px;
+    box-shadow: 0 24px 48px -20px rgba(19,33,59,0.45), inset 0 1px 1px rgba(255,255,255,0.9);
+    z-index:9999;
+    transition:transform .25s cubic-bezier(.34,1.56,.64,1), opacity .2s ease;
+    pointer-events:none;
+  }
+  #drawToolbar.show{ transform:translateX(-50%) translateY(0) scale(1); opacity:1; pointer-events:auto; }
+  .swatch{
+    position:relative; width:25px;height:25px; border-radius:50%; border:none;
+    box-shadow: 0 3px 8px -2px rgba(19,33,59,0.35), inset 0 1px 1px rgba(255,255,255,0.5);
+    cursor:pointer; padding:0; transition:transform .15s cubic-bezier(.34,1.56,.64,1);
+  }
+  .swatch::after{
+    content:''; position:absolute; inset:-4px; border-radius:50%; border:2px solid var(--ink);
+    opacity:0; transform:scale(0.7); transition:opacity .15s ease, transform .15s cubic-bezier(.34,1.56,.64,1);
+  }
+  .swatch.selected{ transform:scale(1.08); }
+  .swatch.selected::after{ opacity:1; transform:scale(1); }
+  .tool-btn{
+    width:34px;height:34px; border-radius:50%; border:none; background:rgba(255,255,255,0.5); color:var(--ink);
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    transition:background .15s ease, color .15s ease, transform .15s cubic-bezier(.34,1.56,.64,1);
+  }
+  .tool-btn svg{ width:16px; height:16px; }
+  .tool-btn .dot{ border-radius:50%; background:currentColor; }
+  #thinBtn .dot{ width:6px; height:6px; }
+  #thickBtn .dot{ width:12px; height:12px; }
+  .tool-btn.selected{ background:var(--c1-b); color:#fff; transform:scale(1.06); }
+  .tool-sep{ width:1px; height:22px; background:rgba(19,33,59,0.14); }
+
+  @media (max-width:480px){
+    #drawToolbar{ max-width:94vw; overflow-x:auto; padding:8px 13px; gap:9px; }
+    .swatch{width:21px;height:21px;}
+    .tool-btn{width:30px;height:30px;}
+    .tool-btn svg{width:14px;height:14px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="kicker">Синтаксис</div>
+    <div class="kicker tag">Кличний відмінок</div>
+  </div>
+
+  <h1><span class="hl">Відокремлені</span> обставини</h1>
+  <p class="sub">Коли дієприслівниковий зворот виділяємо комами, а коли одиничний дієприслівник комою не виділяється.</p>
+
+  <div class="tabbar" id="subtabbar"></div>
+
+  <div class="card" id="lessonArea"></div>
+
+  <footer>@movoznavka</footer>
+</div>
+
+<!-- ==== Малювання поверх екрана (для вчителя) ==== -->
+<canvas id="drawCanvas"></canvas>
+<button id="drawToggleBtn" title="Малювати">
+  <svg id="drawIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4 20L4.6 16.6C4.7 15.9 5.03 15.26 5.55 14.79L15.3 5.7C16.09 4.96 17.34 4.99 18.09 5.78L18.34 6.04C19.08 6.83 19.04 8.08 18.25 8.81L8.5 17.9C8 18.37 7.37 18.66 6.7 18.75L4 20Z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/>
+    <path d="M13.5 7.5L16.5 10.3" stroke="white" stroke-width="1.7" stroke-linecap="round"/>
+  </svg>
+</button>
+<div id="drawToolbar">
+  <button class="swatch selected" style="background:#E5484D" data-color="#E5484D"></button>
+  <button class="swatch" style="background:#3355EE" data-color="#3355EE"></button>
+  <button class="swatch" style="background:#17A863" data-color="#17A863"></button>
+  <button class="swatch" style="background:#13213B" data-color="#13213B"></button>
+  <div class="tool-sep"></div>
+  <button class="tool-btn selected" id="thinBtn" title="Тонка лінія"><span class="dot"></span></button>
+  <button class="tool-btn" id="thickBtn" title="Товста лінія"><span class="dot"></span></button>
+  <div class="tool-sep"></div>
+  <button class="tool-btn" id="eraserBtn" title="Ластик">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M18.5 13.5L10.5 21.5H5.5L2.5 18.5C2.11 18.11 2.11 17.48 2.5 17.09L13.5 6.09C13.89 5.7 14.52 5.7 14.91 6.09L18.5 9.68C19.5 10.68 19.5 12.5 18.5 13.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M9 13.5L15 19.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <button class="tool-btn" id="clearBtn" title="Очистити все">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M5 7H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M9.5 7V4.8C9.5 4.36 9.86 4 10.3 4H13.7C14.14 4 14.5 4.36 14.5 4.8V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M7 7L7.6 19.2C7.63 19.9 8.2 20.5 8.9 20.5H15.1C15.8 20.5 16.37 19.9 16.4 19.2L17 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+</div>
+
+<script>
+/* ============================================================
+   ЯК ДОДАТИ ЧИ ЗМІНИТИ МАТЕРІАЛ
+   Весь контент живе в масиві SECTIONS нижче — це вкладки уроку.
+   Щоб додати картку/слово/питання — скопіюй існуючий блок
+   { ... } всередині потрібного масиву (cards / words / questions)
+   і зміни текст між лапками.
+   Щоб додати нову вкладку — скопіюй один об'єкт зі SECTIONS
+   цілком і зміни tab / title / вміст.
+   ============================================================ */
+
+const SECTIONS = [
+  {
+    id: "vob-diyepryslivnyk", tab: "Дієприслівниковий зворот", dot: "1", type: "cards",
+    title: "Відокремлення обставин",
+    intro: "",
+    cards: [
+      {rule: "Дієприслівниковий зворот (кілька слів)", desc: "завжди виділяємо комами", examples: [{word: "-учи"}, {word: "-ючи"}, {word: "-ачи"}, {word: "-ячи"}, {word: "-ши"}, {word: "-вши"}]},
+      {rule: "Одиничний дієприслівник — виняток", desc: "НЕ відокремлюємо, якщо стоїть після присудка, відповідає на «як?» і означає одну дію (тобто фактично спосіб дії)", examples: [{word: "Сидить замислившись"}, {word: "Ідуть співаючи"}]}
+    ]
+  }
+];
+
+const LETTERS = ["А","Б","В","Г"];
+
+let activeSection = 0;
+let quizIdx = 0;
+let quizAnswers = {};
+
+const subtabbar = document.getElementById('subtabbar');
+const lessonArea = document.getElementById('lessonArea');
+
+function resetQuiz(){ quizIdx = 0; quizAnswers = {}; }
+function currentSection(){ return SECTIONS[activeSection]; }
+
+// ---- per-tab drawing storage ----
+const drawStore = {};
+function sectionKey(){
+  const sec = currentSection();
+  let k = 'sec' + activeSection;
+  if(sec.type === "quiz") k += '__q' + quizIdx;
+  return k;
+}
+function saveCurrentDrawing(){
+  if(window.getDrawingSnapshot) drawStore[sectionKey()] = window.getDrawingSnapshot();
+}
+function restoreCurrentDrawing(){
+  if(window.setDrawingSnapshot) window.setDrawingSnapshot(drawStore[sectionKey()] || null);
+}
+
+function renderTabs(){
+  subtabbar.innerHTML = SECTIONS.map((s,i)=>`
+    <button class="tab ${i===activeSection?'active':''}" data-i="${i}">
+      <span class="dot">${s.dot}</span>${s.tab}
+    </button>`).join('');
+  subtabbar.querySelectorAll('.tab').forEach(btn=>{
+    btn.onclick = ()=>{
+      saveCurrentDrawing();
+      activeSection = +btn.dataset.i;
+      resetQuiz();
+      renderTabs();
+      renderContent();
+    };
+  });
+}
+
+function renderContent(){
+  const s = currentSection();
+  let html = `<p class="section-title">${s.title}</p>${s.intro ? `<p class="section-intro">${s.intro}</p>` : ''}`;
+  if(s.callout) html += `<div class="callout">${s.callout}</div>`;
+
+  if(s.type === "cards"){
+    html += `<div class="cardgrid">${s.cards.map((c)=>`
+      <div class="flip" data-kind="card">        <div class="flip-inner">
+          <div class="flip-face flip-front">
+            <div class="flip-rule">${c.rule}</div>
+            <div class="flip-desc">${c.desc||''}</div>
+            <div class="flip-hint">натисни →</div>
+          </div>
+          <div class="flip-face flip-back">
+            ${c.examples.map(e=>`<div class="flip-example">${e.word}${e.ipa?' '+e.ipa:''}</div>${e.note?`<div class="flip-note">${e.note}</div>`:''}`).join('')}
+            ${c.note?`<div class="flip-note" style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.25);">${c.note}</div>`:''}
+          </div>
+        </div>
+      </div>`).join('')}</div>`;
+  }
+
+  if(s.type === "exceptions"){
+    html += `<div class="chiprow">${s.words.map((w)=>`
+      <div class="chip" data-kind="chip">
+        <div class="w">${w.word}</div>
+        <div class="ipa">${w.ipa}</div>
+      </div>`).join('')}</div>`;
+  }
+
+  if(s.type === "exceptions-groups"){
+    html += s.groups.map(g => `
+      <div class="group-title">${g.title}</div>
+      <div class="chiprow">${g.words.map((w)=>`
+        <div class="chip" data-kind="chip">
+          <div class="w">${w.word}</div>
+          <div class="ipa">${w.ipa}</div>
+        </div>`).join('')}</div>
+    `).join('');
+  }
+
+  if(s.type === "quiz"){
+    lessonArea.innerHTML = html;
+    renderQuiz(s);
+    syncCanvasAfterRender();
+    return;
+  }
+
+  lessonArea.innerHTML = html;
+  lessonArea.querySelectorAll('[data-kind="card"], [data-kind="chip"]').forEach(el=>{
+    el.onclick = ()=>{ el.classList.toggle('open'); };
+  });
+  syncCanvasAfterRender();
+}
+
+function syncCanvasAfterRender(){
+  if(window.resizeDrawCanvas){
+    requestAnimationFrame(()=> requestAnimationFrame(()=>{
+      window.resizeDrawCanvas();
+      restoreCurrentDrawing();
+    }));
+  }
+}
+
+function quizScore(qs){
+  let correct = 0, answered = 0;
+  qs.forEach((_,i)=>{ const r = quizAnswers[i]; if(r){ answered++; if(r.correct) correct++; } });
+  return {correct, answered, total: qs.length};
+}
+
+function renderQuiz(s){
+  const total = s.questions.length;
+
+  if(quizIdx >= total){
+    const {correct} = quizScore(s.questions);
+    const extra = document.createElement('div');
+    extra.innerHTML = `
+      <div class="done-screen">
+        <div class="ring"><div class="big">${correct}/${total}</div></div>
+        <p class="section-intro" style="margin-top:10px;">${correct===total ? 'Ідеально! Матеріал засвоєно 🎉' : 'Непогано — можна ще раз пробігтись картками вище.'}</p>
+        <button class="btn primary" id="quizRestart" style="margin-top:6px;">Пройти ще раз</button>
+      </div>`;
+    lessonArea.appendChild(extra);
+    document.getElementById('quizRestart').onclick = ()=>{ resetQuiz(); renderContent(); };
+    return;
+  }
+
+  const q = s.questions[quizIdx];
+  const rec = quizAnswers[quizIdx];
+
+  const box = document.createElement('div');
+  box.innerHTML = `
+    <div class="qprog">Питання ${quizIdx+1} з ${total}</div>
+    <p class="qtext">${q.q}</p>
+    <div class="options">
+      ${q.opts.map((o,i)=>`
+        <button class="opt" data-i="${i}" ${rec?'disabled':''}>
+          <span class="tile"><span>${LETTERS[i]}</span></span><span>${o}</span>
+        </button>`).join('')}
+    </div>
+    <div class="feedback ${rec?'show '+(rec.correct?'ok':'bad'):''}">
+      ${rec ? (rec.correct ? `<span><b>Правильно.</b></span>` : `<span>Правильна відповідь — ${LETTERS[q.a]}. ${q.opts[q.a]}</span>`) : ''}
+    </div>
+    <div class="nav-row">
+      <button class="btn ghost" id="quizPrev" ${quizIdx===0?'disabled':''}>← Назад</button>
+      <button class="btn primary" id="quizNext" ${rec?'':'disabled'}>${quizIdx===total-1?'До результату':'Далі →'}</button>
+    </div>`;
+  lessonArea.appendChild(box);
+
+  if(rec){
+    box.querySelectorAll('.opt').forEach((btn,i)=>{
+      const tile = btn.querySelector('.tile');
+      if(i===q.a){ btn.classList.add('correct'); tile.insertAdjacentHTML('beforeend','<span class="badge ok">✓</span>'); }
+      else if(i===rec.picked){ btn.classList.add('wrong'); tile.insertAdjacentHTML('beforeend','<span class="badge no">✕</span>'); }
+      else { btn.classList.add('dim'); }
+    });
+  }
+
+  box.querySelectorAll('.opt').forEach(btn=>{
+    btn.onclick = ()=>{
+      if(quizAnswers[quizIdx]) return;
+      const picked = +btn.dataset.i;
+      quizAnswers[quizIdx] = {picked, correct: picked===q.a};
+      renderContent();
+    };
+  });
+  const prevBtn = document.getElementById('quizPrev');
+  const nextBtn = document.getElementById('quizNext');
+  if(prevBtn) prevBtn.onclick = ()=>{ saveCurrentDrawing(); quizIdx--; renderContent(); };
+  if(nextBtn) nextBtn.onclick = ()=>{ saveCurrentDrawing(); quizIdx++; renderContent(); };
+}
+
+renderTabs();
+renderContent();
+
+// ======================================================================
+// МАЛЮВАННЯ ПОВЕРХ ЕКРАНА (режим "учитель")
+// Малює ЛИШЕ Apple Pencil (pointerType === 'pen').
+// ======================================================================
+(function(){
+  const canvas = document.getElementById('drawCanvas');
+  const ctx = canvas.getContext('2d');
+  const toggleBtn = document.getElementById('drawToggleBtn');
+  const toolbar = document.getElementById('drawToolbar');
+  const thinBtn = document.getElementById('thinBtn');
+  const thickBtn = document.getElementById('thickBtn');
+  const eraserBtn = document.getElementById('eraserBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const swatches = document.querySelectorAll('.swatch');
+
+  let drawingActive = false;
+  let isDrawing = false;
+  let currentColor = "#E5484D";
+  let currentWidth = 4;
+  let eraserMode = false;
+  let lastX = 0, lastY = 0;
+  const MOVE_THRESHOLD = 2;
+
+  function docSize(){
+    return {
+      w: document.documentElement.clientWidth,
+      h: Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
+    };
+  }
+
+  function resizeCanvas(){
+    const dpr = window.devicePixelRatio || 1;
+    const {w, h} = docSize();
+    const prev = document.createElement('canvas');
+    prev.width = canvas.width;
+    prev.height = canvas.height;
+    if(canvas.width && canvas.height){
+      prev.getContext('2d').drawImage(canvas, 0, 0);
+    }
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    canvas.width = Math.max(1, Math.round(w * dpr));
+    canvas.height = Math.max(1, Math.round(h * dpr));
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    if(prev.width && prev.height){
+      ctx.drawImage(prev, 0, 0, prev.width / dpr, prev.height / dpr);
+    }
+  }
+  window.resizeDrawCanvas = resizeCanvas;
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+  window.addEventListener('orientationchange', ()=> setTimeout(resizeCanvas, 200));
+  window.addEventListener('load', resizeCanvas);
+
+  window.clearDrawing = function(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  };
+  window.getDrawingSnapshot = function(){
+    try{
+      return (canvas.width && canvas.height) ? canvas.toDataURL('image/png') : null;
+    }catch(e){ return null; }
+  };
+  window.setDrawingSnapshot = function(dataURL){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if(!dataURL) return;
+    const img = new Image();
+    img.onload = function(){
+      const d = window.devicePixelRatio || 1;
+      ctx.drawImage(img, 0, 0, canvas.width / d, canvas.height / d);
+    };
+    img.src = dataURL;
+  };
+
+  function setActive(on){
+    drawingActive = on;
+    canvas.classList.toggle('active', on);
+    toolbar.classList.toggle('show', on);
+    toggleBtn.classList.toggle('on', on);
+    toggleBtn.title = on ? 'Вимкнути малювання' : 'Малювати';
+    const ta = on ? 'pinch-zoom' : 'auto';
+    document.documentElement.style.touchAction = ta;
+    document.body.style.touchAction = ta;
+    if(on) resizeCanvas();
+  }
+
+  toggleBtn.addEventListener('click', ()=> setActive(!drawingActive));
+
+  swatches.forEach(sw=>{
+    sw.addEventListener('click', ()=>{
+      swatches.forEach(s=>s.classList.remove('selected'));
+      sw.classList.add('selected');
+      currentColor = sw.dataset.color;
+      eraserMode = false;
+      eraserBtn.classList.remove('selected');
+    });
+  });
+
+  thinBtn.addEventListener('click', ()=>{
+    currentWidth = 4;
+    thinBtn.classList.add('selected');
+    thickBtn.classList.remove('selected');
+  });
+  thickBtn.addEventListener('click', ()=>{
+    currentWidth = 12;
+    thickBtn.classList.add('selected');
+    thinBtn.classList.remove('selected');
+  });
+  eraserBtn.addEventListener('click', ()=>{
+    eraserMode = !eraserMode;
+    eraserBtn.classList.toggle('selected', eraserMode);
+  });
+  clearBtn.addEventListener('click', ()=>{
+    window.clearDrawing();
+  });
+
+  function pointerPos(e){
+    return { x: e.pageX, y: e.pageY, pressure: e.pressure || 0.5 };
+  }
+  function isPen(e){ return e.pointerType === 'pen'; }
+
+  window.addEventListener('pointerdown', (e)=>{
+    if(!drawingActive || !isPen(e)) return;
+    isDrawing = true;
+    const p = pointerPos(e);
+    lastX = p.x; lastY = p.y;
+  }, {passive:true});
+
+  window.addEventListener('pointermove', (e)=>{
+    if(!drawingActive || !isDrawing || !isPen(e)) return;
+    const p = pointerPos(e);
+    const dx = p.x - lastX, dy = p.y - lastY;
+    if(Math.hypot(dx,dy) < MOVE_THRESHOLD) return;
+    e.preventDefault();
+    ctx.globalCompositeOperation = eraserMode ? 'destination-out' : 'source-over';
+    ctx.strokeStyle = currentColor;
+    const pressureFactor = 0.6 + (p.pressure || 0.5) * 0.8;
+    ctx.lineWidth = (eraserMode ? currentWidth * 3 : currentWidth) * pressureFactor;
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+    lastX = p.x; lastY = p.y;
+  }, {passive:false});
+
+  function stopDrawing(e){ isDrawing = false; }
+  window.addEventListener('pointerup', stopDrawing);
+  window.addEventListener('pointercancel', stopDrawing);
+})();
+</script>
+</body>
+</html>
