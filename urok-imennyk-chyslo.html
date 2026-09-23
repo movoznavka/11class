@@ -89,6 +89,17 @@
   }
   .callout b{color:var(--c4-b);font-family:'Manrope',sans-serif;}
 
+  .pronoun-badge{
+    display:inline-flex;align-items:center;gap:10px;
+    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));color:#fff;
+    font-family:'Manrope',sans-serif;font-weight:800;font-size:18px;letter-spacing:.01em;
+    padding:12px 22px;border-radius:999px;margin:0 0 20px;
+    box-shadow:0 12px 22px -10px var(--c1-sh);
+  }
+  .pronoun-badge::before{
+    content:'→';font-weight:800;opacity:.8;
+  }
+
   /* flip cards */
   .cardgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
   @media(max-width:560px){.cardgrid{grid-template-columns:1fr;}}
@@ -304,7 +315,8 @@ const SECTIONS = [
   {
     id: "chyslo-odnyna", tab: "Тільки однина", dot: "1", type: "cards",
     title: "Іменники, що мають лише однину",
-    intro: "Такі слова вживаються тільки в однині, навіть коли позначають щось численне (singularia tantum).",
+    intro: "Такі слова вживаються тільки в однині.",
+    pronoun: "він / вона / воно",
     cards: [
       {rule: "Збірні поняття", desc: "", examples: [{word: "гілля"}, {word: "дрібнота"}, {word: "листя"}]},
       {rule: "Назви абстрактних понять", desc: "", examples: [{word: "геройство"}, {word: "добро"}, {word: "мир"}]},
@@ -315,7 +327,8 @@ const SECTIONS = [
   {
     id: "chyslo-mnozhyna", tab: "Тільки множина", dot: "2", type: "cards",
     title: "Іменники, що мають лише множину",
-    intro: "Такі слова вживаються тільки в множині, навіть коли йдеться про один предмет (pluralia tantum).",
+    intro: "Такі слова вживаються тільки в множині.",
+    pronoun: "вони",
     cards: [
       {rule: "Сукупність людей, істот, предметів", desc: "", examples: [{word: "гроші"}, {word: "діти"}]},
       {rule: "Ігри, звичаї, обряди", desc: "", examples: [{word: "дебати"}, {word: "іменини"}, {word: "посиденьки"}]},
@@ -373,6 +386,7 @@ function renderTabs(){
 function renderContent(){
   const s = currentSection();
   let html = `<p class="section-title">${s.title}</p>${s.intro ? `<p class="section-intro">${s.intro}</p>` : ''}`;
+  if(s.pronoun) html += `<div class="pronoun-badge">${s.pronoun}</div>`;
   if(s.callout) html += `<div class="callout">${s.callout}</div>`;
 
   if(s.type === "cards"){
