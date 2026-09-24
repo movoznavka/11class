@@ -146,6 +146,22 @@
   .combo-ipa{font-size:13px;font-weight:700;color:var(--c3-b);opacity:0;transition:opacity .2s;}
   .combo-row.open .combo-ipa{opacity:1;}
 
+  /* two columns: разом / окремо */
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;}
+  .twocol-head{
+    text-align:center;font-family:'Manrope',sans-serif;font-weight:800;
+    font-size:22px;color:var(--c2-b);padding:6px 0 10px;
+  }
+  .twocol-cell{
+    background:var(--bg-soft);border-radius:16px;padding:14px 12px;
+    text-align:center;font-family:'Manrope',sans-serif;font-weight:700;
+    font-size:16px;display:flex;align-items:center;justify-content:center;
+  }
+  @media(max-width:480px){
+    .twocol-head{font-size:18px;}
+    .twocol-cell{font-size:14px;padding:12px 8px;}
+  }
+
   /* mini quiz */
   .qtext{font-family:'Manrope',sans-serif;font-size:18px;font-weight:700;line-height:1.4;margin:0 0 18px;}
   .options{display:flex;flex-direction:column;gap:10px;}
@@ -472,7 +488,7 @@
    (якщо є) subsubs [ ... ]. Кожен розділ — один об'єкт { ... }.
    Щоб додати картку/слово/рядок/питання — скопіюй існуючий блок
    { ... } всередині потрібного масиву (cards / words / rows /
-   questions), встав кому після нього і зміни текст між лапками.
+   pairs / questions), встав кому після нього і зміни текст між лапками.
    Щоб додати цілий новий підрозділ (нову кнопку-вкладку) —
    скопіюй один об'єкт зі списку subs (або subsubs) цілком,
    з фігурними дужками, і зміни в ньому tab / title / вміст.
@@ -509,18 +525,20 @@ const TOPICS = {
     ]
   },
   omonimy: {
-    label: "Сполучник чи омонім",
+    label: "Сполучник і однозвучні слова",
     subs: [
       {
-        id: "o-table", tab: "Разом чи окремо", dot: "1", type: "table",
+        id: "o-table", tab: "Разом чи окремо", dot: "1", type: "twocol",
         title: "Сполучник і однозвучні слова",
         intro: "Деякі сполучники звучать так само, як поєднання займенника чи частки з іншим словом. Щоб розрізнити їх, постав питання: якщо питання можна поставити — це не сполучник.",
-        rows: [
-          {write: "проте", say: "сполучник", example: "про те (про що?)", ipa: "займ. + прийм."},
-          {write: "зате", say: "сполучник", example: "за те (за що?)", ipa: "займ. + прийм."},
-          {write: "якби", say: "сполучник", example: "як би", ipa: "частка + займ."},
-          {write: "щоб", say: "сполучник", example: "що б", ipa: "займ. + частка"},
-          {write: "теж", say: "сполучник", example: "те ж (те саме)", ipa: "займ. + частка"}
+        leftTitle: "Разом",
+        rightTitle: "Окремо",
+        pairs: [
+          {left: "проте (але)",    right: "про те (про що?)"},
+          {left: "зате (але)",     right: "за те (за що?)"},
+          {left: "якби (коли б)",  right: "як би"},
+          {left: "щоб (аби)",      right: "що б"},
+          {left: "теж (також)",    right: "те ж (те саме)"}
         ]
       }
     ]
@@ -658,6 +676,16 @@ function renderContent(){
         <span class="combo-example">${r.example}</span>
         <span class="combo-ipa">${r.ipa}</span>
       </div>`).join('')}</div>`;
+  }
+
+  if(s.type === "twocol"){
+    html += `<div class="twocol">
+      <div class="twocol-head">${s.leftTitle}</div>
+      <div class="twocol-head">${s.rightTitle}</div>
+      ${s.pairs.map(p => `
+        <div class="twocol-cell">${p.left}</div>
+        <div class="twocol-cell">${p.right}</div>`).join('')}
+    </div>`;
   }
 
   if(s.type === "quiz"){
