@@ -3,24 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Уроки й тести · 8-9 клас</title>
+<title>Уроки й тести · Навігація</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#FFFEEC;
-    --bg-soft:#FBF7DA;
+    --bg:#D0E9FC;
+    --bg-soft:#E4F2FC;
     --card:#FFFFFF;
-    --ink:#2D2350;
-    --ink-soft:#8C7FA8;
-    --line: rgba(45,35,80,0.10);
+    --ink:#13213B;
+    --ink-soft:#6478A0;
+    --line: rgba(19,33,59,0.08);
 
-    --c1-a:#C9B8F5; --c1-b:#A88AED; --c1-sh: rgba(168,138,237,0.45);
-    --c3-a:#E2ECA0; --c3-b:#8C9425; --c3-sh: rgba(203,216,59,0.4);
-    --c2-b:#4B3480;
+    --c1-a:#6C8CFF; --c1-b:#3355EE; --c1-sh: rgba(51,85,238,0.45);
+    --c3-a:#5FE0A8; --c3-b:#17A863; --c3-sh: rgba(23,168,99,0.4);
+    --c2-b:#E5484D;
 
-    --correct-bg:#F3F6D9;
-    --correct-ink:#7C8A16;
+    --correct-bg:#E6F8EE;
+    --correct-ink:#128A54;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -138,7 +138,7 @@
     gap:8px;
     padding:5px 14px 5px 12px;
     border-radius:999px;
-    background: rgba(168,138,237,0.15);
+    background: rgba(51,85,238,0.10);
   }
   .subgroup-title::before{
     content:'';
@@ -261,12 +261,7 @@
     margin:0;
   }
 
-  .pills{
-    display:flex;
-    gap:8px;
-  }
-  .pills .test-pill{ flex:1; }
-
+  /* --- плашка "тест до теми" --- */
   .test-pill{
     display:flex;
     align-items:center;
@@ -297,14 +292,8 @@
     cursor:default;
     pointer-events:none;
   }
-  .test-pill.tasks.ready{
-    color:var(--c1-b);
-    background:rgba(168,138,237,0.15);
-  }
-  .test-pill.tasks.ready:hover{
-    box-shadow: 0 10px 20px -14px var(--c1-sh);
-  }
 
+  /* --- ДЗ: яскраве світіння --- */
   .test-pill.homework, .block-test-pill.homework, .subgroup-test-pill.homework{
     color:#7A3B00 !important;
     background: linear-gradient(135deg, #FFE27A, #FF9A3D) !important;
@@ -361,14 +350,14 @@
 <body>
 <div class="wrap">
   <div class="topbar">
-    <div class="kicker">Навігація · 8-9 клас</div>
+    <div class="kicker">Навігація</div>
     <div class="kicker tag">для вчителя</div>
   </div>
 
   <div class="teacher-banner">Режим вчителя — учні цього не бачать</div>
 
   <h1>Усі <span class="hl">теми</span></h1>
-  <p class="sub" id="subDesc">Кожному учню — своє посилання з кодом (…/index89.html?u=Ім'я). Він бачить лише ті теми, які ви йому відкрили — і урок, і тест до нього. Собі додайте в кінець ?vchytel=1 — побачите все і хто що має відкритим.</p>
+  <p class="sub" id="subDesc">Кожному учню — своє посилання з кодом (…/index.html?u=Maryna). Він бачить лише ті теми, які ви йому відкрили — і урок, і тест до нього. Собі додайте в кінець ?vchytel=1 — побачите все і хто що має відкритим.</p>
 
   <div id="blocks"></div>
 
@@ -377,280 +366,274 @@
 
 <script>
 /* ============================================================
-   ЯК ДОДАТИ НОВУ ТЕМУ — так само, як в 11-класному index.html:
-   BLOCKS (розділ, тут "8 клас" / "9 клас") → subgroups (підрозділ) →
-   items (картка теми з уроком і, за бажання, тестом та завданнями).
+   ЯК ДОДАТИ НОВУ ТЕМУ
+   Структура: BLOCKS (розділ) → subgroups (підрозділ) → items (картка теми).
+   Кожен item — це один УРОК, і, за бажання, один ТЕСТ до нього:
 
-   У кожної теми є:
-     href  — урок
-     test  — "📝 Тест до теми"
-     tasks — "✏️ Завдання" (звичайні вправи; необов'язкове поле)
+   {
+     icon: "Ф",                 // літера на плитці
+     status: "ready"/"soon",    // готовність УРОКУ
+     title: "Назва теми",
+     desc: "необов'язковий підпис",
+     href: "https://.../urok-....html",   // посилання на урок (ПОВНЕ)
+     test: {                    // необов'язково — якщо тесту ще нема, просто не пишіть test
+       status: "ready"/"soon",
+       href: "https://movoznavka.github.io/11class/....html"
+     }
+   }
 
-   Зараз усі теми стоять як "soon" (заглушки за програмою 8-9 класу).
-   Коли з'явиться готовий урок, тест чи завдання — заміни status на "ready" і
-   встав ПОВНЕ посилання (https://movoznavka.github.io/...).
+   Якщо готовий тільки тест, а уроку ще нема — став status уроку "soon"
+   (картка уроку стане сірою й неактивною), а test.status постав "ready" —
+   плашка тесту однаково буде клікабельною.
+
+   Щоб додати підрозділ — скопіюй { title: "...", items: [...] }.
+   Підрозділ теж може мати свій "загальний тест" — додай йому generalTest
+   (той самий формат, що й у блока): { title: "...", generalTest: {...}, items: [...] }.
+   Щоб додати розділ — скопіюй { name: "...", subgroups: [...] } у BLOCKS.
    ============================================================ */
 
 const BLOCKS = [
   {
-    name: "8 клас",
+    name: "Фонетика",
     subgroups: [
-      { title: "Словосполучення і речення", items: [
-        {icon: "С", status: "ready", title: "Словосполучення", desc: "Типи зв'язку слів", href: "urok8-slovospoluchennya.html",
-          test: {status: "ready", href: "slovospoluchennya8.html"},
-          tasks: {status: "ready", href: "zavdannya8-slovospoluchennya.html"}},
-        {icon: "Г", status: "soon", title: "Граматична помилка в словосполученні", href: "urok8-hramatychna-pomylka-slovospoluchenni.html",
-          test: {status: "soon", href: "hramatychna-pomylka-slovospoluchenni8.html"},
-          tasks: {status: "soon", href: "zavdannya8-hramatychna-pomylka-slovospoluchenni.html"}},
-        {icon: "Р", status: "soon", title: "Речення", href: "urok8-rechennya.html",
-          test: {status: "soon", href: "rechennya8.html"},
-          tasks: {status: "soon", href: "zavdannya8-rechennya.html"}},
-        {icon: "П", status: "soon", title: "Підмет", href: "urok8-pidmet.html",
-          test: {status: "soon", href: "pidmet8.html"},
-          tasks: {status: "soon", href: "zavdannya8-pidmet.html"}},
-        {icon: "П", status: "soon", title: "Присудок. Простий і складений дієслівний присудок", href: "urok8-prysudok-prostyy-skladenyy-diyeslivnyy.html",
-          test: {status: "soon", href: "prysudok-prostyy-skladenyy-diyeslivnyy8.html"},
-          tasks: {status: "soon", href: "zavdannya8-prysudok-prostyy-skladenyy-diyeslivnyy.html"}},
-        {icon: "С", status: "soon", title: "Складений іменний присудок", href: "urok8-skladenyy-imennyy-prysudok.html",
-          test: {status: "soon", href: "skladenyy-imennyy-prysudok8.html"},
-          tasks: {status: "soon", href: "zavdannya8-skladenyy-imennyy-prysudok.html"}},
-        {icon: "У", status: "soon", title: "Узгодження головних членів речення", href: "urok8-uzhodzhennya-holovnykh-chleniv-rechennya.html",
-          test: {status: "soon", href: "uzhodzhennya-holovnykh-chleniv-rechennya8.html"},
-          tasks: {status: "soon", href: "zavdannya8-uzhodzhennya-holovnykh-chleniv-rechennya.html"}},
-        {icon: "Т", status: "soon", title: "Тире між підметом і присудком", href: "urok8-tyre-mizh-pidmetom-prysudkom.html",
-          test: {status: "soon", href: "tyre-mizh-pidmetom-prysudkom8.html"},
-          tasks: {status: "soon", href: "zavdannya8-tyre-mizh-pidmetom-prysudkom.html"}},
-        {icon: "У", status: "soon", title: "Узагальнення: Словосполучення і речення", href: "urok8-uzahalnennya-slovospoluchennya-rechennya.html",
-          test: {status: "soon", href: "uzahalnennya-slovospoluchennya-rechennya8.html"},
-          tasks: {status: "soon", href: "zavdannya8-uzahalnennya-slovospoluchennya-rechennya.html"}}
-      ]},
-      { title: "Другорядні члени речення", items: [
-        {icon: "О", status: "soon", title: "Означення", href: "urok8-oznachennya.html",
-          test: {status: "soon", href: "oznachennya8.html"},
-          tasks: {status: "soon", href: "zavdannya8-oznachennya.html"}},
-        {icon: "П", status: "soon", title: "Прикладка як різновид означення", href: "urok8-prykladka-yak-riznovyd-oznachennya.html",
-          test: {status: "soon", href: "prykladka-yak-riznovyd-oznachennya8.html"},
-          tasks: {status: "soon", href: "zavdannya8-prykladka-yak-riznovyd-oznachennya.html"}},
-        {icon: "Н", status: "soon", title: "Написання прикладок", href: "urok8-napysannya-prykladok.html",
-          test: {status: "soon", href: "napysannya-prykladok8.html"},
-          tasks: {status: "soon", href: "zavdannya8-napysannya-prykladok.html"}},
-        {icon: "Д", status: "soon", title: "Додаток", href: "urok8-dodatok.html",
-          test: {status: "soon", href: "dodatok8.html"},
-          tasks: {status: "soon", href: "zavdannya8-dodatok.html"}},
-        {icon: "О", status: "soon", title: "Обставина", href: "urok8-obstavyna.html",
-          test: {status: "soon", href: "obstavyna8.html"},
-          tasks: {status: "soon", href: "zavdannya8-obstavyna.html"}},
-        {icon: "П", status: "soon", title: "Порівняльний зворот", href: "urok8-porivnyalnyy-zvorot.html",
-          test: {status: "soon", href: "porivnyalnyy-zvorot8.html"},
-          tasks: {status: "soon", href: "zavdannya8-porivnyalnyy-zvorot.html"}},
-        {icon: "П", status: "soon", title: "Порядок слів у реченні. Логічний наголос", href: "urok8-poryadok-sliv-rechenni-lohichnyy.html",
-          test: {status: "soon", href: "poryadok-sliv-rechenni-lohichnyy8.html"},
-          tasks: {status: "soon", href: "zavdannya8-poryadok-sliv-rechenni-lohichnyy.html"}},
-        {icon: "У", status: "soon", title: "Узагальнення: Другорядні члени речення", href: "urok8-uzahalnennya-druhoryadni-chleny-rechennya.html",
-          test: {status: "soon", href: "uzahalnennya-druhoryadni-chleny-rechennya8.html"},
-          tasks: {status: "soon", href: "zavdannya8-uzahalnennya-druhoryadni-chleny-rechennya.html"}}
-      ]},
-      { title: "Односкладні речення. Повне і неповне речення", items: [
-        {icon: "О", status: "soon", title: "Односкладні речення", href: "urok8-odnoskladni-rechennya.html",
-          test: {status: "soon", href: "odnoskladni-rechennya8.html"},
-          tasks: {status: "soon", href: "zavdannya8-odnoskladni-rechennya.html"}},
-        {icon: "О", status: "soon", title: "Означено-особові та неозначено-особові речення", href: "urok8-oznacheno-osobovi-neoznacheno-osobovi-rechennya.html",
-          test: {status: "soon", href: "oznacheno-osobovi-neoznacheno-osobovi-rechennya8.html"},
-          tasks: {status: "soon", href: "zavdannya8-oznacheno-osobovi-neoznacheno-osobovi-rechennya.html"}},
-        {icon: "У", status: "soon", title: "Узагальнено-особові речення", href: "urok8-uzahalneno-osobovi-rechennya.html",
-          test: {status: "soon", href: "uzahalneno-osobovi-rechennya8.html"},
-          tasks: {status: "soon", href: "zavdannya8-uzahalneno-osobovi-rechennya.html"}},
-        {icon: "Б", status: "soon", title: "Безособові речення", href: "urok8-bezosobovi-rechennya.html",
-          test: {status: "soon", href: "bezosobovi-rechennya8.html"},
-          tasks: {status: "soon", href: "zavdannya8-bezosobovi-rechennya.html"}},
-        {icon: "Н", status: "soon", title: "Називні речення", href: "urok8-nazyvni-rechennya.html",
-          test: {status: "soon", href: "nazyvni-rechennya8.html"},
-          tasks: {status: "soon", href: "zavdannya8-nazyvni-rechennya.html"}},
-        {icon: "П", status: "soon", title: "Повні і неповні речення", href: "urok8-povni-nepovni-rechennya.html",
-          test: {status: "soon", href: "povni-nepovni-rechennya8.html"},
-          tasks: {status: "soon", href: "zavdannya8-povni-nepovni-rechennya.html"}},
-        {icon: "У", status: "soon", title: "Узагальнення: Односкладні речення. Повне і неповне речення", href: "urok8-uzahalnennya-odnoskladni-rechennya-povne.html",
-          test: {status: "soon", href: "uzahalnennya-odnoskladni-rechennya-povne8.html"},
-          tasks: {status: "soon", href: "zavdannya8-uzahalnennya-odnoskladni-rechennya-povne.html"}}
-      ]},
-      { title: "Речення з однорідними членами", items: [
-        {icon: "О", status: "soon", title: "Однорідні члени речення", href: "urok8-odnoridni-chleny-rechennya.html",
-          test: {status: "soon", href: "odnoridni-chleny-rechennya8.html"},
-          tasks: {status: "soon", href: "zavdannya8-odnoridni-chleny-rechennya.html"}},
-        {icon: "К", status: "soon", title: "Кома між однорідними членами речення", href: "urok8-koma-mizh-odnoridnymy-chlenamy.html",
-          test: {status: "soon", href: "koma-mizh-odnoridnymy-chlenamy8.html"},
-          tasks: {status: "soon", href: "zavdannya8-koma-mizh-odnoridnymy-chlenamy.html"}},
-        {icon: "О", status: "soon", title: "Однорідні й неоднорідні означення", href: "urok8-odnoridni-neodnoridni-oznachennya.html",
-          test: {status: "soon", href: "odnoridni-neodnoridni-oznachennya8.html"},
-          tasks: {status: "soon", href: "zavdannya8-odnoridni-neodnoridni-oznachennya.html"}},
-        {icon: "У", status: "soon", title: "Узагальнювальні слова в реченнях з однорідними членами", href: "urok8-uzahalnyuvalni-slova-rechennyakh-odnoridnymy.html",
-          test: {status: "soon", href: "uzahalnyuvalni-slova-rechennyakh-odnoridnymy8.html"},
-          tasks: {status: "soon", href: "zavdannya8-uzahalnyuvalni-slova-rechennyakh-odnoridnymy.html"}},
-        {icon: "Т", status: "soon", title: "Типові помилки під час побудови речень з однорідними членами", href: "urok8-typovi-pomylky-pid-chas.html",
-          test: {status: "soon", href: "typovi-pomylky-pid-chas8.html"},
-          tasks: {status: "soon", href: "zavdannya8-typovi-pomylky-pid-chas.html"}}
-      ]},
-      { title: "Речення зі звертаннями, вставними словами (сполученнями слів, реченнями)", items: [
-        {icon: "З", status: "soon", title: "Звертання", href: "urok8-zvertannya.html",
-          test: {status: "soon", href: "zvertannya8.html"},
-          tasks: {status: "soon", href: "zavdannya8-zvertannya.html"}},
-        {icon: "В", status: "soon", title: "Вставні слова (сполучення слів, речення)", href: "urok8-vstavni-slova-spoluchennya-sliv.html",
-          test: {status: "soon", href: "vstavni-slova-spoluchennya-sliv8.html"},
-          tasks: {status: "soon", href: "zavdannya8-vstavni-slova-spoluchennya-sliv.html"}},
-        {icon: "У", status: "soon", title: "Узагальнення: Речення з однорідними членами та Речення зі звертаннями, вставними словами (сполученнями слів, реченнями)", href: "urok8-uzahalnennya-rechennya-odnoridnymy-chlenamy.html",
-          test: {status: "soon", href: "uzahalnennya-rechennya-odnoridnymy-chlenamy8.html"},
-          tasks: {status: "soon", href: "zavdannya8-uzahalnennya-rechennya-odnoridnymy-chlenamy.html"}}
-      ]},
-      { title: "Речення з відокремленими членами", items: [
-        {icon: "В", status: "soon", title: "Відокремлені означення", href: "urok8-vidokremleni-oznachennya.html",
-          test: {status: "soon", href: "vidokremleni-oznachennya8.html"},
-          tasks: {status: "soon", href: "zavdannya8-vidokremleni-oznachennya.html"}},
-        {icon: "В", status: "soon", title: "Відокремлені прикладки", href: "urok8-vidokremleni-prykladky.html",
-          test: {status: "soon", href: "vidokremleni-prykladky8.html"},
-          tasks: {status: "soon", href: "zavdannya8-vidokremleni-prykladky.html"}},
-        {icon: "В", status: "soon", title: "Відокремлені обставини", href: "urok8-vidokremleni-obstavyny.html",
-          test: {status: "soon", href: "vidokremleni-obstavyny8.html"},
-          tasks: {status: "soon", href: "zavdannya8-vidokremleni-obstavyny.html"}},
-        {icon: "В", status: "soon", title: "Відокремлені додатки", href: "urok8-vidokremleni-dodatky.html",
-          test: {status: "soon", href: "vidokremleni-dodatky8.html"},
-          tasks: {status: "soon", href: "zavdannya8-vidokremleni-dodatky.html"}},
-        {icon: "В", status: "soon", title: "Відокремлені уточнювальні члени речення", href: "urok8-vidokremleni-utochnyuvalni-chleny-rechennya.html",
-          test: {status: "soon", href: "vidokremleni-utochnyuvalni-chleny-rechennya8.html"},
-          tasks: {status: "soon", href: "zavdannya8-vidokremleni-utochnyuvalni-chleny-rechennya.html"}},
-        {icon: "У", status: "soon", title: "Узагальнення: Речення з відокремленими членами", href: "urok8-uzahalnennya-rechennya-vidokremlenymy-chlenamy.html",
-          test: {status: "soon", href: "uzahalnennya-rechennya-vidokremlenymy-chlenamy8.html"},
-          tasks: {status: "soon", href: "zavdannya8-uzahalnennya-rechennya-vidokremlenymy-chlenamy.html"}}
-      ]},
-      { title: "Узагальнення та систематизація вивченого", items: [
-        {icon: "С", status: "soon", title: "Словосполучення і речення. Члени речення. Типи речень", href: "urok8-slovospoluchennya-rechennya-chleny-rechennya.html",
-          test: {status: "soon", href: "slovospoluchennya-rechennya-chleny-rechennya8.html"},
-          tasks: {status: "soon", href: "zavdannya8-slovospoluchennya-rechennya-chleny-rechennya.html"}},
-        {icon: "Р", status: "soon", title: "Розділові знаки в простому ускладненому реченні", href: "urok8-rozdilovi-znaky-prostomu-uskladnenomu.html",
-          test: {status: "soon", href: "rozdilovi-znaky-prostomu-uskladnenomu8.html"},
-          tasks: {status: "soon", href: "zavdannya8-rozdilovi-znaky-prostomu-uskladnenomu.html"}}
+      { title: null, items: [
+        {icon: "Ф", status: "ready", title: "Фонетика", desc: "Інтерактивний конспект із картками",
+          href: "https://movoznavka.github.io/11class/urok-fonetyka.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/fonetyka.html"}}
       ]}
     ]
   },
   {
-    name: "9 клас",
-    generalTest: {status: "soon", href: "skladne-rechennya9-zagalnyi.html"},
+    name: "Орфографія",
+    generalTest: {status: "ready", href: "orfografiya-zagalnyi.html"},
     subgroups: [
-      { title: "Складносурядне речення", items: [
-        {icon: "О", status: "ready", title: "Особливості складного речення", href: "urok9-osoblyvosti-skladnoho-rechennya.html",
-          test: {status: "soon", href: "osoblyvosti-skladnoho-rechennya9.html"},
-          tasks: {status: "soon", href: "zavdannya9-osoblyvosti-skladnoho-rechennya.html"}},
-        {icon: "О", status: "soon", title: "Особливості складносурядного речення", href: "urok9-osoblyvosti-skladnosuryadnoho-rechennya.html",
-          test: {status: "soon", href: "osoblyvosti-skladnosuryadnoho-rechennya9.html"},
-          tasks: {status: "soon", href: "zavdannya9-osoblyvosti-skladnosuryadnoho-rechennya.html"}},
-        {icon: "К", status: "soon", title: "Кома та крапка з комою між частинами складносурядного речення", href: "urok9-koma-krapka-komoyu-mizh.html",
-          test: {status: "soon", href: "koma-krapka-komoyu-mizh9.html"},
-          tasks: {status: "soon", href: "zavdannya9-koma-krapka-komoyu-mizh.html"}},
-        {icon: "Т", status: "soon", title: "Тире між частинами складносурядного речення", href: "urok9-tyre-mizh-chastynamy-skladnosuryadnoho.html",
-          test: {status: "soon", href: "tyre-mizh-chastynamy-skladnosuryadnoho9.html"},
-          tasks: {status: "soon", href: "zavdannya9-tyre-mizh-chastynamy-skladnosuryadnoho.html"}},
-        {icon: "У", status: "soon", title: "Узагальнення: Складносурядне речення", href: "urok9-uzahalnennya-skladnosuryadne-rechennya.html",
-          test: {status: "soon", href: "uzahalnennya-skladnosuryadne-rechennya9.html"},
-          tasks: {status: "soon", href: "zavdannya9-uzahalnennya-skladnosuryadne-rechennya.html"}}
+      { title: null, items: [
+        {icon: "С", status: "ready", title: "Спрощення в групах приголосних",
+          href: "https://movoznavka.github.io/11class/urok-sproshchennya.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/sproshchennya.html"}},
+        {icon: "Ч", status: "ready", title: "Чергування суфіксів при додаванні -ськ-",
+          href: "https://movoznavka.github.io/11class/urok-cherguvannya-sk.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/sufiksy-vsi.html"}},
+        {icon: "Ч", status: "ready", title: "Чергування у-в та і-й",
+          href: "https://movoznavka.github.io/11class/urok-cherguvannya-u-v.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/cherguvannya-u-v.html"}},
+        {icon: "П", status: "ready", title: "Правопис префіксів",
+          href: "https://movoznavka.github.io/11class/urok-prefiksy.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/prefiksy.html"}},
+        {icon: "М", status: "ready", title: "М'який знак",
+          href: "https://movoznavka.github.io/11class/urok-myakyj-znak.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/myakyj-znak.html"}},
+        {icon: "А", status: "ready", title: "Апостроф",
+          href: "https://movoznavka.github.io/11class/urok-apostrof.html",
+          test: {status: "ready", href: "apostrof.html"}},
+        {icon: "П", status: "ready", title: "Подвоєння букв",
+          href: "https://movoznavka.github.io/11class/urok-podvoiennya.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/podvoiennya.html"}},
+        {icon: "Н", status: "ready", title: "Правопис НЕ з різними частинами мови", desc: "Разом і окремо за частинами мови",
+          href: "https://movoznavka.github.io/11class/urok-ne-z-chastynamy-movy.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/ne-z-chastynamy-movy.html"}},
+        {icon: "В", status: "ready", title: "Велика буква й лапки у власних назвах",
+          href: "https://movoznavka.github.io/11class/urok-velyka-bukva.html",
+          test: {status: "ready", href: "velyka-bukva.html"}}
       ]},
-      { title: "Складнопідрядне речення", items: [
-        {icon: "О", status: "soon", title: "Особливості складнопідрядного речення", href: "urok9-osoblyvosti-skladnopidryadnoho-rechennya.html",
-          test: {status: "soon", href: "osoblyvosti-skladnopidryadnoho-rechennya9.html"},
-          tasks: {status: "soon", href: "zavdannya9-osoblyvosti-skladnopidryadnoho-rechennya.html"}},
-        {icon: "В", status: "soon", title: "Види складнопідрядних речень", href: "urok9-vydy-skladnopidryadnykh-rechen.html",
-          test: {status: "soon", href: "vydy-skladnopidryadnykh-rechen9.html"},
-          tasks: {status: "soon", href: "zavdannya9-vydy-skladnopidryadnykh-rechen.html"}},
-        {icon: "С", status: "soon", title: "Складнопідрядні речення з підрядними частинами означальними", href: "urok9-skladnopidryadni-rechennya-pidryadnymy-chastynamy.html",
-          test: {status: "soon", href: "skladnopidryadni-rechennya-pidryadnymy-chastynamy9.html"},
-          tasks: {status: "soon", href: "zavdannya9-skladnopidryadni-rechennya-pidryadnymy-chastynamy.html"}},
-        {icon: "С", status: "soon", title: "Складнопідрядні речення з підрядними частинами з’ясувальними", href: "urok9-skladnopidryadni-rechennya-pidryadnymy-chastynamy-2.html",
-          test: {status: "soon", href: "skladnopidryadni-rechennya-pidryadnymy-chastynamy-29.html"},
-          tasks: {status: "soon", href: "zavdannya9-skladnopidryadni-rechennya-pidryadnymy-chastynamy-2.html"}},
-        {icon: "С", status: "soon", title: "Складнопідрядні речення з підрядними частинами місця та часу", href: "urok9-skladnopidryadni-rechennya-pidryadnymy-chastynamy-3.html",
-          test: {status: "soon", href: "skladnopidryadni-rechennya-pidryadnymy-chastynamy-39.html"},
-          tasks: {status: "soon", href: "zavdannya9-skladnopidryadni-rechennya-pidryadnymy-chastynamy-3.html"}},
-        {icon: "С", status: "soon", title: "Складнопідрядні речення з підрядними частинами способу дії і ступеня та з підрядними порівняльними", href: "urok9-skladnopidryadni-rechennya-pidryadnymy-chastynamy-4.html",
-          test: {status: "soon", href: "skladnopidryadni-rechennya-pidryadnymy-chastynamy-49.html"},
-          tasks: {status: "soon", href: "zavdannya9-skladnopidryadni-rechennya-pidryadnymy-chastynamy-4.html"}},
-        {icon: "С", status: "soon", title: "Складнопідрядні речення з підрядними частинами умови, причини та мети", href: "urok9-skladnopidryadni-rechennya-pidryadnymy-chastynamy-5.html",
-          test: {status: "soon", href: "skladnopidryadni-rechennya-pidryadnymy-chastynamy-59.html"},
-          tasks: {status: "soon", href: "zavdannya9-skladnopidryadni-rechennya-pidryadnymy-chastynamy-5.html"}},
-        {icon: "С", status: "soon", title: "Складнопідрядні речення з підрядними частинами допустовими та наслідковими", href: "urok9-skladnopidryadni-rechennya-pidryadnymy-chastynamy-6.html",
-          test: {status: "soon", href: "skladnopidryadni-rechennya-pidryadnymy-chastynamy-69.html"},
-          tasks: {status: "soon", href: "zavdannya9-skladnopidryadni-rechennya-pidryadnymy-chastynamy-6.html"}},
-        {icon: "С", status: "soon", title: "Складнопідрядні речення з кількома підрядними частинами", href: "urok9-skladnopidryadni-rechennya-kilkoma-pidryadnymy.html",
-          test: {status: "soon", href: "skladnopidryadni-rechennya-kilkoma-pidryadnymy9.html"},
-          tasks: {status: "soon", href: "zavdannya9-skladnopidryadni-rechennya-kilkoma-pidryadnymy.html"}},
-        {icon: "У", status: "soon", title: "Узагальнення: Складнопідрядне речення", href: "urok9-uzahalnennya-skladnopidryadne-rechennya.html",
-          test: {status: "soon", href: "uzahalnennya-skladnopidryadne-rechennya9.html"},
-          tasks: {status: "soon", href: "zavdannya9-uzahalnennya-skladnopidryadne-rechennya.html"}}
+      { title: "Написання іншомовних слів", items: [
+        {icon: "И", status: "ready", title: "Букви и, і",
+          href: "https://movoznavka.github.io/11class/urok-inshomovni-y-i.html",
+          test: {status: "ready", href: "inshomovni-y-i.html"}},
+        {icon: "П", status: "ready", title: "Подвоєні букви",
+          href: "https://movoznavka.github.io/11class/urok-inshomovni-podvoiennya.html",
+          test: {status: "ready", href: "inshomovni-podvoiennya.html"}},
+        {icon: "М", status: "ready", title: "М'який знак",
+          href: "https://movoznavka.github.io/11class/urok-inshomovni-myakyj-znak.html",
+          test: {status: "ready", href: "inshomovni-myakyj-znak.html"}},
+        {icon: "А", status: "ready", title: "Апостроф",
+          href: "https://movoznavka.github.io/11class/urok-inshomovni-apostrof.html",
+          test: {status: "ready", href: "inshomovni-apostrof.html"}}
       ]},
-      { title: "Безсполучникове складне речення", items: [
-        {icon: "О", status: "soon", title: "Особливості складного безсполучникового речення", href: "urok9-osoblyvosti-skladnoho-bezspoluchnykovoho-rechennya.html",
-          test: {status: "soon", href: "osoblyvosti-skladnoho-bezspoluchnykovoho-rechennya9.html"},
-          tasks: {status: "soon", href: "zavdannya9-osoblyvosti-skladnoho-bezspoluchnykovoho-rechennya.html"}},
-        {icon: "К", status: "soon", title: "Кома та крапка з комою між частинами безсполучникового складного речення", href: "urok9-koma-krapka-komoyu-mizh-2.html",
-          test: {status: "soon", href: "koma-krapka-komoyu-mizh-29.html"},
-          tasks: {status: "soon", href: "zavdannya9-koma-krapka-komoyu-mizh-2.html"}},
-        {icon: "Д", status: "soon", title: "Двокрапка між частинами безсполучникового складного речення", href: "urok9-dvokrapka-mizh-chastynamy-bezspoluchnykovoho.html",
-          test: {status: "soon", href: "dvokrapka-mizh-chastynamy-bezspoluchnykovoho9.html"},
-          tasks: {status: "soon", href: "zavdannya9-dvokrapka-mizh-chastynamy-bezspoluchnykovoho.html"}},
-        {icon: "Т", status: "soon", title: "Тире між частинами безсполучникового складного речення", href: "urok9-tyre-mizh-chastynamy-bezspoluchnykovoho.html",
-          test: {status: "soon", href: "tyre-mizh-chastynamy-bezspoluchnykovoho9.html"},
-          tasks: {status: "soon", href: "zavdannya9-tyre-mizh-chastynamy-bezspoluchnykovoho.html"}},
-        {icon: "У", status: "soon", title: "Узагальнення: Безсполучникове складне речення", href: "urok9-uzahalnennya-bezspoluchnykove-skladne-rechennya.html",
-          test: {status: "soon", href: "uzahalnennya-bezspoluchnykove-skladne-rechennya9.html"},
-          tasks: {status: "soon", href: "zavdannya9-uzahalnennya-bezspoluchnykove-skladne-rechennya.html"}}
+      { title: "Складні слова", generalTest: {status: "ready", href: "skladni-slova-zagalnyi.html"}, items: [
+        {icon: "С", status: "ready", title: "Складні іменники",
+          href: "https://movoznavka.github.io/11class/urok-skladni-imennyky.html",
+          test: {status: "ready", href: "skladni-imennyky.html"}},
+        {icon: "С", status: "ready", title: "Складні прикметники",
+          href: "https://movoznavka.github.io/11class/urok-skladni-prykmetnyky.html",
+          test: {status: "ready", href: "skladni-prykmetnyky.html"}},
+        {icon: "С", status: "ready", title: "Складний прислівник",
+          href: "https://movoznavka.github.io/11class/urok-skladni-prysliv.html",
+          test: {status: "ready", href: "skladni-prysliv.html"}}
+      ]}
+    ]
+  },
+  {
+    name: "Лексикологія",
+    subgroups: [
+      { title: null, items: [
+        {icon: "Л", status: "ready", title: "Лексикологія", href: "urok-leksykologiya.html",
+          test: {status: "ready", href: "leksykologiya.html"}},
+        {icon: "Л", status: "ready", title: "Лексичні помилки", href: "urok-leksychni-pomylky.html",
+          test: {status: "ready", href: "leksychni-pomylky.html"}},
+        {icon: "Ф", status: "ready", title: "Фразеологія", href: "urok-frazeologiya.html",
+          test: {status: "ready", href: "frazeologiya.html"}}
+      ]}
+    ]
+  },
+  {
+    name: "Морфологія",
+    generalTest: {status: "ready", href: "morfologiya-zagalnyi.html"},
+    subgroups: [
+      { title: "Іменник", items: [
+        {icon: "І", status: "ready", title: "Рід",
+          href: "https://movoznavka.github.io/11class/urok-imennyk-rid.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/rid_imennyka_trainer.html"}},
+        {icon: "І", status: "ready", title: "Число",
+          href: "https://movoznavka.github.io/11class/urok-imennyk-chyslo.html",
+          test: {status: "ready", href: "imennyk-chyslo.html"}},
+        {icon: "І", status: "ready", title: "Групи", 
+         href: "https://movoznavka.github.io/11class/urok-imennyk-hrupy.html",
+          test: {status: "ready", href: "imennyk-hrupy.html"}},
+        {icon: "І", status: "ready", title: "Відміни", 
+         href: "https://movoznavka.github.io/11class/urok-imennyk-vidminy.html",
+          test: {status: "ready", href: "imennyk-vidminy.html"}},
+        {icon: "І", status: "ready", title: "Родовий відмінок", 
+         href: "https://movoznavka.github.io/11class/urok-imennyk-rodovyi.html",
+          test: {status: "ready", href: "imennyk-rodovyi.html"}},
+        {icon: "І", status: "ready", title: "Кличний відмінок", 
+         href: "https://movoznavka.github.io/11class/urok-klychnyj-vidminok.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/klychnyj-vidminok.html"}},
+        {icon: "І", status: "ready", title: "Імена по батькові", href: "urok-imennyk-po-batkovi.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/imennyk-po-batkovi.html"}}
       ]},
-      { title: "Складне речення з різними видами зв’язку", items: [
-        {icon: "С", status: "soon", title: "Складне речення із сурядним і підрядним зв’язками", href: "urok9-skladne-rechennya-iz-suryadnym.html",
-          test: {status: "soon", href: "skladne-rechennya-iz-suryadnym9.html"},
-          tasks: {status: "soon", href: "zavdannya9-skladne-rechennya-iz-suryadnym.html"}},
-        {icon: "С", status: "soon", title: "Складне речення із сполучниковим і безсполучниковим зв’язками", href: "urok9-skladne-rechennya-iz-spoluchnykovym.html",
-          test: {status: "soon", href: "skladne-rechennya-iz-spoluchnykovym9.html"},
-          tasks: {status: "soon", href: "zavdannya9-skladne-rechennya-iz-spoluchnykovym.html"}},
-        {icon: "Р", status: "soon", title: "Розділові знаки в складному реченні з різними видами зв’язку", href: "urok9-rozdilovi-znaky-skladnomu-rechenni.html",
-          test: {status: "soon", href: "rozdilovi-znaky-skladnomu-rechenni9.html"},
-          tasks: {status: "soon", href: "zavdannya9-rozdilovi-znaky-skladnomu-rechenni.html"}},
-        {icon: "У", status: "soon", title: "Узагальнення: Складне речення з різними видами зв’язку", href: "urok9-uzahalnennya-skladne-rechennya-riznymy.html",
-          test: {status: "soon", href: "uzahalnennya-skladne-rechennya-riznymy9.html"},
-          tasks: {status: "soon", href: "zavdannya9-uzahalnennya-skladne-rechennya-riznymy.html"}}
+      { title: "Прикметник", items: [
+        {icon: "П", status: "ready", title: "Ступені порівняння",
+          href: "https://movoznavka.github.io/11class/urok-prykmetnyk-stupeni.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/prykmetnyk-stupeni.html"}},
+        {icon: "П", status: "ready", title: "Правопис прикметникових суфіксів",
+          href: "https://movoznavka.github.io/11class/urok-prykmetnyk-sufiksy.html",
+          test: {status: "ready", href: "prykmetnyk-sufiksy.html"}}
       ]},
-      { title: "Чуже мовлення. Діалог", items: [
-        {icon: "П", status: "soon", title: "Пряма мова", href: "urok9-pryama-mova.html",
-          test: {status: "soon", href: "pryama-mova9.html"},
-          tasks: {status: "soon", href: "zavdannya9-pryama-mova.html"}},
-        {icon: "Н", status: "soon", title: "Непряма мова. Заміна прямої мови непрямою", href: "urok9-nepryama-mova-zamina-pryamoyi.html",
-          test: {status: "soon", href: "nepryama-mova-zamina-pryamoyi9.html"},
-          tasks: {status: "soon", href: "zavdannya9-nepryama-mova-zamina-pryamoyi.html"}},
-        {icon: "Д", status: "soon", title: "Діалог", href: "urok9-dialoh.html",
-          test: {status: "soon", href: "dialoh9.html"},
-          tasks: {status: "soon", href: "zavdannya9-dialoh.html"}},
-        {icon: "Ц", status: "soon", title: "Цитата", href: "urok9-tsytata.html",
-          test: {status: "soon", href: "tsytata9.html"},
-          tasks: {status: "soon", href: "zavdannya9-tsytata.html"}},
-        {icon: "У", status: "soon", title: "Узагальнення: Чуже мовлення. Діалог", href: "urok9-uzahalnennya-chuzhe-movlennya-dialoh.html",
-          test: {status: "soon", href: "uzahalnennya-chuzhe-movlennya-dialoh9.html"},
-          tasks: {status: "soon", href: "zavdannya9-uzahalnennya-chuzhe-movlennya-dialoh.html"}}
+      { title: "Числівник", items: [
+        {icon: "Ч", status: "ready", title: "Відмінювання числівників",
+          href: "https://movoznavka.github.io/11class/urok-chyslivnyk-vidminy.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/chyslivnyk-vidminy.html"}},
+        {icon: "Ч", status: "ready", title: "Узгодження числівника з іменником",
+          href: "https://movoznavka.github.io/11class/urok-chyslivnyk-uzgodzhennya.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/chyslivnyk-uzgodzhennya.html"}},
+        {icon: "Ч", status: "ready", title: "Позначення часу",
+          href: "https://movoznavka.github.io/11class/urok-chyslivnyk-chas.html",
+          test: {status: "ready", href: "chyslivnyk-chas.html"}}
       ]},
-      { title: "Узагальнення та систематизація вивченого", items: [
-        {icon: "З", status: "soon", title: "Звук. Слово. Речення. Текст", href: "urok9-zvuk-slovo-rechennya-tekst.html",
-          test: {status: "soon", href: "zvuk-slovo-rechennya-tekst9.html"},
-          tasks: {status: "soon", href: "zavdannya9-zvuk-slovo-rechennya-tekst.html"}},
-        {icon: "Л", status: "soon", title: "Лексичні помилки", href: "urok9-leksychni-pomylky.html",
-          test: {status: "soon", href: "leksychni-pomylky9.html"},
-          tasks: {status: "soon", href: "zavdannya9-leksychni-pomylky.html"}},
-        {icon: "Г", status: "soon", title: "Граматичні помилки, пов’язані з порушенням морфологічних норм", href: "urok9-hramatychni-pomylky-povyazani-porushennyam.html",
-          test: {status: "soon", href: "hramatychni-pomylky-povyazani-porushennyam9.html"},
-          tasks: {status: "soon", href: "zavdannya9-hramatychni-pomylky-povyazani-porushennyam.html"}},
-        {icon: "Г", status: "soon", title: "Граматичні помилки, пов’язані з порушенням синтаксичних норм", href: "urok9-hramatychni-pomylky-povyazani-porushennyam-2.html",
-          test: {status: "soon", href: "hramatychni-pomylky-povyazani-porushennyam-29.html"},
-          tasks: {status: "soon", href: "zavdannya9-hramatychni-pomylky-povyazani-porushennyam-2.html"}},
-        {icon: "О", status: "soon", title: "Орфографія", href: "urok9-orfohrafiya.html",
-          test: {status: "soon", href: "orfohrafiya9.html"},
-          tasks: {status: "soon", href: "zavdannya9-orfohrafiya.html"}},
-        {icon: "П", status: "soon", title: "Пунктуація", href: "urok9-punktuatsiya.html",
-          test: {status: "soon", href: "punktuatsiya9.html"},
-          tasks: {status: "soon", href: "zavdannya9-punktuatsiya.html"}}
+      { title: "Займенник", items: [
+        {icon: "З", status: "ready", title: "Займенник",
+          href: "https://movoznavka.github.io/11class/urok-zaimennyk.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/zaimennyk.html"}}
+      ]},
+      { title: "Дієслово", items: [
+        {icon: "Д", status: "ready", title: "Форми дієслова", 
+         href: "https://movoznavka.github.io/11class/urok-diyeslovo-formy.html",
+          test: {status: "ready", href: "diyeslovo-formy.html"}},
+        {icon: "Д", status: "ready", title: "Дієвідміни", 
+         href: "https://movoznavka.github.io/11class/urok-diyeslovo-diyevidminy.html",
+          test: {status: "ready", href: "diyeslovo-diyevidminy.html"}},
+        {icon: "Д", status: "ready", title: "Способи", 
+         href: "https://movoznavka.github.io/11class/urok-diyeslovo-sposoby.html",
+          test: {status: "ready", href: "diyeslovo-sposoby.html"}},
+        {icon: "Д", status: "ready", title: "Дієприкметник", 
+         href: "https://movoznavka.github.io/11class/urok-diyeprykmetnyk.html",
+          test: {status: "ready", href: "diyeprykmetnyk.html"}},
+        {icon: "Д", status: "ready", title: "Дієприслівник", 
+         href: "https://movoznavka.github.io/11class/urok-diyeprysliv.html",
+          test: {status: "ready", href: "diyeprysliv.html"}}
+      ]},
+      { title: "Прислівник", items: [
+        {icon: "П", status: "ready", title: "Прислівник", href: "urok-prysliv.html",
+          test: {status: "ready", href: "prysliv.html"}}
+      ]},
+      { title: "Службові частини мови", items: [
+        {icon: "П", status: "ready", title: "Прийменник", 
+         href: "https://movoznavka.github.io/11class/urok-pryimennyk.html",
+          test: {status: "ready", href: "pryimennyk.html"}},
+        {icon: "С", status: "ready", title: "Сполучник", 
+         href: "https://movoznavka.github.io/11class/urok-spoluchnyk.html",
+          test: {status: "ready", href: "spoluchnyk.html"}},
+        {icon: "Ч", status: "ready", title: "Частка", 
+         href: "https://movoznavka.github.io/11class/urok-chastka.html",
+          test: {status: "ready", href: "chastka.html"}}
+      ]},
+      { title: "Вигук", items: [
+        {icon: "В", status: "ready", title: "Вигук", href: "urok-vyhuk.html",
+          test: {status: "ready", href: "vyhuk.html"}}
+      ]}
+    ]
+  },
+  {
+    name: "Синтаксис і пунктуація",
+    generalTest: {status: "ready", href: "syntaksys-zagalnyi.html"},
+    subgroups: [
+      { title: null, items: [
+        {icon: "С", status: "ready", title: "Словосполучення", 
+         href: "https://movoznavka.github.io/11class/urok-slovospoluchennya.html",
+          test: {status: "ready", href: "slovospoluchennya.html"}},
+        {icon: "В", status: "ready", title: "Види речення", 
+         href: "https://movoznavka.github.io/11class/urok-vydy-rechennya.html",
+          test: {status: "ready", href: "vydy-rechennya.html"}}
+      ]},
+      { title: "Члени речення", items: [
+        {icon: "Ч", status: "ready", title: "Головні члени", 
+         href: "https://movoznavka.github.io/11class/urok-chleny-holovni.html",
+          test: {status: "ready", href: "chleny-holovni.html"}},
+        {icon: "Ч", status: "ready", title: "Другорядні члени", href: "urok-chleny-druhoryadni.html",
+          test: {status: "ready", href: "chleny-druhoryadni.html"}}
+      ]},
+      { title: null, items: [
+        {icon: "Т", status: "ready", title: "Тире між підметом і присудком", href: "urok-tyre-pidmet-prysudok.html",
+          test: {status: "ready", href: "tyre-pidmet-prysudok.html"}},
+        {icon: "Т", status: "ready", title: "Типи односкладних речень", href: "urok-odnoskladni.html",
+          test: {status: "ready", href: "odnoskladni.html"}}
+      ]},
+      { title: "Однорідні члени речення", items: [
+        {icon: "О", status: "ready", title: "Однорідні члени", href: "urok-odnoridni.html",
+          test: {status: "ready", href: "odnoridni.html"}},
+        {icon: "О", status: "ready", title: "Однорідні й неоднорідні означення", href: "urok-odnoridni-neodnoridni.html",
+          test: {status: "ready", href: "odnoridni-neodnoridni.html"}}
+      ]},
+      { title: null, items: [
+        {icon: "В", status: "ready", title: "Вставні слова, словосполучення та речення", href: "urok-vstavni.html",
+          test: {status: "ready", href: "vstavni.html"}},
+        {icon: "З", status: "ready", title: "Звертання", href: "urok-zvertannya.html",
+          test: {status: "ready", href: "zvertannya.html"}}
+      ]},
+      { title: "Відокремлені другорядні члени речення", items: [
+        {icon: "В", status: "ready", title: "Означення", href: "urok-vidokremleni-oznachennya.html",
+          test: {status: "ready", href: "vidokremleni-oznachennya.html"}},
+        {icon: "В", status: "ready", title: "Прикладка", href: "urok-vidokremleni-prykladka.html",
+          test: {status: "ready", href: "vidokremleni-prykladka.html"}},
+        {icon: "В", status: "ready", title: "Обставина", href: "urok-vidokremleni-obstavyna.html",
+          test: {status: "ready", href: "vidokremleni-obstavyna.html"}},
+        {icon: "В", status: "ready", title: "Додаток", href: "urok-vidokremleni-dodatok.html",
+          test: {status: "ready", href: "vidokremleni-dodatok.html"}}
+      ]},
+      { title: "Складне речення", items: [
+        {icon: "С", status: "ready", title: "Сурядні", href: "urok-skladne-suryadni.html",
+          test: {status: "ready", href: "skladne-suryadni.html"}},
+        {icon: "С", status: "ready", title: "Підрядні", href: "urok-skladne-pidryadni.html",
+          test: {status: "ready", href: "skladne-pidryadni.html"}},
+        {icon: "С", status: "ready", title: "Безсполучникові", href: "urok-skladne-bezspoluchnykovi.html",
+          test: {status: "ready", href: "skladne-bezspoluchnykovi.html"}},
+        {icon: "С", status: "ready", title: "З різними видами зв'язку", href: "urok-skladne-rizni-zvyazky.html",
+          test: {status: "ready", href: "skladne-rizni-zvyazky.html"}}
+      ]},
+      { title: null, items: [
+        {icon: "П", status: "ready", title: "Пряма мова",
+          href: "https://movoznavka.github.io/11class/urok-pryama-mova.html",
+          test: {status: "ready", href: "https://movoznavka.github.io/11class/pryama-mova.html"}}
+      ]}
+    ]
+  },
+  {
+    name: "Тексти",
+    subgroups: [
+      { title: null, items: [
+        {icon: "Т", status: "ready", title: "Тексти", href: "urok-teksty.html",
+          test: {status: "ready", href: "teksty.html"}}
       ]}
     ]
   }
@@ -663,13 +646,6 @@ function pillHtml(test){
   const clickable = test.status === 'ready';
   const label = "📝 Тест до теми";
   return `<a class="test-pill ${test.status}" href="${clickable ? test.href : '#'}" data-testkey="${test.href}">${label}</a>`;
-}
-
-function tasksPillHtml(tasks){
-  if(!tasks) return '';
-  const clickable = tasks.status === 'ready';
-  const label = "✏️ Завдання";
-  return `<a class="test-pill tasks ${tasks.status}" href="${clickable ? tasks.href : '#'}" data-testkey="${tasks.href}">${label}</a>`;
 }
 
 function generalTestPillHtml(test){
@@ -711,7 +687,7 @@ function renderBlocks_(){
                   <p class="card-title">${it.title}</p>
                   ${it.desc?`<p class="card-sub">${it.desc}</p>`:''}
                 </a>
-                <div class="pills">${pillHtml(it.test)}${tasksPillHtml(it.tasks)}</div>
+                ${pillHtml(it.test)}
               </div>`).join('')}
           </div>
         </div>
@@ -722,12 +698,14 @@ function renderBlocks_(){
 renderBlocks_();
 
 // ============================================================
-// ДЗ — те саме, що й у 11-класному порталі. Встав сюди /exec-посилання
-// НОВОГО Apps Script проєкту, розгорнутого для бота @resultat89_bot
-// (той, що з Code89.gs) — НЕ те саме посилання, що для 11 класу,
-// інакше учні 8-9 класів побачать чужі позначки ДЗ.
+// ДЗ — ЯСКРАВЕ ПОЗНАЧЕННЯ (ПЕРСОНАЛЬНО ДЛЯ КОЖНОГО УЧНЯ)
+// Тут вказуєте посилання вашого Apps Script (те саме, що для бота),
+// закінчується на /exec. Керуєте позначками ДЗ прямо в Telegram-боті
+// командою /дз (там спершу обираєте учня) — код нижче лише зчитує,
+// що призначено САМЕ ЦЬОМУ учню (за кодом ?u=...), і підсвічує пілюлі
+// тільки на його сторінці.
 // ============================================================
-const HOMEWORK_API_URL = "ВСТАВТЕ_СЮДИ_/exec_ПОСИЛАННЯ_НОВОГО_APPS_SCRIPT";
+const HOMEWORK_API_URL = "https://script.google.com/macros/s/AKfycbzDs5WkG3yAOIFbj4BEvTczkCynEAkhIja0ThB3LGtpXerg2pUdtcX1AzDTisH_v36k/exec";
 
 let _lastHomeworkMap = null;
 function applyHomework(map){
@@ -760,28 +738,46 @@ function loadHomework(studentCode){
 }
 
 // ============================================================
-// ХТО ЩО БАЧИТЬ — заповни так само, як STUDENT_ACCESS в 11-класному
-// index.html: код учня → масив href уроків, які йому відкрито.
-// Посилання для учня: .../index89.html?u=Ім'я
+// ХТО ЩО БАЧИТЬ
+// Код учня (те, що йде після ?u=) — обирайте самі, наприклад ім'я.
+// Посилання для учня: .../index.html?u=Maryna
+//
+// Кожен код відкриває СПИСОК ТЕМ (масив href уроків, як і раніше) —
+// а урок і тест до нього показуються/ховаються РАЗОМ, як одна тема.
+//
+// ВАЖЛИВО: якщо учня немає в цьому списку — посилання НЕ спрацює,
+// портал покаже "Це посилання недійсне".
 // ============================================================
 const STUDENT_ACCESS = {
+  "Ліза Настя":   [],
+  "Вікторія":   [],
+  "Марина Світлана": [],
+  "Яна":   [],
+  "Віка":   [],
+  "Андрій": [],
+  "Аня": [],
+  "Марія": [],
+  "Максим": [],
+  "Анастасія": [],
+  "Ростислав": [],
+  "Вероніка": [],
+  "Віолета Софія": [],
+  "Саміра": [],
+  
   // "код-учня": ["href-теми-1", "href-теми-2"]
-  // Порожній масив = учень має дійсне посилання, теми відкриває бот (кнопка "🔓 Теми").
-  // 8 клас
-  "Софія-Ніколь": [],
-  "Денис": [],
-  // 9 клас
-  "Ліда": [],
-  "Діма": [],
-  "Оля": [],
-  "Кіра": []
 };
 
 // ============================================================
-// ГРУПОВІ КОДИ (одне посилання — двоє учнів), як і в 11 класі.
+// ГРУПОВІ КОДИ (одне посилання — двоє учнів)
+// Якщо код є ключем тут — портал спершу спитає, хто саме зайшов,
+// і далі підставлятиме ОСОБИСТЕ ім'я і в лінки на уроки/тести,
+// і в результати в Telegram — щоб було видно, хто саме що зробив.
+// Одиночних учнів сюди додавати не треба.
 // ============================================================
 const GROUP_MEMBERS = {
-  // "код групи в нижньому регістрі": ["Ім'я1", "Ім'я2"]
+  "ліза настя": ["Ліза", "Настя"],
+  "марина світлана": ["Марина", "Світлана"],
+  "віолета софія": ["Віолета", "Софія"]
 };
 
 function normalizeCode(s){
@@ -793,6 +789,11 @@ Object.keys(STUDENT_ACCESS).forEach(function(code){
   NORMALIZED_ACCESS[normalizeCode(code)] = STUDENT_ACCESS[code];
 });
 
+// ============================================================
+// ЗАВЕРШЕННЯ ВХОДУ УЧНЯ: ховає закриті теми, підвантажує ДЗ,
+// і — головне — дописує ?student=Ім'я в кожне посилання на урок,
+// щоб сторінка тесту брала ім'я з лінка й не питала його вручну.
+// ============================================================
 function appendStudentParam_(href, name){
   const sep = href.indexOf('?') > -1 ? '&' : '?';
   return href + sep + 'student=' + encodeURIComponent(name);
@@ -809,11 +810,10 @@ function applyAccessAndRender_(studentCode, allowed, displayName){
     if (card.getAttribute('href') !== '#') {
       card.setAttribute('href', appendStudentParam_(card.getAttribute('href'), displayName));
     }
-    wrap.querySelectorAll('.test-pill').forEach(function(pill){
-      if (pill.getAttribute('href') !== '#') {
-        pill.setAttribute('href', appendStudentParam_(pill.getAttribute('href'), displayName));
-      }
-    });
+    const pill = wrap.querySelector('.test-pill');
+    if (pill && pill.getAttribute('href') !== '#') {
+      pill.setAttribute('href', appendStudentParam_(pill.getAttribute('href'), displayName));
+    }
   });
   document.querySelectorAll('.subgroup').forEach(function(sg){
     if (!sg.querySelector('.card')) sg.remove();
@@ -837,13 +837,26 @@ function applyAccessAndRender_(studentCode, allowed, displayName){
   }
 }
 
+// Теми можна відкривати або вручну (STUDENT_ACCESS вище), або через
+// бота кнопкою "🔓 Теми". Щоб сторінка не «блимала» (спочатку всі теми,
+// потім лише дозволені), спершу одразу й синхронно показуємо статичний
+// список — і лише ЯКЩО бот справді відкрив щось додаткове, перемальовуємо
+// список ще раз (це рідкісний випадок, і невеличке оновлення тут не заважає).
+// Групи, де вчителька задає ДЗ окремо кожному (а не на всю пару разом).
+// Для них ДЗ шукаємо за особистим ім'ям, а не кодом посилання.
+const HW_SPLIT_GROUPS = ["марина світлана"];
+
 function finishStudentView_(studentCode, allowedStatic, displayName){
-  loadHomework(studentCode);
+  const hwLookupCode = HW_SPLIT_GROUPS.indexOf(studentCode) !== -1 ? displayName : studentCode;
+  loadHomework(hwLookupCode);
   applyAccessAndRender_(studentCode, allowedStatic, displayName);
 
   const stillWaiting = HOMEWORK_API_URL && HOMEWORK_API_URL.indexOf('ВСТАВТЕ') !== 0;
   const blocksEl = document.getElementById('blocks');
 
+  // Якщо після статичного списку карток узагалі не лишилось (весь доступ
+  // очікується від бота) — не лишаємо порожню сторінку, а пишемо, що йде
+  // завантаження, поки чекаємо відповідь.
   let loadingEl = null;
   if (stillWaiting && !document.querySelector('.card-wrap')) {
     loadingEl = document.createElement('p');
@@ -864,6 +877,8 @@ function finishStudentView_(studentCode, allowedStatic, displayName){
     if (extra.length > 0) {
       renderBlocks_();
       applyAccessAndRender_(studentCode, allowedStatic.concat(extra), displayName);
+      // Перемальовування вище стирає картки разом з уже застосованими
+      // позначками ДЗ — застосовуємо їх ще раз на нових картках.
       if (_lastHomeworkMap) applyHomework(_lastHomeworkMap);
     }
 
@@ -961,9 +976,6 @@ function showNamePicker_(studentCode, allowed, members){
     return;
   }
 
-  // Учням службові підписи не потрібні: верхній рядок «Навігація · 8-9 клас» (заголовок «Усі теми» лишається)
-  document.querySelectorAll('.topbar, .teacher-banner').forEach(function(el){ el.remove(); });
-
   if (studentCode && allowed) {
     const tag = document.querySelector('.kicker.tag');
     if (tag) tag.remove();
@@ -977,6 +989,7 @@ function showNamePicker_(studentCode, allowed, members){
         showNamePicker_(studentCode, allowed, members);
       }
     } else {
+      // одиночний учень — його ім'я і є кодом у посиланні
       finishStudentView_(studentCode, allowed, params.get('u').trim());
     }
   } else {
