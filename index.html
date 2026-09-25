@@ -115,6 +115,15 @@
     pointer-events:none;
   }
 
+  /* --- окрема плашка для тесту "на відповідність" (інший колір, щоб не плутати із загальним) --- */
+  .block-test-pill.match.ready{
+    color:var(--c1-b);
+    background:rgba(51,85,238,0.12);
+  }
+  .block-test-pill.match.ready:hover{
+    box-shadow: 0 10px 20px -14px var(--c1-sh);
+  }
+
   .subgroup{ margin-bottom:26px; margin-top:24px; }
   .subgroup:first-of-type{ margin-top:22px; }
   .subgroup-header{
@@ -389,6 +398,12 @@
    Щоб додати підрозділ — скопіюй { title: "...", items: [...] }.
    Підрозділ теж може мати свій "загальний тест" — додай йому generalTest
    (той самий формат, що й у блока): { title: "...", generalTest: {...}, items: [...] }.
+
+   Блок може мати ще й ДРУГИЙ загальний тест — "на відповідність"
+   (інший тип завдань, тому й плашка інша: синя "🔗 Тест на відповідність"
+   замість зеленої "📝 Загальний тест"). Додай блоку matchTest
+   (той самий формат: {status, href}).
+
    Щоб додати розділ — скопіюй { name: "...", subgroups: [...] } у BLOCKS.
    ============================================================ */
 
@@ -479,6 +494,7 @@ const BLOCKS = [
   {
     name: "Морфологія",
     generalTest: {status: "ready", href: "morfologiya-zagalnyi.html"},
+    matchTest: {status: "soon", href: "morfologiya-vidpovidnist.html"},
     subgroups: [
       { title: "Іменник", items: [
         {icon: "І", status: "ready", title: "Рід",
@@ -547,7 +563,7 @@ const BLOCKS = [
         {icon: "П", status: "ready", title: "Прислівник", href: "urok-prysliv.html",
           test: {status: "ready", href: "prysliv.html"}}
       ]},
-      { title: "Службові частини мови", items: [
+      { title: "Службові частини мови", generalTest: {status: "soon", href: "sluzhbovi-zagalnyi.html"}, items: [
         {icon: "П", status: "ready", title: "Прийменник", 
          href: "https://movoznavka.github.io/11class/urok-pryimennyk.html",
           test: {status: "ready", href: "pryimennyk.html"}},
@@ -662,12 +678,20 @@ function subgroupTestPillHtml(test){
   return `<a class="subgroup-test-pill ${test.status}" href="${clickable ? test.href : '#'}" data-testkey="${test.href}">${label}</a>`;
 }
 
+function matchTestPillHtml(test){
+  if(!test) return '';
+  const clickable = test.status === 'ready';
+  const label = "🔗 Тест на відповідність";
+  return `<a class="block-test-pill match ${test.status}" href="${clickable ? test.href : '#'}" data-testkey="${test.href}">${label}</a>`;
+}
+
 function renderBlocks_(){
   blocksEl.innerHTML = BLOCKS.map(block => `
     <div class="block">
       <div class="block-header">
         <h2 class="block-title">${block.name}</h2>
         ${generalTestPillHtml(block.generalTest)}
+        ${matchTestPillHtml(block.matchTest)}
       </div>
       ${block.subgroups.map(sg => `
         <div class="subgroup">
