@@ -182,69 +182,196 @@
   footer{text-align:center;margin-top:22px;font-size:12.5px;color:var(--ink-soft);font-weight:500;}
 
   /* ===================== DRAWING / TEACHER MODE ===================== */
-  #drawCanvas{ position:absolute; top:0; left:0; z-index:9998; pointer-events:none; }
+  /* Canvas is positioned over the whole DOCUMENT (not just the viewport),
+     so ink scrolls together with the page content instead of staying
+     glued to the screen. Its size is recalculated after every content
+     change (see resizeCanvas() below). */
+  #drawCanvas{
+    position:absolute;
+    top:0;
+    left:0;
+    z-index:9998;
+    pointer-events:none; /* drawing is handled via window-level listeners so
+                             taps/clicks on real UI underneath always pass through */
+  }
+
+  #drawDebug{
+    position:fixed;
+    top:8px;
+    left:8px;
+    z-index:10000;
+    background:rgba(19,33,59,0.82);
+    color:#fff;
+    font-family:'Manrope',monospace;
+    font-size:12px;
+    font-weight:700;
+    padding:5px 10px;
+    border-radius:10px;
+    pointer-events:none;
+    display:none;
+  }
+  #drawDebug.show{display:block;}
 
   #drawToggleBtn{
-    position:fixed; right:20px; bottom:20px; width:58px;height:58px; border-radius:50%;
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    width:58px;height:58px;
+    border-radius:50%;
     border:1px solid rgba(255,255,255,0.5);
     background:
       linear-gradient(150deg, rgba(255,255,255,0.35), rgba(255,255,255,0) 60%),
       linear-gradient(155deg,var(--c1-a),var(--c1-b));
     backdrop-filter: blur(10px) saturate(160%);
     -webkit-backdrop-filter: blur(10px) saturate(160%);
-    box-shadow: 0 14px 28px -10px var(--c1-sh), inset 0 1px 1px rgba(255,255,255,0.6), inset 0 -6px 10px -4px rgba(0,0,0,0.15);
-    color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:9999;
+    box-shadow:
+      0 14px 28px -10px var(--c1-sh),
+      inset 0 1px 1px rgba(255,255,255,0.6),
+      inset 0 -6px 10px -4px rgba(0,0,0,0.15);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    z-index:9999;
     transition:transform .18s cubic-bezier(.34,1.56,.64,1), background .2s ease, box-shadow .2s ease;
   }
-  #drawToggleBtn svg{ width:24px;height:24px; display:block; transition:transform .25s ease, opacity .15s ease; }
+  #drawToggleBtn svg{
+    width:24px;height:24px;
+    display:block;
+    transition:transform .25s ease, opacity .15s ease;
+  }
   #drawToggleBtn:active{transform:scale(0.90);}
   #drawToggleBtn.on{
     background:
       linear-gradient(150deg, rgba(255,255,255,0.35), rgba(255,255,255,0) 60%),
       linear-gradient(155deg,#FF8A65,var(--c2-b));
-    box-shadow: 0 14px 28px -10px rgba(229,72,77,0.55), inset 0 1px 1px rgba(255,255,255,0.6), inset 0 -6px 10px -4px rgba(0,0,0,0.15);
+    box-shadow:
+      0 14px 28px -10px rgba(229,72,77,0.55),
+      inset 0 1px 1px rgba(255,255,255,0.6),
+      inset 0 -6px 10px -4px rgba(0,0,0,0.15);
   }
   #drawToggleBtn.on svg{ transform:rotate(90deg); }
 
   #drawToolbar{
-    position:fixed; left:50%; bottom:22px; transform:translateX(-50%) translateY(130%) scale(0.94); opacity:0;
-    display:flex; align-items:center; gap:12px;
-    background: linear-gradient(150deg, rgba(255,255,255,0.6), rgba(255,255,255,0.15));
+    position:fixed;
+    left:50%;
+    bottom:22px;
+    transform:translateX(-50%) translateY(130%) scale(0.94);
+    opacity:0;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:
+      linear-gradient(150deg, rgba(255,255,255,0.6), rgba(255,255,255,0.15));
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     border:1px solid rgba(255,255,255,0.7);
-    padding:9px 16px; border-radius:999px;
-    box-shadow: 0 24px 48px -20px rgba(19,33,59,0.45), inset 0 1px 1px rgba(255,255,255,0.9);
+    padding:9px 16px;
+    border-radius:999px;
+    box-shadow:
+      0 24px 48px -20px rgba(19,33,59,0.45),
+      inset 0 1px 1px rgba(255,255,255,0.9);
     z-index:9999;
     transition:transform .25s cubic-bezier(.34,1.56,.64,1), opacity .2s ease;
     pointer-events:none;
   }
-  #drawToolbar.show{ transform:translateX(-50%) translateY(0) scale(1); opacity:1; pointer-events:auto; }
+  #drawToolbar.show{
+    transform:translateX(-50%) translateY(0) scale(1);
+    opacity:1;
+    pointer-events:auto;
+  }
+  /* панель згорнута, але малювання лишається увімкненим */
+  #drawToolbar.mini{
+    transform:translateX(-50%) translateY(130%) scale(0.94);
+    opacity:0;
+    pointer-events:none;
+  }
+  #drawToolbarMini{
+    position:fixed;
+    left:50%;
+    bottom:20px;
+    transform:translateX(-50%) translateY(130%) scale(0.9);
+    opacity:0;
+    width:40px;height:26px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,0.5);
+    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));
+    box-shadow:0 10px 20px -10px var(--c1-sh);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    z-index:9999;
+    transition:transform .25s cubic-bezier(.34,1.56,.64,1), opacity .2s ease;
+    pointer-events:none;
+  }
+  #drawToolbarMini svg{width:18px;height:18px;}
+  #drawToolbarMini.show{
+    transform:translateX(-50%) translateY(0) scale(1);
+    opacity:1;
+    pointer-events:auto;
+  }
   .swatch{
-    position:relative; width:25px;height:25px; border-radius:50%; border:none;
-    box-shadow: 0 3px 8px -2px rgba(19,33,59,0.35), inset 0 1px 1px rgba(255,255,255,0.5);
-    cursor:pointer; padding:0; transition:transform .15s cubic-bezier(.34,1.56,.64,1);
+    position:relative;
+    width:25px;height:25px;
+    border-radius:50%;
+    border:none;
+    box-shadow:
+      0 3px 8px -2px rgba(19,33,59,0.35),
+      inset 0 1px 1px rgba(255,255,255,0.5);
+    cursor:pointer;
+    padding:0;
+    transition:transform .15s cubic-bezier(.34,1.56,.64,1);
   }
   .swatch::after{
-    content:''; position:absolute; inset:-4px; border-radius:50%; border:2px solid var(--ink);
-    opacity:0; transform:scale(0.7); transition:opacity .15s ease, transform .15s cubic-bezier(.34,1.56,.64,1);
+    content:'';
+    position:absolute;
+    inset:-4px;
+    border-radius:50%;
+    border:2px solid var(--ink);
+    opacity:0;
+    transform:scale(0.7);
+    transition:opacity .15s ease, transform .15s cubic-bezier(.34,1.56,.64,1);
   }
   .swatch.selected{ transform:scale(1.08); }
   .swatch.selected::after{ opacity:1; transform:scale(1); }
   .tool-btn{
-    width:34px;height:34px; border-radius:50%; border:none; background:rgba(255,255,255,0.5); color:var(--ink);
-    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    width:34px;height:34px;
+    border-radius:50%;
+    border:none;
+    background:rgba(255,255,255,0.5);
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
     transition:background .15s ease, color .15s ease, transform .15s cubic-bezier(.34,1.56,.64,1);
   }
   .tool-btn svg{ width:16px; height:16px; }
-  .tool-btn .dot{ border-radius:50%; background:currentColor; }
-  #thinBtn .dot{ width:6px; height:6px; }
-  #thickBtn .dot{ width:12px; height:12px; }
-  .tool-btn.selected{ background:var(--c1-b); color:#fff; transform:scale(1.06); }
-  .tool-sep{ width:1px; height:22px; background:rgba(19,33,59,0.14); }
+  .tool-btn .dot{
+    border-radius:50%;
+    background:currentColor;
+  }
+  #xthinBtn .dot{ width:3.5px; height:3.5px; }
+  #thinBtn .dot{ width:7px; height:7px; }
+  #thickBtn .dot{ width:12.5px; height:12.5px; }
+  .tool-btn.selected{
+    background:var(--c1-b);
+    color:#fff;
+    transform:scale(1.06);
+  }
+  .tool-sep{
+    width:1px;
+    height:22px;
+    background:rgba(19,33,59,0.14);
+  }
 
   @media (max-width:480px){
-    #drawToolbar{ max-width:94vw; overflow-x:auto; padding:8px 13px; gap:9px; }
+    #drawToolbar{
+      max-width:94vw;
+      overflow-x:auto;
+      padding:8px 13px;
+      gap:9px;
+    }
     .swatch{width:21px;height:21px;}
     .tool-btn{width:30px;height:30px;}
     .tool-btn svg{width:14px;height:14px;}
@@ -270,6 +397,8 @@
 
 <!-- ==== Малювання поверх екрана (для вчителя) ==== -->
 <canvas id="drawCanvas"></canvas>
+<div id="drawDebug"></div>
+
 <button id="drawToggleBtn" title="Малювати">
   <svg id="drawIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M4 20L4.6 16.6C4.7 15.9 5.03 15.26 5.55 14.79L15.3 5.7C16.09 4.96 17.34 4.99 18.09 5.78L18.34 6.04C19.08 6.83 19.04 8.08 18.25 8.81L8.5 17.9C8 18.37 7.37 18.66 6.7 18.75L4 20Z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/>
@@ -282,7 +411,8 @@
   <button class="swatch" style="background:#17A863" data-color="#17A863"></button>
   <button class="swatch" style="background:#13213B" data-color="#13213B"></button>
   <div class="tool-sep"></div>
-  <button class="tool-btn selected" id="thinBtn" title="Тонка лінія"><span class="dot"></span></button>
+  <button class="tool-btn selected" id="xthinBtn" title="Дуже тонка лінія"><span class="dot"></span></button>
+  <button class="tool-btn" id="thinBtn" title="Тонка лінія"><span class="dot"></span></button>
   <button class="tool-btn" id="thickBtn" title="Товста лінія"><span class="dot"></span></button>
   <div class="tool-sep"></div>
   <button class="tool-btn" id="eraserBtn" title="Ластик">
@@ -298,7 +428,18 @@
       <path d="M7 7L7.6 19.2C7.63 19.9 8.2 20.5 8.9 20.5H15.1C15.8 20.5 16.37 19.9 16.4 19.2L17 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
   </button>
+  <div class="tool-sep"></div>
+  <button class="tool-btn" id="minimizeBtn" title="Згорнути панель">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
 </div>
+<button id="drawToolbarMini" title="Розгорнути панель">
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M6 15L12 9L18 15" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</button>
 
 <script>
 /* ============================================================
@@ -508,13 +649,33 @@ renderContent();
 
 // ======================================================================
 // МАЛЮВАННЯ ПОВЕРХ ЕКРАНА (режим "учитель")
-// Малює ЛИШЕ Apple Pencil (pointerType === 'pen').
+//
+// Ця версія навмисно побудована один в один за робочим прикладом, який
+// підтвердив, що пише без затримок і що кнопка з панеллю не зникають і не
+// роздуваються під час зуму. Різниця з попередніми спробами:
+//   • НІЯКОГО втручання в touch-action — воно завжди 'auto', як типово
+//     в браузері. preventDefault() на самому дотику пером і так гарантує,
+//     що перо не гортає й не зумить сторінку; більше нічого чіпати не
+//     треба, а зайві обмеження touch-action, судячи з усього, і були
+//     причиною затримки між буквами.
+//   • НІЯКОЇ JS-компенсації позиції/розміру кнопки й панелі під час
+//     pinch-zoom. Вони — звичайний CSS position:fixed. Раніше спроби
+//     "виправити" це власним кодом лише ламали те, що й так працювало.
+//   • Малювання — просте, пряме, растрове (як у прикладі), без черг і
+//     буферизації.
+// Єдине, що збережено понад приклад: чорнило кожної вкладки зберігається
+// окремо (бо в цьому уроці, на відміну від прикладу, є кілька вкладок) —
+// через ті самі getDrawingSnapshot/setDrawingSnapshot, які вже викликає
+// зовнішній скрипт при перемиканні вкладок.
 // ======================================================================
 (function(){
   const canvas = document.getElementById('drawCanvas');
   const ctx = canvas.getContext('2d');
   const toggleBtn = document.getElementById('drawToggleBtn');
   const toolbar = document.getElementById('drawToolbar');
+  const toolbarMini = document.getElementById('drawToolbarMini');
+  const minimizeBtn = document.getElementById('minimizeBtn');
+  const xthinBtn = document.getElementById('xthinBtn');
   const thinBtn = document.getElementById('thinBtn');
   const thickBtn = document.getElementById('thickBtn');
   const eraserBtn = document.getElementById('eraserBtn');
@@ -527,44 +688,56 @@ renderContent();
   let currentWidth = 4;
   let eraserMode = false;
   let lastX = 0, lastY = 0;
-  const MOVE_THRESHOLD = 2;
+  let activePointerId = null;
 
-  function docSize(){
-    return {
-      w: document.documentElement.clientWidth,
-      h: Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
-    };
+  window.isDrawingActive = function(){ return drawingActive; };
+
+  function currentDocHeight(){
+    return Math.max(
+      document.documentElement.scrollHeight,
+      document.body.scrollHeight,
+      window.innerHeight
+    );
   }
 
   function resizeCanvas(){
-    const dpr = window.devicePixelRatio || 1;
-    const {w, h} = docSize();
+    const docWidth = document.documentElement.clientWidth;
+    const docHeight = currentDocHeight();
+
     const prev = document.createElement('canvas');
     prev.width = canvas.width;
     prev.height = canvas.height;
     if(canvas.width && canvas.height){
       prev.getContext('2d').drawImage(canvas, 0, 0);
     }
-    canvas.style.width = w + 'px';
-    canvas.style.height = h + 'px';
-    canvas.width = Math.max(1, Math.round(w * dpr));
-    canvas.height = Math.max(1, Math.round(h * dpr));
-    ctx.setTransform(dpr,0,0,dpr,0,0);
+
+    canvas.width = docWidth * devicePixelRatio;
+    canvas.height = docHeight * devicePixelRatio;
+    canvas.style.width = docWidth + 'px';
+    canvas.style.height = docHeight + 'px';
+    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
+
     if(prev.width && prev.height){
-      ctx.drawImage(prev, 0, 0, prev.width / dpr, prev.height / dpr);
+      ctx.drawImage(prev, 0, 0, prev.width / devicePixelRatio, prev.height / devicePixelRatio);
     }
   }
   window.resizeDrawCanvas = resizeCanvas;
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
-  window.addEventListener('orientationchange', ()=> setTimeout(resizeCanvas, 200));
-  window.addEventListener('load', resizeCanvas);
+  window.addEventListener('orientationchange', resizeCanvas);
+  if(window.ResizeObserver){
+    new ResizeObserver(()=> resizeCanvas()).observe(document.body);
+  }
 
   window.clearDrawing = function(){
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   };
+
+  // сумісний з рештою сторінки API: чорнило кожної вкладки зберігається й
+  // відновлюється окремо при перемиканні вкладок (викликається з
+  // зовнішнього скрипту через saveCurrentDrawing()/restoreCurrentDrawing())
   window.getDrawingSnapshot = function(){
     try{
       return (canvas.width && canvas.height) ? canvas.toDataURL('image/png') : null;
@@ -575,25 +748,33 @@ renderContent();
     if(!dataURL) return;
     const img = new Image();
     img.onload = function(){
-      const d = window.devicePixelRatio || 1;
-      ctx.drawImage(img, 0, 0, canvas.width / d, canvas.height / d);
+      ctx.drawImage(img, 0, 0, canvas.width / devicePixelRatio, canvas.height / devicePixelRatio);
     };
     img.src = dataURL;
   };
 
   function setActive(on){
     drawingActive = on;
-    canvas.classList.toggle('active', on);
     toolbar.classList.toggle('show', on);
+    toolbar.classList.remove('mini');
+    if(toolbarMini) toolbarMini.classList.remove('show');
     toggleBtn.classList.toggle('on', on);
     toggleBtn.title = on ? 'Вимкнути малювання' : 'Малювати';
-    const ta = on ? 'pinch-zoom' : 'auto';
-    document.documentElement.style.touchAction = ta;
-    document.body.style.touchAction = ta;
-    if(on) resizeCanvas();
   }
-
   toggleBtn.addEventListener('click', ()=> setActive(!drawingActive));
+
+  if(minimizeBtn && toolbarMini){
+    minimizeBtn.addEventListener('click', ()=>{
+      toolbar.classList.remove('show');
+      toolbar.classList.add('mini');
+      toolbarMini.classList.add('show');
+    });
+    toolbarMini.addEventListener('click', ()=>{
+      toolbar.classList.remove('mini');
+      toolbar.classList.add('show');
+      toolbarMini.classList.remove('show');
+    });
+  }
 
   swatches.forEach(sw=>{
     sw.addEventListener('click', ()=>{
@@ -605,15 +786,22 @@ renderContent();
     });
   });
 
+  if(xthinBtn){
+    xthinBtn.addEventListener('click', ()=>{
+      currentWidth = 2;
+      [xthinBtn,thinBtn,thickBtn].forEach(b=>b.classList.remove('selected'));
+      xthinBtn.classList.add('selected');
+    });
+  }
   thinBtn.addEventListener('click', ()=>{
-    currentWidth = 4;
+    currentWidth = xthinBtn ? 5 : 4;
+    [xthinBtn,thinBtn,thickBtn].forEach(b=>b&&b.classList.remove('selected'));
     thinBtn.classList.add('selected');
-    thickBtn.classList.remove('selected');
   });
   thickBtn.addEventListener('click', ()=>{
-    currentWidth = 12;
+    currentWidth = xthinBtn ? 11 : 12;
+    [xthinBtn,thinBtn,thickBtn].forEach(b=>b&&b.classList.remove('selected'));
     thickBtn.classList.add('selected');
-    thinBtn.classList.remove('selected');
   });
   eraserBtn.addEventListener('click', ()=>{
     eraserMode = !eraserMode;
@@ -624,23 +812,36 @@ renderContent();
   });
 
   function pointerPos(e){
-    return { x: e.pageX, y: e.pageY, pressure: e.pressure || 0.5 };
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+      pressure: e.pressure || 0.5,
+    };
   }
-  function isPen(e){ return e.pointerType === 'pen'; }
 
-  window.addEventListener('pointerdown', (e)=>{
-    if(!drawingActive || !isPen(e)) return;
+  function isOnControls(e){
+    return !!(e.target.closest && e.target.closest('#drawToolbar, #drawToolbarMini, #drawToggleBtn'));
+  }
+
+  document.addEventListener('pointerdown', (e)=>{
+    if(!drawingActive) return;
+    if(e.pointerType !== 'pen') return;
+    if(isOnControls(e)) return;
+
+    e.preventDefault();
     isDrawing = true;
+    activePointerId = e.pointerId;
     const p = pointerPos(e);
     lastX = p.x; lastY = p.y;
-  }, {passive:true});
+  }, { passive: false });
 
-  window.addEventListener('pointermove', (e)=>{
-    if(!drawingActive || !isDrawing || !isPen(e)) return;
-    const p = pointerPos(e);
-    const dx = p.x - lastX, dy = p.y - lastY;
-    if(Math.hypot(dx,dy) < MOVE_THRESHOLD) return;
+  document.addEventListener('pointermove', (e)=>{
+    if(!drawingActive || !isDrawing) return;
+    if(e.pointerId !== activePointerId) return;
+
     e.preventDefault();
+    const p = pointerPos(e);
     ctx.globalCompositeOperation = eraserMode ? 'destination-out' : 'source-over';
     ctx.strokeStyle = currentColor;
     const pressureFactor = 0.6 + (p.pressure || 0.5) * 0.8;
@@ -650,11 +851,21 @@ renderContent();
     ctx.lineTo(p.x, p.y);
     ctx.stroke();
     lastX = p.x; lastY = p.y;
-  }, {passive:false});
+  }, { passive: false });
 
-  function stopDrawing(e){ isDrawing = false; }
-  window.addEventListener('pointerup', stopDrawing);
-  window.addEventListener('pointercancel', stopDrawing);
+  function stopDrawing(e){
+    if(e && e.pointerId !== undefined && e.pointerId !== activePointerId) return;
+    isDrawing = false;
+    activePointerId = null;
+  }
+  document.addEventListener('pointerup', stopDrawing);
+  document.addEventListener('pointercancel', stopDrawing);
+
+  document.addEventListener('touchmove', function(e){
+    if(drawingActive && e.touches && e.touches[0] && e.touches[0].touchType === 'stylus'){
+      e.preventDefault();
+    }
+  }, { passive: false });
 })();
 </script>
 </body>
