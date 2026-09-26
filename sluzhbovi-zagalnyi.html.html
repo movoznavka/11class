@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Службові частини мови · Тест</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#D0E9FC; --bg-soft:#E4F2FC; --card:#FFFFFF;
+    --ink:#13213B; --ink-soft:#6478A0; --line:rgba(19,33,59,0.08);
+    --ac-a:#A5B4FC; --ac-b:#6366F1; --ac-sh:rgba(99,102,241,0.45);
+    --ok-bg:#E6F8EE; --ok-ink:#128A54; --bad-bg:#FDECEC; --bad-ink:#D8393E;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-height:100vh;padding:28px 16px 64px;}
+  .wrap{max-width:720px;margin:0 auto;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;margin-bottom:22px;border-bottom:1.5px solid rgba(19,33,59,0.14);}
+  .kicker{font-family:'Manrope',sans-serif;font-weight:800;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;opacity:.55;}
+  .kicker.tag{opacity:.4;}
+  h1{font-family:'Manrope',sans-serif;font-weight:800;font-size:clamp(26px,6vw,38px);line-height:1.08;letter-spacing:-0.01em;margin:0 0 8px;text-transform:uppercase;}
+  h1 .hl{color:var(--ac-b);}
+  .sub{color:var(--ink-soft);font-size:15px;max-width:56ch;margin:0 0 22px;font-weight:500;}
+  .card{background:var(--card);border-radius:28px;padding:30px 26px;box-shadow:0 20px 44px -28px rgba(19,33,59,0.35);}
+  .progress-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .qnum{font-family:'Manrope',sans-serif;font-weight:700;font-size:13px;color:var(--ink-soft);}
+  .score{font-family:'Manrope',sans-serif;font-weight:800;font-size:12.5px;color:var(--ok-ink);background:var(--ok-bg);padding:6px 13px;border-radius:999px;}
+  .segbar{display:flex;gap:3px;margin-bottom:22px;flex-wrap:wrap;}
+  .seg{flex:1;min-width:6px;height:6px;border-radius:999px;background:var(--bg-soft);}
+  .seg.current{background:var(--ac-b);}
+  .seg.done-correct{background:var(--ok-ink);}
+  .seg.done-wrong{background:var(--bad-ink);}
+  .qtext{font-family:'Manrope',sans-serif;font-size:18px;font-weight:700;line-height:1.5;margin:0 0 20px;}
+  .qtext b{color:var(--ac-b);}
+  .options{display:flex;flex-direction:column;gap:10px;}
+  .opt{display:flex;align-items:center;gap:13px;text-align:left;width:100%;padding:9px 14px 9px 9px;border-radius:18px;border:none;background:var(--bg-soft);cursor:pointer;font-size:15px;font-weight:500;color:var(--ink);}
+  .opt[disabled]{cursor:default;}
+  .tile{width:32px;height:32px;min-width:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;font-weight:800;font-size:13.5px;color:var(--ac-b);background:linear-gradient(150deg,rgba(255,255,255,0.75),rgba(140,124,255,0.22));border:1px solid rgba(255,255,255,0.7);position:relative;}
+  .badge{position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;border:2px solid var(--card);display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;color:#fff;}
+  .badge.ok{background:var(--ok-ink);} .badge.no{background:var(--bad-ink);}
+  .opt.correct{background:var(--ok-bg);} .opt.wrong{background:var(--bad-bg);} .opt.dim{opacity:.5;}
+  /* --- matching (establish correspondence) questions --- */
+  .match-grid{display:flex;gap:18px;align-items:flex-start;background:var(--bg-soft);border-radius:20px;padding:16px;}
+  .match-col{flex:1;display:flex;flex-direction:column;gap:10px;min-width:0;}
+  .match-word-row{display:flex;align-items:center;gap:8px;}
+  .match-word-card{flex:1;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:11px 14px;font-family:'Manrope',sans-serif;font-weight:700;font-size:14px;color:var(--ink);min-width:0;}
+  .match-word-card b{color:var(--ac-b);margin-right:4px;}
+  .match-arrow{color:var(--ink-soft);font-size:16px;flex-shrink:0;}
+  .match-answer-box{flex:1;min-height:44px;border:1.5px dashed var(--ac-a);border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;font-weight:800;font-size:13px;cursor:pointer;background:#fff;color:var(--ac-b);padding:6px 8px;text-align:center;}
+  .match-answer-box.filled{border-style:solid;background:#EFEBFF;}
+  .match-answer-box.correct{border-color:var(--ok-ink);background:var(--ok-bg);color:var(--ok-ink);}
+  .match-answer-box.wrong{border-color:var(--bad-ink);background:var(--bad-bg);color:var(--bad-ink);}
+  .match-opt-card{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;font-family:'Manrope',sans-serif;font-weight:700;font-size:14px;cursor:pointer;color:var(--ink);}
+  .match-opt-card.active{border-color:var(--ac-b);background:#EFEBFF;box-shadow:0 0 0 3px rgba(108,76,241,0.15);}
+  .match-opt-card.disabled{cursor:default;opacity:.85;}
+  @media (max-width:520px){
+    .match-grid{flex-direction:column;}
+    .match-word-card, .match-opt-card{font-size:13px;}
+  }
+  .feedback{margin-top:16px;padding:13px 16px;border-radius:16px;font-size:14.5px;font-weight:600;display:none;}
+  .feedback.show{display:block;}
+  .feedback.ok{background:var(--ok-bg);color:var(--ok-ink);} .feedback.bad{background:var(--bad-bg);color:var(--bad-ink);}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:24px;}
+  .btn{font-family:'Manrope',sans-serif;font-weight:800;font-size:13px;padding:12px 22px;border-radius:999px;border:none;cursor:pointer;}
+  .btn.primary{background:linear-gradient(155deg,var(--ac-a),var(--ac-b));color:#fff;box-shadow:0 10px 20px -8px var(--ac-sh);}
+  .btn.ghost{background:transparent;color:var(--ink-soft);}
+  .btn:disabled{opacity:.3;cursor:default;box-shadow:none;}
+  .name-screen input{width:100%;padding:14px 16px;border-radius:16px;border:1.5px solid var(--line);background:var(--bg-soft);font-size:15px;font-weight:500;color:var(--ink);outline:none;margin-bottom:18px;}
+  .name-screen label{display:block;font-family:'Manrope',sans-serif;font-weight:700;font-size:14px;margin-bottom:10px;}
+  .done-screen{text-align:center;padding:16px 0;}
+  .done-screen .ring{width:120px;height:120px;margin:0 auto 18px;border-radius:50%;background:linear-gradient(155deg,var(--ac-a),var(--ac-b));box-shadow:0 16px 30px -12px var(--ac-sh);display:flex;align-items:center;justify-content:center;}
+  .done-screen .big{font-family:'Manrope',sans-serif;font-weight:800;font-size:30px;color:#fff;}
+  footer{text-align:center;margin-top:22px;font-size:12.5px;color:var(--ink-soft);font-weight:500;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="kicker">Службові частини мови · Усі теми</div>
+    <div class="kicker tag" id="totalTag"></div>
+  </div>
+  <h1>Загальний <span class="hl">тест</span> зі службових частин мови</h1>
+  <p class="sub" id="subText"></p>
+  <div class="card"><div id="quizArea"></div></div>
+  <footer>@movoznavka</footer>
+</div>
+
+<script>
+// Кожен елемент — або type:"single" (звичайний вибір), або type:"match"
+// (установити відповідність: sentence з (1)...(4) + правильна літера для кожного номера).
+const POOL = [
+  {type:"match",
+    sentence:"<b>(1)Фух</b>, нарешті ми <b>(2)таки</b> зійшли <b>(3)на</b> цю гору, <b>(4)дарма що</b> вже були вкрай утомлені й знесилені.",
+    words:["Фух","таки","на","дарма що"],
+    letters:["прийменник","частка","вигук","займенник","сполучник"],
+    answer:[2,1,0,4]},
+  {type:"match",
+    sentence:"Чужа душа — <b>(1)то</b>, кажуть, темний ліс, <b>(2)а</b> я скажу: не <b>(3)кожна</b>, <b>(4)ой</b> не кожна!",
+    words:["то","а","кожна","ой"],
+    letters:["прикметник","вигук","частка","займенник","сполучник"],
+    answer:[2,4,3,1]},
+  {type:"match",
+    sentence:"<b>(1)Добридень!</b> <b>(2)Чи</b> не підкажете, коли відбуває потяг на Одесу <b>(3)й</b> <b>(4)від</b> якої платформи?",
+    words:["Добридень","Чи","й","від"],
+    letters:["прийменник","прислівник","сполучник","частка","вигук"],
+    answer:[4,3,2,0]},
+  {type:"match",
+    sentence:"<b>(1)Їй-богу</b>, я <b>(2)не</b> знаю цього чоловіка, <b>(3)адже</b> вперше <b>(4)у</b> вашому місті.",
+    words:["Їй-богу","не","адже","у"],
+    letters:["прийменник","прислівник","сполучник","частка","вигук"],
+    answer:[4,3,2,0]},
+  {type:"match",
+    sentence:"<b>(1)Навіть</b> не думайте, <b>(2)що</b> ви чимось зобов'язані нам, <b>(3)з огляду на</b> обставини ми все самі владнаємо. <b>(4)До побачення!</b>",
+    words:["Навіть","що","з огляду на","До побачення"],
+    letters:["прийменник","займенник","сполучник","частка","вигук"],
+    answer:[3,2,0,4]},
+  {type:"match",
+    sentence:"<b>(1)Протягом</b> години ми <b>(2)й</b> не ворухнулися, <b>(3)тому що</b> фільм <b>(4)своїм</b> сюжетом тримав нас у напруженні.",
+    words:["Протягом","й","тому що","своїм"],
+    letters:["прийменник","займенник","сполучник","частка","вигук"],
+    answer:[0,3,2,1]}
+];
+
+function pluralZ(n){
+  if(n%10===1 && n%100!==11) return n+" завдання";
+  if(n%10>=2 && n%10<=4 && (n%100<10||n%100>=20)) return n+" завдання";
+  return n+" завдань";
+}
+
+const LETTERS = ["А","Б","В","Г","Д"];
+let ORDER = [];
+let qIdx = 0, answers = {}, studentName = "", started = false;
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function newOrder(){ ORDER = shuffle(POOL.map((_,i)=>i)); }
+newOrder();
+document.getElementById('totalTag').textContent = pluralZ(POOL.length);
+document.getElementById('subText').textContent = pluralZ(POOL.length)+" про прийменник, сполучник, частку й вигук — щоразу інша добірка. Формат НМТ.";
+
+const quizArea = document.getElementById('quizArea');
+
+function scoreOverall(){
+  let correct=0, answered=0;
+  ORDER.forEach((_,i)=>{ const r=answers[i]; if(r){ answered++; if(r.correct) correct++; } });
+  return {correct, answered, total: ORDER.length};
+}
+
+function renderNameScreen(){
+  quizArea.innerHTML = `
+    <div class="name-screen">
+      <label for="nameInput">Як тебе звати?</label>
+      <input type="text" id="nameInput" placeholder="Ім'я" autocomplete="off">
+      <button class="btn primary" id="startBtn" style="width:100%;">Почати тест</button>
+    </div>`;
+  const input = document.getElementById('nameInput');
+  input.focus();
+  const go = ()=>{ studentName = input.value.trim() || "Без імені"; started=true; qIdx=0; renderQuiz(); };
+  document.getElementById('startBtn').onclick = go;
+  input.addEventListener('keydown', e=>{ if(e.key==='Enter') go(); });
+}
+
+function renderQuiz(){
+  if(!started){ renderNameScreen(); return; }
+  const total = ORDER.length;
+  if(qIdx >= total){
+    const {correct, answered} = scoreOverall();
+    quizArea.innerHTML = `
+      <div class="done-screen">
+        <div class="ring"><div class="big">${correct}/${answered}</div></div>
+        <p class="sub" style="margin:0 auto 14px;">${studentName} · відповідано ${answered} з ${total}</p>
+        <button class="btn primary" id="restartBtn">Пройти ще раз</button>
+      </div>`;
+    document.getElementById('restartBtn').onclick = ()=>{
+      answers = {}; qIdx = 0; window.__matchSelected=null; newOrder(); renderQuiz();
+    };
+    return;
+  }
+
+  const q = POOL[ORDER[qIdx]];
+  const rec = answers[qIdx];
+  const {correct, answered} = scoreOverall();
+
+  let segs = '';
+  ORDER.forEach((_,i)=>{
+    const r = answers[i];
+    const cls = i===qIdx ? 'current' : (r ? (r.correct?'done-correct':'done-wrong') : '');
+    segs += `<div class="seg ${cls}"></div>`;
+  });
+
+  if(q.type === 'match'){
+    const picks = rec ? rec.picks : [null,null,null,null];
+    const revealed = !!rec;
+    let selected = (typeof window.__matchSelected === 'number') ? window.__matchSelected : null;
+
+    let leftHtml = '';
+    for(let n=0;n<4;n++){
+      let boxCls = 'match-answer-box';
+      let boxLabel = picks[n]===null ? '?' : LETTERS[picks[n]];
+      if(revealed){
+        if(picks[n]===q.answer[n]) boxCls += ' filled correct';
+        else boxCls += ' filled wrong';
+        if(picks[n]===null) boxLabel = LETTERS[q.answer[n]];
+      } else if(picks[n]!==null){
+        boxCls += ' filled';
+      }
+      leftHtml += `<div class="match-word-row">
+        <div class="match-word-card"><b>${n+1}.</b>${q.words[n]}</div>
+        <div class="match-arrow">→</div>
+        <div class="${boxCls}" data-n="${n}">${boxLabel}</div>
+      </div>`;
+    }
+
+    let rightHtml = '';
+    q.letters.forEach((l,li)=>{
+      let cls = 'match-opt-card';
+      if(revealed) cls += ' disabled';
+      else if(selected===li) cls += ' active';
+      rightHtml += `<div class="${cls}" data-l="${li}">${LETTERS[li]}. ${l}</div>`;
+    });
+
+    quizArea.innerHTML = `
+      <div class="progress-row"><div class="qnum">${studentName} · Питання ${qIdx+1} з ${total}</div><div class="score">${correct}/${answered||0}</div></div>
+      <div class="segbar">${segs}</div>
+      <p class="qtext">${q.sentence}</p>
+      <div class="match-grid">
+        <div class="match-col">${leftHtml}</div>
+        <div class="match-col">${rightHtml}</div>
+      </div>
+      <div class="feedback ${rec?'show '+(rec.correct?'ok':'bad'):''}" id="fb">
+        ${rec ? (rec.correct ? '<span>Правильно! Усі відповідності встановлено вірно.</span>' : '<span>Є помилки — правильні відповіді підсвічено зеленим.</span>') : ''}
+      </div>
+      <div class="nav-row">
+        <button class="btn ghost" id="prevBtn" ${qIdx===0?'disabled':''}>← Назад</button>
+        <button class="btn primary" id="nextBtn" ${rec?'':'disabled'}>${qIdx===total-1?'До результату':'Далі →'}</button>
+      </div>`;
+
+    if(!revealed){
+      quizArea.querySelectorAll('.match-opt-card').forEach(card=>{
+        card.onclick = ()=>{
+          window.__matchSelected = +card.dataset.l;
+          renderQuiz();
+        };
+      });
+      quizArea.querySelectorAll('.match-answer-box').forEach(box=>{
+        box.onclick = ()=>{
+          const n = +box.dataset.n;
+          if(selected===null){
+            if(picks[n]!==null){ picks[n]=null; renderQuiz(); }
+            return;
+          }
+          picks[n] = selected;
+          window.__matchSelected = null;
+          if(picks.every(p=>p!==null)){
+            const isCorrect = picks.every((p,i)=>p===q.answer[i]);
+            answers[qIdx] = {picks, correct:isCorrect};
+          }
+          renderQuiz();
+        };
+      });
+    }
+  } else {
+    // single-choice fallback (про запас, якщо додадуться звичайні питання)
+    quizArea.innerHTML = `
+      <div class="progress-row"><div class="qnum">${studentName} · Питання ${qIdx+1} з ${total}</div><div class="score">${correct}/${answered||0}</div></div>
+      <div class="segbar">${segs}</div>
+      <p class="qtext">${q.q}</p>
+      <div class="options">
+        ${q.opts.map((o,i)=>`<button class="opt" data-i="${i}" ${rec?'disabled':''}><span class="tile">${LETTERS[i]}</span><span>${o}</span></button>`).join('')}
+      </div>
+      <div class="feedback ${rec?'show '+(rec.correct?'ok':'bad'):''}">${rec ? (rec.correct?`<span>Правильно! Відповідь — ${LETTERS[q.a]}.</span>`:`<span>Правильна відповідь — ${LETTERS[q.a]}.</span>`) : ''}</div>
+      <div class="nav-row">
+        <button class="btn ghost" id="prevBtn" ${qIdx===0?'disabled':''}>← Назад</button>
+        <button class="btn primary" id="nextBtn" ${rec?'':'disabled'}>${qIdx===total-1?'До результату':'Далі →'}</button>
+      </div>`;
+    if(rec){
+      quizArea.querySelectorAll('.opt').forEach((btn,i)=>{
+        if(i===q.a) btn.classList.add('correct');
+        else if(i===rec.picked) btn.classList.add('wrong');
+        else btn.classList.add('dim');
+      });
+    }
+    quizArea.querySelectorAll('.opt').forEach(btn=>{
+      btn.onclick = ()=>{
+        if(answers[qIdx]) return;
+        const picked = +btn.dataset.i;
+        answers[qIdx] = {picked, correct: picked===q.a};
+        renderQuiz();
+      };
+    });
+  }
+
+  document.getElementById('prevBtn').onclick = ()=>{ window.__matchSelected=null; qIdx--; renderQuiz(); };
+  document.getElementById('nextBtn').onclick = ()=>{ window.__matchSelected=null; qIdx++; renderQuiz(); };
+}
+
+renderQuiz();
+</script>
+</body>
+</html>
