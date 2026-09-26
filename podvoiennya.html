@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Подвоєння букв · Тренажер</title>
+<title>Орфографія · Урок</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -15,9 +15,10 @@
     --ink-soft:#6478A0;
     --line: rgba(19,33,59,0.08);
 
-    --c1-a:#6C8CFF; --c1-b:#3355EE; --c1-sh: rgba(51,85,238,0.45);
+    --c1-a:#FDE047; --c1-b:#CA8A04; --c1-sh: rgba(202,138,4,0.45);
     --c3-a:#5FE0A8; --c3-b:#17A863; --c3-sh: rgba(23,168,99,0.4);
     --c2-b:#E5484D;
+    --c4-a:#FFB86C; --c4-b:#F5820D;
 
     --correct-bg:#E6F8EE;
     --correct-ink:#128A54;
@@ -34,300 +35,185 @@
     padding:28px 16px 64px;
     position:relative;
   }
-  .wrap{max-width:720px;margin:0 auto;}
+  .wrap{max-width:760px;margin:0 auto;}
 
   .topbar{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding-bottom:16px;
-    margin-bottom:22px;
+    display:flex;justify-content:space-between;align-items:center;
+    padding-bottom:16px;margin-bottom:22px;
     border-bottom:1.5px solid rgba(19,33,59,0.14);
   }
   .kicker{
-    font-family:'Manrope',sans-serif;
-    font-weight:800;
-    font-size:12.5px;
-    letter-spacing:.12em;
-    text-transform:uppercase;
-    color:var(--ink);
-    opacity:.55;
+    font-family:'Manrope',sans-serif;font-weight:800;font-size:12.5px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--ink);opacity:.55;
   }
   .kicker.tag{opacity:.4;}
 
-  .review-banner{
-    display:none;
-    align-items:center;
-    gap:8px;
-    background:#FFF4E0;
-    color:#8A5A00;
-    font-family:'Manrope',sans-serif;
-    font-weight:700;
-    font-size:13px;
-    padding:10px 16px;
-    border-radius:14px;
-    margin-bottom:16px;
-  }
-  .review-banner.show{display:flex;}
-
   h1{
-    font-family:'Manrope',sans-serif;
-    font-weight:800;
-    font-size:clamp(26px,6vw,38px);
-    line-height:1.05;
-    letter-spacing:-0.01em;
-    margin:0 0 8px;
-    text-transform:uppercase;
+    font-family:'Manrope',sans-serif;font-weight:800;
+    font-size:clamp(22px,5.2vw,34px);line-height:1.1;letter-spacing:-0.01em;
+    margin:0 0 8px;text-transform:uppercase;
   }
   h1 .hl{color:var(--c1-b);}
-  .sub{color:var(--ink-soft);font-size:15px;max-width:50ch;margin:0 0 22px;font-weight:500;}
+  .sub{color:var(--ink-soft);font-size:15px;max-width:56ch;margin:0 0 22px;font-weight:500;}
+
+  /* level 1: топіки */
+  .topictoggle{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+  .topictoggle button{
+    flex:1 1 calc(33.333% - 7px);min-width:140px;padding:15px;border-radius:20px;border:none;background:var(--card);
+    font-family:'Manrope',sans-serif;font-weight:800;font-size:13.5px;color:var(--ink-soft);
+    cursor:pointer;box-shadow:0 8px 18px -14px rgba(19,33,59,.3);
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .topictoggle button.active{
+    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));color:#fff;
+    box-shadow:0 10px 20px -10px var(--c1-sh);
+  }
+
+  /* level 2 & level 3 tabs */
+  .tabbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tabbar.nested{margin-bottom:20px;}
+  .tab{
+    padding:10px 15px 10px 10px;border-radius:999px;border:none;background:var(--card);
+    color:var(--ink-soft);font-family:'Manrope',sans-serif;font-weight:800;font-size:12.5px;
+    cursor:pointer;display:flex;align-items:center;gap:8px;
+    box-shadow: 0 8px 18px -14px rgba(19,33,59,0.3);
+  }
+  .tabbar.nested .tab{background:var(--bg-soft);box-shadow:none;}
+  .tab .dot{
+    width:22px;height:22px;border-radius:8px;background:rgba(51,85,238,.1);color:var(--c1-b);
+    display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;
+  }
+  .tab.active{
+    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));color:#fff;
+    box-shadow:0 10px 20px -10px var(--c1-sh);
+  }
+  .tab.active .dot{background:rgba(255,255,255,.25);color:#fff;}
+
+  .tabbar.nested .tab.active{background:#fff;color:var(--c1-b);box-shadow:0 6px 16px -10px rgba(19,33,59,.3);}
+  .tabbar.nested .tab.active .dot{background:var(--c1-b);color:#fff;}
 
   .card{
-    background:var(--card);
-    border-radius:28px;
-    padding:30px 26px;
+    background:var(--card);border-radius:28px;padding:28px 24px;
     box-shadow: 0 20px 44px -28px rgba(19,33,59,0.35);
   }
 
-  .progress-row{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    margin-bottom:16px;
-  }
-  .qnum{
-    font-family:'Manrope',sans-serif;
-    font-weight:700;
-    font-size:13px;
-    color:var(--ink-soft);
-  }
-  .score{
-    font-family:'Manrope',sans-serif;
-    font-weight:800;
-    font-size:12.5px;
-    color:var(--c3-b);
-    background:var(--correct-bg);
-    padding:6px 13px;
-    border-radius:999px;
-  }
+  .section-title{font-family:'Manrope',sans-serif;font-weight:800;font-size:20px;letter-spacing:-0.005em;margin:0 0 8px;}
+  .section-intro{color:var(--ink-soft);font-size:14.5px;line-height:1.6;margin:0 0 18px;}
+  .section-intro b{color:var(--ink);}
 
-  .segbar{display:flex;gap:3px;margin-bottom:22px;flex-wrap:wrap;}
-  .seg{
-    flex:1;
-    min-width:6px;
-    height:6px;
-    border-radius:999px;
-    background:var(--bg-soft);
-    cursor:pointer;
+  .callout{
+    background:linear-gradient(155deg, rgba(255,184,108,.22), rgba(245,130,13,.10));
+    border-radius:18px;padding:14px 18px;margin-bottom:20px;font-size:13.5px;line-height:1.55;color:var(--ink);
   }
-  .seg.current{background:var(--c1-b);}
-  .seg.done-correct{background:var(--c3-b);}
-  .seg.done-wrong{background:var(--c2-b);}
+  .callout b{color:var(--c4-b);font-family:'Manrope',sans-serif;}
 
-  .qtext{
-    font-family:'Manrope',sans-serif;
-    font-size:19px;
-    font-weight:700;
-    line-height:1.4;
-    margin:0 0 20px;
-    letter-spacing:-0.005em;
-  }
-  .qtext u{ text-decoration-thickness:2px; text-underline-offset:2px; }
+  .mnemo{margin-top:16px;font-size:13px;line-height:1.55;color:var(--ink-soft);}
+  .mnemo b{color:var(--ink);}
 
+  /* flip cards */
+  .cardgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:560px){.cardgrid{grid-template-columns:1fr;}}
+  .flip{perspective:1200px;height:158px;cursor:pointer;}
+  .flip-inner{position:relative;width:100%;height:100%;transition:transform .5s cubic-bezier(.4,.2,.2,1);transform-style:preserve-3d;}
+  .flip.open .flip-inner{transform:rotateY(180deg);}
+  .flip-face{position:absolute;inset:0;border-radius:20px;padding:16px 18px;backface-visibility:hidden;display:flex;flex-direction:column;justify-content:center;}
+  .flip-front{background:var(--bg-soft);}
+  .flip-back{background:linear-gradient(155deg,var(--c1-a),var(--c1-b));color:#fff;transform:rotateY(180deg);align-items:center;text-align:center;}
+  .flip-tag{font-family:'Manrope',sans-serif;font-weight:800;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;opacity:.55;margin-bottom:7px;}
+  .flip-back .flip-tag{opacity:.75;}
+  .flip-rule{font-family:'Manrope',sans-serif;font-weight:800;font-size:15px;line-height:1.32;}
+  .flip-desc{font-size:12.5px;margin-top:7px;opacity:.8;line-height:1.4;}
+  .flip-example{font-size:14px;font-weight:700;margin-bottom:3px;}
+  .flip-example:last-child{margin-bottom:0;}
+  .flip-note{font-size:11px;opacity:.7;font-weight:500;}
+  .flip-hint{position:absolute;bottom:9px;right:14px;font-size:10px;font-weight:700;opacity:.4;}
+
+  /* exceptions chips */
+  .chiprow{display:flex;flex-wrap:wrap;gap:10px;}
+  .chip{background:var(--bg-soft);border-radius:16px;padding:13px 18px;cursor:pointer;min-width:126px;transition:background .2s;}
+  .chip .w{font-family:'Manrope',sans-serif;font-weight:800;font-size:14.5px;}
+  .chip .ipa{font-size:12.5px;color:#fff;font-weight:700;margin-top:5px;display:none;}
+  .chip.open{background:linear-gradient(155deg, var(--c4-a), var(--c4-b));}
+  .chip.open .w{color:#fff;}
+  .chip.open .ipa{display:block;}
+
+  /* combo table */
+  .combo-table{display:flex;flex-direction:column;gap:8px;}
+  .combo-row{display:flex;align-items:center;gap:12px;background:var(--bg-soft);border-radius:16px;padding:12px 16px;cursor:pointer;flex-wrap:wrap;}
+  .combo-write{font-family:'Manrope',sans-serif;font-weight:800;font-size:14px;color:var(--c1-b);min-width:56px;}
+  .combo-say{font-family:'Manrope',sans-serif;font-weight:800;font-size:13px;color:var(--ink-soft);min-width:52px;}
+  .combo-example{flex:1;font-size:14px;font-weight:600;min-width:110px;}
+  .combo-ipa{font-size:13px;font-weight:700;color:var(--c3-b);opacity:0;transition:opacity .2s;}
+  .combo-row.open .combo-ipa{opacity:1;}
+
+  /* mini quiz */
+  .qtext{font-family:'Manrope',sans-serif;font-size:18px;font-weight:700;line-height:1.4;margin:0 0 18px;}
   .options{display:flex;flex-direction:column;gap:10px;}
   .opt{
-    display:flex;
-    align-items:center;
-    gap:13px;
-    text-align:left;
-    width:100%;
-    padding:9px 14px 9px 9px;
-    border-radius:18px;
-    border:none;
-    background:var(--bg-soft);
-    cursor:pointer;
-    font-family:'Inter',sans-serif;
-    font-size:15px;
-    font-weight:500;
-    color:var(--ink);
+    display:flex;align-items:center;gap:13px;text-align:left;width:100%;
+    padding:9px 14px 9px 9px;border-radius:18px;border:none;background:var(--bg-soft);
+    cursor:pointer;font-family:'Inter',sans-serif;font-size:14.5px;font-weight:500;color:var(--ink);
     transition:transform .12s ease, background .15s ease;
   }
   .opt:hover{transform:translateY(-1px);}
   .opt[disabled]{cursor:default;}
   .opt[disabled]:hover{transform:none;}
-  .opt u{ text-decoration-thickness:2px; text-underline-offset:2px; }
-
-  /* --- glass letter tile: uniform accent color, translucent, blurred, like iOS icons --- */
   .tile{
-    position:relative;
-    width:32px;height:32px;min-width:32px;
-    border-radius:10px;
+    position:relative;width:30px;height:30px;min-width:30px;border-radius:10px;
     display:flex;align-items:center;justify-content:center;
-    font-family:'Manrope',sans-serif;
-    font-weight:800;
-    font-size:13.5px;
-    color:var(--c1-b);
+    font-family:'Manrope',sans-serif;font-weight:800;font-size:13px;color:var(--c1-b);
     background: linear-gradient(150deg, rgba(255,255,255,0.75), rgba(108,140,255,0.22));
     backdrop-filter: blur(6px) saturate(160%);
-    -webkit-backdrop-filter: blur(6px) saturate(160%);
     border:1px solid rgba(255,255,255,0.7);
     box-shadow: 0 4px 12px -7px var(--c1-sh), inset 0 1px 1px rgba(255,255,255,0.8);
-    overflow:visible;
   }
-  .tile > span{position:relative;z-index:1;}
-
   .badge{
-    position:absolute;
-    top:-5px;right:-5px;
-    width:16px;height:16px;
-    border-radius:50%;
-    border:2px solid var(--card);
-    display:flex;align-items:center;justify-content:center;
-    font-size:9.5px;
-    font-weight:800;
-    color:#fff;
-    z-index:2;
+    position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;
+    border:2px solid var(--card);display:flex;align-items:center;justify-content:center;
+    font-size:9.5px;font-weight:800;color:#fff;
   }
   .badge.ok{background:var(--c3-b);}
   .badge.no{background:var(--c2-b);}
-
   .opt.correct{background:var(--correct-bg);}
   .opt.wrong{background:var(--wrong-bg);}
   .opt.dim{opacity:.5;}
-
-  .feedback{
-    margin-top:16px;
-    padding:13px 16px;
-    border-radius:16px;
-    font-size:14.5px;
-    font-weight:600;
-    display:none;
-    align-items:center;
-    gap:9px;
-  }
+  .feedback{margin-top:16px;padding:13px 16px;border-radius:16px;font-size:14px;font-weight:600;display:none;align-items:center;gap:9px;}
   .feedback.show{display:flex;}
   .feedback.ok{background:var(--correct-bg);color:var(--correct-ink);}
   .feedback.bad{background:var(--wrong-bg);color:var(--wrong-ink);}
-  .feedback b{font-family:'Manrope',sans-serif;}
-
-  .nav-row{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-top:24px;
-  }
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:22px;}
   .btn{
-    font-family:'Manrope',sans-serif;
-    font-weight:800;
-    font-size:13px;
-    padding:12px 22px;
-    border-radius:999px;
-    border:none;
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    gap:6px;
+    font-family:'Manrope',sans-serif;font-weight:800;font-size:13px;padding:12px 22px;
+    border-radius:999px;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;
   }
-  .btn.primary{
-    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));
-    color:#fff;
-    box-shadow:0 10px 20px -8px var(--c1-sh);
-  }
+  .btn.primary{background:linear-gradient(155deg,var(--c1-a),var(--c1-b));color:#fff;box-shadow:0 10px 20px -8px var(--c1-sh);}
   .btn.ghost{background:transparent;color:var(--ink-soft);}
   .btn:disabled{opacity:.3;cursor:default;box-shadow:none;}
-  .btn.small{
-    font-size:12px;
-    padding:8px 4px;
-    opacity:.55;
-    text-decoration:underline;
-    text-underline-offset:2px;
-  }
-  .btn.small:hover{opacity:.85;}
-  .reset-row{
-    text-align:center;
-    margin-top:6px;
-    display:flex;
-    justify-content:center;
-    gap:14px;
-    flex-wrap:wrap;
-  }
+  .qprog{font-family:'Manrope',sans-serif;font-weight:700;font-size:13px;color:var(--ink-soft);margin-bottom:14px;}
 
   .done-screen{text-align:center;padding:16px 0;}
   .done-screen .ring{
-    width:120px;height:120px;
-    margin:0 auto 18px;
-    border-radius:50%;
+    width:110px;height:110px;margin:0 auto 16px;border-radius:50%;
     background:linear-gradient(155deg,var(--c1-a),var(--c1-b));
     box-shadow:0 16px 30px -12px var(--c1-sh);
-    display:flex;align-items:center;justify-content:center;
-    position:relative;
+    display:flex;align-items:center;justify-content:center;position:relative;
   }
-  .done-screen .ring::before{
-    content:'';
-    position:absolute;
-    top:6px;left:10px;right:10px;
-    height:46%;
-    border-radius:50% 50% 60% 60%;
-    background:linear-gradient(to bottom, rgba(255,255,255,0.5), rgba(255,255,255,0));
-  }
-  .done-screen .big{
-    font-family:'Manrope',sans-serif;
-    font-weight:800;
-    font-size:30px;
-    color:#fff;
-    position:relative;
-    z-index:1;
-  }
-  .done-screen .send-status{
-    font-size:13px;
-    font-weight:600;
-    color:var(--ink-soft);
-    margin-top:10px;
-    min-height:18px;
-  }
-  .done-screen .send-status.ok{color:var(--correct-ink);}
-  .done-screen .send-status.bad{color:var(--wrong-ink);}
+  .done-screen .big{font-family:'Manrope',sans-serif;font-weight:800;font-size:28px;color:#fff;}
 
-  .name-screen{padding:6px 0;}
-  .name-screen label{
-    display:block;
-    font-family:'Manrope',sans-serif;
-    font-weight:700;
-    font-size:14px;
-    margin-bottom:10px;
-    color:var(--ink);
-  }
-  .name-screen input{
-    width:100%;
-    padding:14px 16px;
-    border-radius:16px;
-    border:1.5px solid var(--line);
-    background:var(--bg-soft);
-    font-family:'Inter',sans-serif;
-    font-size:15px;
-    font-weight:500;
-    color:var(--ink);
-    outline:none;
-    margin-bottom:18px;
-  }
-  .name-screen input:focus{border-color:var(--c1-b);}
-
-  footer{
-    text-align:center;
-    margin-top:22px;
-    font-size:12.5px;
-    color:var(--ink-soft);
-    font-weight:500;
-  }
+  footer{text-align:center;margin-top:22px;font-size:12.5px;color:var(--ink-soft);font-weight:500;}
 
   /* ===================== DRAWING / TEACHER MODE ===================== */
+  /* Canvas is positioned over the whole DOCUMENT (not just the viewport),
+     so ink scrolls together with the page content instead of staying
+     glued to the screen. Its size is recalculated after every content
+     change (see resizeCanvas() below). */
   #drawCanvas{
     position:absolute;
     top:0;
     left:0;
-    width:100%;
     z-index:9998;
-    pointer-events:none;
+    pointer-events:none; /* drawing is handled via window-level listeners so
+                             taps/clicks on real UI underneath always pass through */
   }
 
   #drawToggleBtn{
@@ -399,6 +285,35 @@
     opacity:1;
     pointer-events:auto;
   }
+  /* панель згорнута, але малювання лишається увімкненим */
+  #drawToolbar.mini{
+    transform:translateX(-50%) translateY(130%) scale(0.94);
+    opacity:0;
+    pointer-events:none;
+  }
+  #drawToolbarMini{
+    position:fixed;
+    left:50%;
+    bottom:20px;
+    transform:translateX(-50%) translateY(130%) scale(0.9);
+    opacity:0;
+    width:40px;height:26px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,0.5);
+    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));
+    box-shadow:0 10px 20px -10px var(--c1-sh);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    z-index:9999;
+    transition:transform .25s cubic-bezier(.34,1.56,.64,1), opacity .2s ease;
+    pointer-events:none;
+  }
+  #drawToolbarMini svg{width:18px;height:18px;}
+  #drawToolbarMini.show{
+    transform:translateX(-50%) translateY(0) scale(1);
+    opacity:1;
+    pointer-events:auto;
+  }
   .swatch{
     position:relative;
     width:25px;height:25px;
@@ -440,8 +355,9 @@
     border-radius:50%;
     background:currentColor;
   }
-  #thinBtn .dot{ width:6px; height:6px; }
-  #thickBtn .dot{ width:12px; height:12px; }
+  #xthinBtn .dot{ width:3.5px; height:3.5px; }
+  #thinBtn .dot{ width:7px; height:7px; }
+  #thickBtn .dot{ width:12.5px; height:12.5px; }
   .tool-btn.selected{
     background:var(--c1-b);
     color:#fff;
@@ -469,18 +385,17 @@
 <body>
 <div class="wrap">
   <div class="topbar">
-    <div class="kicker">Подвоєння</div>
-    <div class="kicker tag" id="totalTag">82 завдань</div>
+    <div class="kicker">Орфографія · Урок</div>
+    <div class="kicker tag" id="totalTag"></div>
   </div>
 
-  <div class="review-banner" id="reviewBanner">👀 Режим перегляду відповідей учня</div>
+  <h1>Подвоєння і <span class="hl">подовження</span> приголосних</h1>
 
-  <h1>Тренажер <span class="hl">подвоєння букв</span></h1>
-  <p class="sub">Формат ЗНО/НМТ — обери правильний варіант, перевір відповідь одразу.</p>
+  <div class="topictoggle" id="topictoggle"></div>
+  <div class="tabbar" id="subtabbar"></div>
+  <div class="tabbar nested" id="subsubtabbar"></div>
 
-  <div class="card">
-    <div id="quizArea"></div>
-  </div>
+  <div class="card" id="lessonArea"></div>
 
   <footer>@movoznavka</footer>
 </div>
@@ -499,7 +414,8 @@
   <button class="swatch" style="background:#17A863" data-color="#17A863"></button>
   <button class="swatch" style="background:#13213B" data-color="#13213B"></button>
   <div class="tool-sep"></div>
-  <button class="tool-btn selected" id="thinBtn" title="Тонка лінія"><span class="dot"></span></button>
+  <button class="tool-btn selected" id="xthinBtn" title="Дуже тонка лінія"><span class="dot"></span></button>
+  <button class="tool-btn" id="thinBtn" title="Тонка лінія"><span class="dot"></span></button>
   <button class="tool-btn" id="thickBtn" title="Товста лінія"><span class="dot"></span></button>
   <div class="tool-sep"></div>
   <button class="tool-btn" id="eraserBtn" title="Ластик">
@@ -512,547 +428,422 @@
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M5 7H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
       <path d="M9.5 7V4.8C9.5 4.36 9.86 4 10.3 4H13.7C14.14 4 14.5 4.36 14.5 4.8V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M7 7L7.7 18.6C7.75 19.42 8.42 20 9.24 20H14.76C15.58 20 16.25 19.42 16.3 18.6L17 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M10.3 10.5V16.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-      <path d="M13.7 10.5V16.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M7 7L7.6 19.2C7.63 19.9 8.2 20.5 8.9 20.5H15.1C15.8 20.5 16.37 19.9 16.4 19.2L17 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  <div class="tool-sep"></div>
+  <button class="tool-btn" id="minimizeBtn" title="Згорнути панель">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
   </button>
 </div>
+<button id="drawToolbarMini" title="Розгорнути панель">
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M6 15L12 9L18 15" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</button>
 
 <script>
-// Усі питання об'єднано в один суцільний список (розділи більше не розділені вкладками)
-// Слово в подвійних квадратних дужках, напр. [[а]] всередині опції, підкреслюється автоматично.
-const ALL_QUESTIONS = [
-  {q:"Подвоєння букв є в усіх словах рядка", opts:["під..аш..я, л..яний, суд..ею","качен..я, гран..ю, гостин..ість","еталон..ий, зван..ий, молод..ю","попідтин..ю, замріян..о, зустріч..ю"], a:0},
-  {q:"Подвоєні літери НЕ ТРЕБА писати в обох словах рядка", opts:["причеса(н/нн)ий, огне(н/нн)ий","узгодже(н/нн)ий, блаже(н/нн)ий","зарахова(н/нн)ий, мерзе(н/нн)ий","обітова(н/нн)ий, букве(н/нн)ий"], a:3},
-  {q:"Подвоєні літери треба писати в усіх словах рядка", opts:["лата(т/тт)я, грома(д/дд)я, Зази(м/мм)'я","мі(д/дд)ю, гра(н/нн)ю, чарівніс(т/тт)ю","су(д/дд)ів, ста(т/тт)ей, відкри(т/тт)ів","(л/лл)ється, І(л/лл)я, рі(л/лл)я"], a:3},
-  {q:"Подвоєні літери НЕ ТРЕБА писати в обох словах рядка", opts:["обізна(н/нн)ість, здорове(н/нн)ий","освіче(н/нн)ість, страше(н/нн)ий","шале(н/нн)ий, роздвоє(н/нн)ість","числе(н/нн)ий, упевне(н/нн)ий"], a:2},
-  {q:"Подвоєння букв є в усіх словах рядка", opts:["незмін..ість, об..ризкати, огнен..ий","глинян..ий, роз..утися, сестрич..ин","завдан..ь, правосуд..я, розкіш..ю","навіжен..ий, роз..олочений, почут..я"], a:0},
-  {q:"Подвоєні літери треба писати в обох словах рядка", opts:["ма(з/зз)ю, перекона(н/нн)ь","заполо(ч/чч)ю, ста(т/тт)ею","залізя(ч/чч)я, ніжніс(т/тт)ю","гі(л/лл)я, геніальніс(т/тт)ю"], a:1},
-  {q:"Подвоєні літери треба писати в обох словах кожного рядка, ОКРІМ", opts:["невблага(н/нн)ою заметі(л/лл)ю","довгожда(н/нн)ою зустрі(ч/чч)ю","нескінче(н/нн)ою спіра(л/лл)ю","тума(н/нн)ою дале(ч/чч)ю","бездо(н/нн)ою глибі(н/нн)ю"], a:1},
-  {q:"Подвоєні літери треба писати в усіх словах рядка", opts:["Поді(л/лл)я, Закарпа(т/тт)я, Попіль(н/нн)я","паморо(з/зз)ю, блаки(т/тт)ю, скатер(т/тт)ю","навма(н/нн)я, негада(н/нн)о, спросо(н/нн)я","попідвіко(н/нн)ю, гуа(ш/шш)ю, ви(л/лл)єш"], a:3},
-  {q:"Подвоєння букв є в усіх словах рядка", opts:["кін..ота, заповід..ю, с..авець","звід..аля, Керч..ю, запитан..я","сон..ий, шален..ий, навман..я","ясніст..ю, письмен..ик, облич..я"], a:0},
-  {q:"Подвоєння букв є в усіх словах рядка", opts:["довгождан..ий, занят..я, монотон..ий","осерд..я, нав..ипередки, мерзен..ий","осін..ій, обіцян..ий, від..зеркален..я","відмін..ик, зелен..ю, перел..єш"], a:3},
-  {q:"НЕМАЄ подвоєних літер у слові", opts:["зібра(н/нн)ість","бо(в/вв)аніти","ро(з/зз)утися","осі(н/нн)ій"], a:0},
-  {q:"Подвоєні літери треба писати в усіх словах рядка", opts:["Прикарпа(т/тт)я, Побу(ж/жж)я, Берес(т/тт)я","осере(д/дд)я, милосер(д/дд)я, знаря(д/дд)я","каніфо(л/лл)ю, ри(с/сс)ю, кмітливіс(т/тт)ю","камі(н/нн)я, підгрун(т/тт)я, підні(ж/жж)я","Прип'я(т/тт)ю, Ро(с/сс)ю, Воли(н/нн)ю"], a:4},
-  {q:"Подвоєні літери треба писати в слові", opts:["щас(т/тт)я","попа(д/дд)я","завзя(т/тт)я","подві(р/рр)'я"], a:2},
-  {q:"Прочитайте уривок із поезії.<br>Я Вас давно забути вже пови(1)а.<br>Це так природ(2)о — відста(3)і і час.<br>Я вже забула. Не моя прови(4)а —<br>то музика нагадує про Вас,<br>то раптом ця осі(5)я хуртови(6)а.<br><br>Подвоєні літери <b>нн</b> треба писати замість цифр", opts:["1, 2","1, 3","1, 5","4, 5","5, 6"], a:2},
-  {q:"НЕМАЄ подвоєних літер у слові", opts:["со(н/нн)ик","розрі(с/сс)я","пере(д/дд)ень","освітле(н/нн)ість"], a:3},
-  {q:"Подвоєні літери НЕ ТРЕБА писати в усіх словах рядка", opts:["нездо́ла(н/нн)ий, незліче(н/нн)ий, ешело(н/нн)ий","шале(н/нн)ий, захараще(н/нн)ий, невгомо(н/нн)ий","клятве(н/нн)ий, нездійсне(н/нн)ий, віко(н/нн)иця","букве(н/нн)ий, реформе(н/нн)ий, удава(н/нн)ий"], a:3},
-  {q:"Подвоєні літери треба писати в слові", opts:["букве(н/нн)ий","засвоє(н/нн)ий","годи(н/нн)иковий","розкодова(н/нн)ий"], a:2},
-  {q:"Подвоєні літери треба писати в усіх словах рядка", opts:["ві(д/дд)звеніти, щоде(н/нн)ик, завда(н/нн)ь","числе(н/нн)ий, шале(н/нн)ий, незмі(н/нн)ий","попідти(н/нн)ю, скля(н/нн)ий, о(б/бб)ризкати","гости(н/нн)ість, бо(в/вв)аніти, (л/лл)яний","Га(н/нн)а, Маріа(н/нн)а, Богда(н/нн)а"], a:3},
-  {q:"Подвоєні літери треба писати в обох словах рядка", opts:["бо(в/вв)ан, дзві(н/нн)иця","нужде(н/нн)ий, (с/сс)авець","о(в/вв)а, заборгова(н/нн)ість","(л/лл)яний, перепели(н/нн)ий"], a:1},
-  {q:"У формі орудного відмінка буде відбуватися подвоєння літер в обох іменниках варіанта", opts:["гордість, грань","деталь, верф","зелень, гуаш","медаль, Керч","поміч, повість"], a:2},
-  {q:"Подвоєні літери треба писати в слові", opts:["гі(л/лл)я","ку(т/тт)я","пові(р/рр)'я","ненас(т/тт)я"], a:0},
-  {q:"Подвоєння букв є в усіх словах рядка", opts:["узліс..я, розріс..я, широчен..ий","підніж..я, проклят..ь, лимон..ик","орлин..ий, місьь..ом, кохан..я","напружен..ість, гуаш..ю, зіл..я"], a:0},
-  {q:"Подвоєні літери треба писати в усіх словах рядка", opts:["сумі(ш/шш)ю, смер(т/тт)ю, узлі(с/сс)я","відста(н/нн)ю, зацвіта(н/нн)я, бага(т/тт)ь","Сі(ч/чч)ю, нехворо(щ/щщ)ю, промі(н/нн)я","навма(н/нн)я, дозві(л/лл)ям, гі(л/лл)ячком"], a:3},
-  {q:"Подвоєння букв є в усіх словах рядка", opts:["дан..ий, глибін..ю, від..іл","Волин..ю, окаян..ий, ов..а","бездоріж..я, кут..я, марен..я","відкрит..ів, закон..ість, кров..ю"], a:1},
-  {q:"Прочитайте речення.<br>Яких тільки (1)обли(ч/чч) не побачиш на ярмарку: одні (2)заспа(н/нн)і, інші (3)заклопота(н/нн)і, але ніхто не приховує своїх (4)почу(т/тт)ів.<br><br>Подвоєні літери треба писати в слові, позначеному цифрою", opts:["1","2","3","4"], a:3},
-  {q:"Подвоєні літери НЕ ТРЕБА писати в усіх словах рядка", opts:["здійсне(н/нн)ий, неждан(н/нн)о, корі(н/нн)ий","індиче(н/нн)я, іме(н/нн)ик, пореформе(н/нн)ий","заболоче(н/нн)ий, студе(н/нн)ий, букве(н/нн)ий","да(н/нн)ий, недоторка(н/нн)ий, свяще(н/нн)ик"], a:2},
-  {q:"Подвоєні літери треба писати в слові", opts:["блаже(н/нн)ий","втомле(н/нн)ий","клятве(н/нн)ий","розбеще(н/нн)ий"], a:0},
-  {q:"Подвоєння букв є в усіх словах рядка", opts:["жадан..ий, безліч..ю, стат..я","під..анство, любов..ю, Іл..я","невгомон..ий, ніч..ю, л..ємо","вівсян..ий, туман..о, пісен..ий"], a:2},
-  {q:"Подвоєні літери треба писати в слові", opts:["чес(т/тт)ю","гордіс(т/тт)ю","любо(в/вв)'ю","розкі(ш/шш)ю"], a:3},
-  {q:"Подвоєні літери треба писати в обох словах рядка", opts:["охоро(н/нн)ик, зва(н/нн)ий","зако(н/нн)ик, смире(н/нн)ий","відмі(н/нн)ик, зведе(н/нн)ий","прикордо(н/нн)ик, да(н/нн)ий"], a:1},
-  {q:"Подвоєння букв є в усіх словах рядка", opts:["зран..я, народжен..ий, екран..ий","вагон..ий, пореформен..ий, лют..ю","жовч..ю, воз..єднан..я, задзеркал..я","благословен..я, востан..є, в..ічливо"], a:3},
-  {q:"Подвоєні літери треба писати в усіх словах рядка", opts:["воскресі(н/нн)я, жада(н/нн)ий, доні(с/сс)я","бездорі(ж/жж)я, мись(к/кк)ом, спросо(н/нн)я","ми(т/тт)ю, дотепніс(т/тт)ю, здорове(н/нн)ий","пла(т/тт)я, благослове(н/нн)ий, освяче(н/нн)ий","студе(н/нн)ий, не(в/вв)ічливий, пісе(н/нн)ий"], a:1},
-  {q:"Прочитайте уривок із поезії.<br>Срібне плесо озера під лісом,<br>В золоті Святвечора дідух.<br>Сокрове(1)им виповне(2)ий змістом<br>Первород(3)ий, незнище(4)ий дух...<br>Батькові стражда(5)я і гонитва,<br>Гордість, непокора і війна,<br>Мамина притише(6)а молитва,<br>Де у кожнім слові — таї(7)а.<br><br>Подвоєні літери <b>нн</b> треба писати замість цифр", opts:["1, 2, 4","1, 4, 5","1, 3, 5","4, 5, 6","2, 4, 7"], a:1},
-  {q:"Подвоєння букв є в усіх словах рядка", opts:["передгроз..я, мучен..ик, стат..ями","освячен..ий, суверен..ий, цін..ий","океан..ий, передміст..я, старан..ий","Прикарпат..я, почут..ів, суд..івський"], a:3},
-  {q:"НЕМАЄ подвоєних літер у слові", opts:["незліче́(н/нн)ий","здійсне́(н/нн)ий","невгомо́(н/нн)ий","довгожда́(н/нн)ий"], a:3},
-  {q:"Подвоєні літери треба писати в усіх словах рядка", opts:["велелю(д/дд)я, роздо(л/лл)я, царстве(н/нн)ий","верхові(т/тт)я, злиде(н/нн)ий, обіця(н/нн)ий","моното(н/нн)ий, су(д/дд)івський, ви(с/сс)ати","пере(л/лл)ю, приви(д/дд)я, бджоли(н/нн)ий","широче(н/нн)ий, зі(л/лл)я, тополи(н/нн)ий"], a:2},
-  {q:"Подвоєні літери треба писати в усіх словах рядка", opts:["ста(л/лл)ю, росли(н/нн)ість, Повол(ж/жж)я","поколі(н/нн)я, письме(н/нн)ик, полоне(н/нн)ий","I(л/лл)я, напруже(н/нн)ість, Запорі(ж/жж)я","коха(н/нн)я, пере(л/лл)ють, во(з/зз)'єднання","бездога(н/нн)ий, любо(в/вв)'ю, передгро(з/зз)я"], a:3},
-  {q:"Подвоєні літери треба писати в усіх словах рядка", opts:["гі(л/лл)я(ч/чч)я, ві(д/дд)зьобати, бездо(н/нн)ий","за(в/вв)ишки, тря(с/сс)я, розлюче(н/нн)ий","соколи(н/нн)ий, ро(з/зз)олочений, воста(н/нн)є","(в/вв)імкнути, навма(н/нн)я, вівся(н/нн)ий","огне(н/нн)ий, обітова(н/нн)ий, страше(н/нн)ий"], a:0},
-  {q:"Подвоєні літери треба писати в слові", opts:["кро(в/вв)'ю","радіс(т/тт)ю","маті(р/рр)'ю","Прип'я(т/тт)ю"], a:3},
-  {q:"Подвоєні літери треба писати в усіх словах рядка", opts:["блаки(т/тт)ю, сестри(ч/чч)ин, пі(д/дд)анство","ста(т/тт)ями, безсмер(т/тт)я, нездола(н/нн)ий","ста(т/тт)ей, подоро(ж/жж)ю, страй(к/кк)ом","народже(н/нн)ий, довкі(л/лл)я, пі(в/вв)ідерко","передбуря(н/нн)ий, зві(д/дд)аля, ро(з/зз)утися"], a:0},
-  {q:"Прочитайте уривок із поезії (цифра в дужках позначає наступне слово).<br>Не всі на світі радощі (1)свяще(н/нн)і —<br>Є радощі, (2)народже(н/нн)і з (3)прокля(т/тт)ь:<br>Коли, метнувши громи (4)навіже(н/нн)і,<br>Став Єву Бог із раю (5)прога(н/нн)ять.<br><br>Подвоєні літери треба писати в слові, позначеному цифрою", opts:["1","2","3","4","5"], a:0},
-  {q:"У формі орудного відмінка буде відбуватися подвоєння літер в обох іменниках рядка", opts:["міль, кіновар","папороть, фальш","безліч, мудрість","ясність, паморозь","сіножать, Січ"], a:4},
-  {q:"Подвоєння букв є в усіх словах рядка", opts:["вихован..ість, галуз..ю, Маріан..а","стат..ей, здоровен..ий, Ган..очка","блажен..ий, далеч..ю, Ген..адій","детал..ю, індичен..я, Запоріж..я"], a:2},
-  {q:"Подвоєні літери треба писати в усіх словах рядка", opts:["ві(с/сс)ю, розкі(ш/шш)ю, кро(в/вв)'ю, осі(н/нн)ю","рі(ч/чч)ю, чес(т/тт)ю, моло(д/дд)ю, сі(л/лл)ю","мі(д/дд)ю, розпові(д/дд)ю, ні(ч/чч)ю, мі(ц/цц)ю","ті(н/нн)ю, радіс(т/тт)ю, пові(н/нн)ю, щедріс(т/тт)ю","сі(л/лл)ю, пі(ч/чч)ю, пові(н/нн)ю, щедріс(т/тт)ю"], a:2},
-  {q:"Подвоєння букв є в усіх словах рядка", opts:["бездоган..ий, в..ічливий, Закавказ..я","бджолин..ий, верховіт..я, вознісс..я","заметіл..ю, дзвін..иця, довкіл..я","імен..ик, злиден..ий, буквен..ий"], a:0},
-  {q:"Подвоєні літери НЕ ТРЕБА писати в обох словах рядка", opts:["умі(н/нн)ь, ста(т/тт)ей","узбі(ч/чч), почу(т/тт)ів","протирі(ч/чч), су(д/дд)ів","відкри(т/тт)ів, зітха(н/нн)ь"], a:0},
-  {q:"Подвоєні літери треба писати в обох словах кожного рядка, ОКРІМ", opts:["(л/лл)яне пла(т/тт)я","со(н/нн)а рі(л/лл)я","височе(н/нн)а дзві(н/нн)иця","стара(н/нн)ий відмі(н/нн)ик","океа(н/нн)е роздо(л/лл)я"], a:2},
-  {q:"Подвоєні літери НЕ ТРЕБА писати в усіх словах рядка", opts:["захопле(н/нн)ий, тел(е/ее)ксперт, закоха(н/нн)ість","шале(н/нн)ий, освіче(н/нн)ість, віде(о/оо)гляд","бажа(н/нн)ість, ро(з/зз)танути, нед(о/оо)цінений","шале(н/нн)ий, довгожда(н/нн)ий, зва(н/нн)ий"], a:3},
-  {q:"Подвоєні літери треба писати в усіх словах рядка", opts:["сторі(ч/чч)я, рі(л/лл)ею, су(д/дд)івський","знаря(д/дд)я, жи(т/тт)євість, Кер(ч/чч)ю","пита(н/нн)я, відкри(т/тт)ів, учас(т/тт)ю","зі(л/лл)я, подоро(ж/жж)ю, ви(л/лл)ити"], a:0},
-  {q:"Орфографічну помилку допущено в рядку", opts:["справжньою самовідданістю","дивовижною подорож'ю","батьківською заповіддю","синівською любов'ю","невиразною тінню"], a:1},
-  {q:"У формі родового відмінка множини НЕ ПОДВОЮЮТЬСЯ літери в обох іменниках усіх варіантів, ОКРІМ", opts:["покоління, прощання","роздоріжжя, стаття","щеплення, терпіння","століття, почуття","узвишшя, заняття"], a:3},
-  {q:"НЕМАЄ подвоєних літер у слові", opts:["зва(н/нн)ий","годи(н/нн)ик","ро(з/зз)броїтися","ві(д/дд)зеркалювати"], a:0},
-  {q:"Подвоєні літери треба писати в усіх словах рядка", opts:["стара(н/нн)ий, сувере(н/нн)ий, о(б/бб)ігти","одухотворе(н/нн)ий, окая(н/нн)ий, возні(с/сс)я","навіже(н/нн)ий, бе(з/зз)вучність, свяще(н/нн)ий","зако(н/нн)ість, замрія(н/нн)о, ві(д/дд)аль","війсь(к/кк)омат, адресова(н/нн)ий, пі(в/вв)агон"], a:0},
-  {q:"У формі орудного відмінка буде відбуватися подвоєння літер в обох іменниках рядка", opts:["височінь, жовч","матір, блакить","заполоч, віддаль","мідь, пригорщ","печаль, скатерть"], a:2},
-  {q:"У формі родового відмінка множини НЕ ПОДВОЮЮТЬСЯ літери в обох іменниках усіх варіантів, ОКРІМ", opts:["протиріччя, узбіччя","запитання, уміння","обійстя, перехрестя","коливання, відкриття","страждання, латаття"], a:3},
-  {q:"Подвоєні літери треба писати в усіх словах рядка", opts:["о(б/бб)ігати, безсо(н/нн)ий, камі(н/нн)ий","спи(н/нн)ий, одухотворе(н/нн)ий, (с/сс)ати","ві(д/дд)ілити, вини(с/сс)я, непоміче(н/нн)ість","щоде(н/нн)ий, царстве(н/нн)ий, бе(з/зз)вучний"], a:0},
-  {q:"Подвоєні літери НЕ ТРЕБА писати в слові", opts:["весі(л/лл)я","підда(ш/шш)я","перехрес(т/тт)я","роздорі(ж/жж)я"], a:2},
-  {q:"Подвоєні літери треба писати в обох словах рядка", opts:["Запорі(ж/жж)я, ста(т/тт)ей","попідти(н/нн)ю, зна(н/нн)ь","до побаче(н/нн)я, (л/лл)ете","обите(л/лл)ю, поголі(в/вв)'я"], a:2},
-  {q:"Подвоєні літери треба писати в усіх словах рядка", opts:["стара(н/нн)ий, пісе(н/нн)ий, студе(н/нн)ий","війсь(к/кк)омат, замрія(н/нн)о, океа(н/нн)ий","перені(с/сс)я, спі(в/вв)ітчизник, височи(н/нн)а","тума(н/нн)ий, бе(з/зз)вучний, божестве(н/нн)ий"], a:3},
-  {q:"Подвоєні літери треба писати в усіх словах рядка", opts:["орли(н/нн)ий, бе(з/зз)вучний, на(в/вв)ипередки","спі(в/вв)ітчизник, пі(в/вв)ісь, греча(н/нн)ий","оста(н/нн)ій, непоміче(н/нн)ість, навма(н/нн)я","смі(т/тт)єпереробний, ві(д/дд)іл, да(н/нн)ий","божестве(н/нн)ий, проні(с/сс)я, ві(д/дд)алік"], a:4},
-  {q:"Подвоєні літери НЕ ТРЕБА писати в слові", opts:["нашес(т/тт)я","велелю(д/дд)я","Закавка(з/зз)я","Криворі(ж/жж)я"], a:0},
-  {q:"Помилку допущено в рядку", opts:["прозеленню, узбережжя, щедрістю","сіножаттю, попідвіконню, милосердя","самовідданістю, тінню, одухотворений","ридання, побуквенний, ввічливістю"], a:3},
-  {q:"Подвоєння букв є в усіх словах рядка", opts:["Побуж..я, екстрен..ий, віс..ю","військ..омат, облич.., латат..я","студен..ий, мід..ю, велелюд..я","бов..аніти, маз..ю, гіл..яч..я"], a:3},
-  {q:"Подвоєні літери треба писати в обох словах рядка", opts:["Прикарпа(т/тт)я, Сі(ч/чч)ю","роздорі(ж/жж)я, жов(ч/чч)ю","гра(н/нн)ю, пригор(щ/щщ)ю","височі(н/нн)ю, фаль(ш/шш)ю"], a:0},
-  {q:"Прочитайте уривок із поезії.<br>Осі(1)ій місяць пряв<br>Оста(2)і чари літа в здичавілім<br>Старез(3)ім парку. І вікно здавалось<br>Отвором у міжзоря(4)і безкраї,<br>Звідкіль густим потоком ллялось сяйво.<br>Холодне, міжпланетне, ледь зловісне,<br>З пливкою прозеле(5)ю глиби(6)и.<br><br>Подвоєні літери <b>нн</b> треба писати замість цифр", opts:["1, 2, 3","1, 2, 5","2, 4, 6","4, 5, 6","1, 5, 6"], a:1},
-  {q:"Подвоєні літери треба писати в слові", opts:["обробле(н/нн)ий","електро(н/нн)ий","глиня(н/нн)ий","сказа(н/нн)ий"], a:1},
-  {q:"Подвоєні літери треба писати в усіх словах рядка", opts:["істи(н/нн)ий, ро(з/зз)иратися, обітова(н/нн)ий","розрі(с/сс)я, буде(н/нн)ий, неписьме(н/нн)ий","окая(н/нн)ий, здорове(н/нн)ий, освяче(н/нн)ий","ві(д/дд)іл, узгодже(н/нн)ість, здійсне́(н/нн)ий"], a:1},
-  {q:"НЕМАЄ помилки в рядку", opts:["благословенний, віддалік, клятвений","височінь, божествений, дотепністю","академістечко, відкриття, заввишки","адресований, вирішений, гречаний"], a:0},
-  {q:"Подвоєння букв є в усіх словах рядка", opts:["каніфол..ю, Ган..уся, священ..ий","чест..ю, щоден..ик, Прип'ят..ю","роз..броїти, радіст..ю, зітхан..я","доніс..я, клятвен..ий, кіновар..ю"], a:0},
-  {q:"Подвоєні літери треба писати в обох словах рядка", opts:["спросо(н/нн)я, пере(л/лл)ю","гідніс(т/тт)ю, мавпе(н/нн)я","навма(н/нн)я, завда(н/нн)ь","І(л/лл)я, запопадливіс(т/тт)ю"], a:0},
-  {q:"Помилку допущено в рядку", opts:["іменник, кмітливістю, орлиний","миттю, казарменний, привиддя","коливання, мудрістю, подорожжю","обітований, невблаганний, поміччю"], a:1},
-  {q:"Подвоєні літери НЕ ТРЕБА писати в обох словах рядка", opts:["рида(н/нн)ь, дале(ч/чч)ю","заня(т/тт)ь, спіра(л/лл)ю","узбі(ч/чч), мудріс(т/тт)ю","обли(ч/чч), безлі(ч/чч)ю"], a:2},
-  {q:"У формі родового відмінка множини НЕ ПОДВОЮЮТЬСЯ літери в обох іменниках усіх варіантів, ОКРІМ", opts:["узбережжя, суддя","знаряддя, ридання","обличчя, голосіння","передмістя, звання","зітхання, весілля"], a:0},
-  {q:"Прочитайте рядки.<br>(1)Жи(т/тт)я ішло, минуло той перон.<br>Гукала тиша рупором вокзальним.<br>Багато слів (2)написа(н/нн)о пером.<br>(3)Несказа(н/нн)е лишилось (4)несказа́(н/нн)им.<br><br>Подвоєні літери <b>НЕ ТРЕБА</b> писати в словах, позначених цифрами", opts:["1, 2","2, 3","3, 4","2, 4"], a:1},
-  {q:"Подвоєні літери НЕ ТРЕБА писати в усіх словах рядка", opts:["дзві(н/нн)иця, дерев'я(н/нн)ий, греча(н/нн)ий","невизна(н/нн)ий, вітря(н/нн)ий, незмі(н/нн)ий","невимуше(н/нн)ий, весня(н/нн)ий, де(н/нн)ий","скля(н/нн)ий, недописа(н/нн)ий, зві(д/дд)аля"], a:0},
-  {q:"Подвоєні літери треба писати в усіх словах рядка", opts:["старови(н/нн)ий, вівся(н/нн)ий, етало(н/нн)ий","за(в/вв)ишки, тополи(н/нн)ий, бе(з/зз)вучність","широче(н/нн)ий, воста(н/нн)є, блаже(н/нн)ий","ві(д/дд)звеніти, бджоли(н/нн)ий, мись(к/кк)ом"], a:2},
-  {q:"Прочитайте уривок із поезії (цифра в дужках позначає наступне слово).<br>Я йшов і йшов по синім (1)узбере(ж/жж)і,<br>Мовчали гордо скелі (2)кам'я(н/нн)і.<br>Лиш паморозь (3)осі(н/нн)я на (4)вбра(н/нн)і<br>Мене назад вернути закликали<br>У місто, де світилися вогні.<br><br>Подвоєні літери треба писати в усіх словах, ОКРІМ позначеного цифрою", opts:["1","2","3","4","5"], a:1},
-  {q:"Подвоєні літери треба писати в слові", opts:["греча(н/нн)ий","реформе(н/нн)ий","довгожда(н/нн)ий","благослове(н/нн)ий"], a:3},
-  {q:"Подвоєні літери треба писати в усіх словах рядка", opts:["ві(с/сс)ю, почу(т/тт)ів, схожіс(т/тт)ю","Ро(с/сс)ю, бездорі(ж/жж)я, тер(т/тт)я","Оболо(н/нн)ю, зра(н/нн)я, узбі(ч/чч)","породі(л/лл)я, рі(ч/чч)ю, І(л/лл)єнко"], a:3},
-  {q:"Подвоєння букв є в усіх словах рядка", opts:["царствен..ий, шит..я, сіл..ю","від..ячити, узвиш..я, тряс..я","щеплен..я, попад..я, медал..ю","вис..ати, колос..я, підгрунт..я"], a:1},
-  {q:"Подвоєння букв є в усіх словах рядка", opts:["умін..я, непомічен..ість, стал..ю","рослин..ість, узбіч.., годин..ик","священ..ик, памороз..ю, с..ати","суд..я, пташин..ий, страждан..о"], a:2},
-  {q:"Подвоєні літери треба писати в усіх словах рядка", opts:["ри(с/сс)ю, підгрун(т/тт)я, су(д/дд)івський","Побу(ж/жж)я, пошес(т/тт)ю, осере(д/дд)я","узбі(ч/чч)ям, підні(ж/жж)я, Повол(ж/жж)я","одухотворе(н/нн)я, ви(л/лл)єш, Воли(н/нн)ю"], a:3}
-];
+/* ============================================================
+   ЯК ДОДАТИ ЧИ ЗМІНИТИ МАТЕРІАЛ
+   Весь контент живе в об'єкті TOPICS нижче.
+   Структура: TOPICS.suffix / TOPICS.noun / ... → subs [ ... ].
+   Кожен розділ — один об'єкт { ... }.
+   Щоб додати картку/слово/питання — скопіюй існуючий блок
+   { ... } всередині потрібного масиву (cards / words / questions)
+   і зміни текст між лапками.
+   Щоб додати новий підрозділ (вкладку) — скопіюй один об'єкт
+   зі списку subs цілком і зміни tab / title / вміст.
+   ============================================================ */
 
-// ============================================================
-// ДЗ: підтримує і "одне число" (?hw=35 — почати з №35 і до кінця,
-// як завжди було), і "список/діапазон" (?hw=22-28,36-46 — показати
-// ЛИШЕ ці завдання, під їхніми справжніми номерами).
-// ============================================================
-function parseHwSpec_(raw){
-  if(!raw) return null;
-  raw = raw.trim()
-    .replace(/[\u2010-\u2015\u2212]/g, '-')
-    .replace(/[\u00A0\u202F]/g, ' ');
-  if(/^\d+$/.test(raw)){
-    return { type: 'from', start: parseInt(raw, 10) };
-  }
-  const set = new Set();
-  raw.split(',').forEach(function(part){
-    part = part.trim();
-    if(!part) return;
-    const m = part.match(/^(\d+)\s*-\s*(\d+)$/);
-    if(m){
-      let a = parseInt(m[1],10), b = parseInt(m[2],10);
-      if(a > b){ const t=a; a=b; b=t; }
-      for(let n=a; n<=b; n++) set.add(n);
-    } else {
-      const n = parseInt(part,10);
-      if(!isNaN(n)) set.add(n);
-    }
-  });
-  return set.size ? { type: 'subset', numbers: Array.from(set).sort(function(a,b){return a-b;}) } : null;
-}
-
-const _hwParam = new URLSearchParams(location.search).get('hw');
-const _hwSpec = parseHwSpec_(_hwParam);
-
-let QUESTIONS = ALL_QUESTIONS;
-let _hwStartIdx = 0;
-if(_hwSpec){
-  if(_hwSpec.type === 'subset'){
-    const filtered = _hwSpec.numbers
-      .map(function(n){ return ALL_QUESTIONS[n-1] ? Object.assign({origIndex: n-1}, ALL_QUESTIONS[n-1]) : null; })
-      .filter(Boolean);
-    if(filtered.length) QUESTIONS = filtered;
-  } else if(_hwSpec.type === 'from'){
-    if(_hwSpec.start >= 1 && _hwSpec.start <= ALL_QUESTIONS.length){
-      _hwStartIdx = _hwSpec.start - 1;
-    }
-  }
-}
-
-const LETTERS = ["А","Б","В","Г","Д"];
-
-// --- Telegram reporting config ---
-// Адреса вашого Apps Script веб-застосунку (закінчується на /exec).
-// Через нього результат одразу і зберігається в таблицю, і надсилається
-// вчителю в Telegram (див. Code.gs) — сама сторінка тесту в бот більше
-// напряму не пише.
-const LOG_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyDGcDVtwD0L8WW0zDIsXwYwwf6zp4XzmofzdI0wU-AhhfZIXbH2lOHquNSHI8cKRc7/exec";
-
-function logToSheet(payload){
-  try{
-    return fetch(LOG_WEBAPP_URL, {
-      method: 'POST',
-      headers: {'Content-Type':'text/plain;charset=utf-8'},
-      body: JSON.stringify(payload)
-    }).then(resp => resp.ok).catch(()=>false);
-  }catch(e){
-    return Promise.resolve(false);
-  }
-}
-
-let qIdx = 0;
-let answers = {};
-let flags = {}; // { questionIndex: true } — учень позначив питання як незрозуміле
-let studentName = "";
-let started = false;
-let reportSent = false;
-let finished = false;
-let reviewMode = false; // true, коли сторінку відкрито за посиланням "розбір відповідей"
-
-// ============================================================
-// ЗБЕРЕЖЕННЯ ПРОГРЕСУ (щоб не пропадало, якщо зникне інтернет)
-// Пишемо у звичайний localStorage браузера (не window.storage —
-// той працює лише в превʼю Claude, а не на реальному сайті).
-// Ключ прив'язаний до сторінки й імені учня, тож прогрес з одного
-// тесту не змішається з іншим.
-// ============================================================
-function progressKey_(){
-  return 'quizProgress::' + location.pathname + '::' + studentName;
-}
-function saveProgress_(){
-  try{
-    localStorage.setItem(progressKey_(), JSON.stringify({
-      answers, flags, qIdx, finished, hwParam: _hwParam || '', ts: Date.now()
-    }));
-  }catch(e){ /* сховище недоступне (приватний режим тощо) — просто не збережеться */ }
-}
-function loadProgress_(){
-  try{
-    const raw = localStorage.getItem(progressKey_());
-    if(!raw) return null;
-    const data = JSON.parse(raw);
-    if((data.hwParam || '') !== (_hwParam || '')) return null; // інше завдання — не відновлюємо
-    return data;
-  }catch(e){ return null; }
-}
-function clearProgress_(){
-  try{ localStorage.removeItem(progressKey_()); }catch(e){}
-}
-
-const quizArea = document.getElementById('quizArea');
-document.getElementById('totalTag').textContent = QUESTIONS.length + " завдань";
-
-// [[текст]] у варіанті відповіді перетворюється на <u>текст</u>
-function renderOpt(o){
-  return o.replace(/\[\[([^\]]+)\]\]/g, '<u>$1</u>');
-}
-
-function scoreOverall(){
-  let correct = 0, answered = 0;
-  QUESTIONS.forEach((_,i)=>{
-    const rec = answers[i];
-    if(rec){ answered++; if(rec.correct) correct++; }
-  });
-  return {correct, answered, total: QUESTIONS.length};
-}
-
-async function getStoredName(){
-  try{
-    const result = await window.storage.get('student_name');
-    return result ? result.value : null;
-  }catch(e){
-    return null;
-  }
-}
-
-async function setStoredName(name){
-  try{
-    await window.storage.set('student_name', name);
-  }catch(e){
-    // сховище недоступне — ім'я просто не запам'ятається між сесіями
-  }
-}
-
-async function clearStoredName(){
-  try{
-    await window.storage.delete('student_name');
-  }catch(e){}
-}
-
-
-// ---- Посилання "розбір відповідей" ----
-// Кодує відповіді учня прямо в URL цієї ж сторінки: ?review=1&name=...&ans=0-0,2-1,5-3,...
-// У рядок ans потрапляють лише питання, на які учень ВІДПОВІВ (номер-вибір),
-// тож посилання лишається коротким, навіть якщо тест великий, а відповіли на кілька.
-function buildReviewLink(){
-  const pairs = [];
-  QUESTIONS.forEach((_,i)=>{
-    const rec = answers[i];
-    if(rec) pairs.push(i + '-' + rec.picked);
-  });
-  const ansStr = pairs.join(',');
-  const flagStr = Object.keys(flags).filter(i=>flags[i]).join(',');
-  const base = location.origin + location.pathname;
-    let url = `${base}?review=1&name=${encodeURIComponent(studentName)}&ans=${ansStr}`;
-  if(flagStr) url += `&flags=${flagStr}`;
-  if(_hwParam) url += `&hw=${encodeURIComponent(_hwParam)}`;
-  return url;
-}
-
-// Розпізнає посилання розбору й заповнює answers/studentName з нього
-function parseReviewParam(){
-  const params = new URLSearchParams(location.search);
-  if(params.get('review') !== '1') return false;
-  const name = params.get('name');
-  const ansParam = params.get('ans');
-  if(!ansParam) return false;
-
-  studentName = name || 'Учень';
-  answers = {};
-  ansParam.split(',').forEach(pair=>{
-    const [idxStr, valStr] = pair.split('-');
-    const i = Number(idxStr);
-    const picked = Number(valStr);
-    if(!Number.isNaN(i) && !Number.isNaN(picked) && i >= 0 && i < QUESTIONS.length){
-      answers[i] = {picked, correct: picked === QUESTIONS[i].a};
-    }
-  });
-
-  flags = {};
-  const flagsParam = params.get('flags');
-  if(flagsParam){
-    flagsParam.split(',').forEach(s=>{
-      const i = Number(s);
-      if(!Number.isNaN(i)) flags[i] = true;
-    });
-  }
-
-  started = true;
-  reviewMode = true;
-  qIdx = 0;
-  return true;
-}
-
-function renderNameScreen(prefill){
-  quizArea.innerHTML = `
-    <div class="name-screen">
-      <label for="nameInput">Як тебе звати?</label>
-      <input type="text" id="nameInput" placeholder="Ім'я" autocomplete="off" value="${prefill ? prefill.replace(/"/g,'&quot;') : ''}">
-      <button class="btn primary" id="startBtn" style="width:100%;justify-content:center;">Почати тест</button>
-    </div>
-  `;
-  const input = document.getElementById('nameInput');
-  const startBtn = document.getElementById('startBtn');
-  input.focus();
-  const go = async ()=>{
-    const val = input.value.trim();
-    studentName = val || "Без імені";
-    await setStoredName(studentName);
-    started = true;
-    qIdx = 0;
-    renderQuiz();
-  };
-  startBtn.onclick = go;
-  input.addEventListener('keydown', (e)=>{ if(e.key==='Enter') go(); });
-}
-
-async function sendTelegramReport(){
-  const {correct, total, answered} = scoreOverall();
-  const wrongList = [];
-  const flaggedList = [];
-  QUESTIONS.forEach((_,i)=>{
-    const rec = answers[i];
-    const num = (QUESTIONS[i].origIndex !== undefined ? QUESTIONS[i].origIndex : i) + 1;
-    if(rec && !rec.correct) wrongList.push(num);
-    if(flags[i]) flaggedList.push(num);
-  });
-
-  const reviewLink = buildReviewLink();
-  const statusEl = document.getElementById('sendStatus');
-
-  const ok = await logToSheet({
-    type: "quiz_result",
-    student: studentName,
-    testName: "Подвоєння букв",
-    correct, answered, total,
-    wrongList,
-    flaggedList,
-    reviewLink
-  });
-
-  if(ok){
-    reportSent = true;
-    clearProgress_();
-    if(statusEl){ statusEl.textContent = 'Результат надіслано вчителю ✓'; statusEl.className = 'send-status ok'; }
-  } else if(statusEl){
-    statusEl.innerHTML = 'Не вдалося надіслати результат (перевірте інтернет). Прогрес збережено, спробуйте ще раз.<br><button class="btn ghost small" id="retrySendBtn" style="margin-top:8px;">Спробувати ще раз</button>';
-    statusEl.className = 'send-status bad';
-    const retryBtn = document.getElementById('retrySendBtn');
-    if(retryBtn) retryBtn.onclick = ()=>{
-      statusEl.textContent = 'Надсилаємо результат...';
-      statusEl.className = 'send-status';
-      sendTelegramReport();
-    };
-  }
-}
-
-function renderQuiz(){
-  document.getElementById('reviewBanner').classList.toggle('show', reviewMode);
-
-  if(!started){ renderNameScreen(); return; }
-
-  const total = QUESTIONS.length;
-
-  if(qIdx >= total || finished){
-    const {correct, answered} = scoreOverall();
-    quizArea.innerHTML = `
-      <div class="done-screen">
-        <div class="ring"><div class="big">${correct}/${answered}</div></div>
-        <p class="sub" style="margin:0 auto 4px;">${studentName} · Подвоєння букв · відповідано ${answered} з ${total}</p>
-        ${reviewMode ? '' : `<div class="send-status" id="sendStatus">Надсилаємо результат...</div>
-        <button class="btn primary" id="restartBtn" style="margin-top:14px;">Пройти ще раз</button>`}
-      </div>`;
-    if(!reviewMode){
-      document.getElementById('restartBtn').onclick = ()=>{
-        answers = {}; flags = {};
-        qIdx = 0; reportSent = false; finished = false;
-        clearProgress_();
-        renderQuiz();
-      };
-      saveProgress_();
-      if(!reportSent){
-        sendTelegramReport();
+const TOPICS = {
+  podvoinnya: {
+    label: "Подвоєння",
+    subs: [
+      {
+        id: "d-morphem", tab: "На межі морфем", dot: "1", type: "cards",
+        title: "Подвоєння на межі морфем",
+        intro: "",
+        cards: [
+          {rule: "Префікс + корінь", desc: "", examples: [{word: "роззброїти"}, {word: "оббити"}]},
+          {rule: "Корінь + суфікс", desc: "", examples: [{word: "сонний"}]},
+          {rule: "Основа на -с + суфікс -ся", desc: "", examples: [{word: "понісся"}, {word: "розрісся"}]},
+          {rule: "Основа + основа", desc: "", examples: [{word: "юннат"}, {word: "військком"}]}
+        ]
+      },
+      {
+        id: "d-suffix", tab: "Суфікси прикметників і дієприкметників", dot: "2", type: "cards",
+        title: "Коли подвоюється суфікс",
+        intro: "",
+        cards: [
+          {rule: "Прикметники", desc: "(вищий вияв ознаки) — <b>з подвоєнням</b>", examples: []},
+          {rule: "Дієприкметники", desc: "(незавершена дія) — <b>без подвоєння</b>", examples: []},
+          {rule: "-анн-, -янн-, -енн-, -онн- та -ан-, -ян-, -ен-, -он-", desc: "залежить від наголосу", examples: [{word: "несказа́нна"}, {word: "неска́зана"}, {word: "нездола́нний"}, {word: "нездо́ланий"}]}
+        ]
+      },
+      {
+        id: "d-fromnoun", tab: "Прикметник від іменника", dot: "3", type: "cards",
+        title: "Прикметники, утворені від іменників",
+        intro: "Подвоєння з'являється не завжди — залежить від суфікса.",
+        cards: [
+          {rule: "Сон → сонний", desc: "подвоєння", examples: [{word: "сонний"}]},
+          {rule: "Орел → орлиний", desc: "без подвоєння", examples: [{word: "орлиний"}]},
+          {rule: "Гречка → гречаний", desc: "без подвоєння", examples: [{word: "гречаний"}]}
+        ]
       }
-    }
+    ]
+  },
+  podovzhennya: {
+    label: "Подовження",
+    subs: [
+      {
+        id: "l-main", tab: "Правило", dot: "1", type: "cards",
+        title: "Подовження приголосних",
+        intro: "Відбувається наприкінці слів перед я, ю, є після д, т, з, с, ч, ш, ж, ц, л, н — коли приголосний стоїть між голосними.",
+        cards: [
+          {rule: "Слово має мати у кінці я, ю, є", desc: "подовжується приголосний, що стоїть між голосними перед я, ю, є", examples: [{word: "життя"}, {word: "обличчя"}, {word: "знання"}]},
+          {rule: "Родовий відмінок [ів]", desc: "виняток: подовження залишається", examples: [{word: "суддя → суддів"}]},
+          {rule: "Між приголосними подовження не відбувається", desc: "приголосний стоїть у групі, а не між голосними", examples: [{word: "радістю"}, {word: "Поволжя"}]}
+        ]
+      },
+      {
+        id: "l-exc", tab: "Винятки", dot: "2", type: "exceptions",
+        title: "Винятки",
+        intro: "Подовження не відбувається, хоч умови ніби підходять. Тисни на слово.",
+        words: [
+          {word: "попадя", ipa: "без подовження"},
+          {word: "кутя", ipa: "без подовження"}
+        ]
+      },
+      {
+        id: "l-lyty", tab: "Лити, льон", dot: "3", type: "cards",
+        title: "Подовження у формах лити та льон",
+        intro: "",
+        cards: [
+          {rule: "Теперішній час дієслова лити", desc: "", examples: [{word: "наллю"}, {word: "наллємо"}, {word: "виллється"}]},
+          {rule: "Від льон", desc: "", examples: [{word: "лляний"}]}
+        ]
+      }
+    ]
+  },
+  vynyatky: {
+    label: "Винятки",
+    subs: [
+      {
+        id: "v-main", tab: "Слова-винятки", dot: "1", type: "exceptions",
+        title: "Загальні винятки",
+        intro: "Ці слова не підпорядковуються загальним правилам подвоєння. Тисни, щоб побачити пояснення.",
+        words: [
+          {word: "довгожданий", ipa: "без подвоєння"},
+          {word: "священник", ipa: "варіант написання слова «священик» — подвоєння узаконено новим правописом"},
+          {word: "священний", ipa: "«святий» — подвоєння за загальним правилом (суфікс -енн-)"},
+          {word: "дзвіниця", ipa: "без подвоєння"},
+          {word: "овва!", ipa: "з подвоєнням"},
+          {word: "бовван", ipa: "з подвоєнням"},
+          {word: "ссавці", ipa: "з подвоєнням"},
+          {word: "Ганна", ipa: "з подвоєнням (власне ім'я)"},
+          {word: "навіжений", ipa: "без подвоєння"}
+        ]
+      }
+    ]
+  }
+};
+
+const LETTERS = ["А","Б","В","Г"];
+const TOPIC_ORDER = ["podvoinnya","podovzhennya","vynyatky"];
+
+let activeTopic = "podvoinnya";
+let activeSub = 0;
+let activeSubsub = 0;
+let quizIdx = 0;
+let quizAnswers = {};
+
+const topictoggle = document.getElementById('topictoggle');
+const subtabbar = document.getElementById('subtabbar');
+const subsubtabbar = document.getElementById('subsubtabbar');
+const lessonArea = document.getElementById('lessonArea');
+
+function resetNav(){ activeSub = 0; activeSubsub = 0; quizIdx = 0; quizAnswers = {}; }
+function resetQuiz(){ quizIdx = 0; quizAnswers = {}; }
+
+function currentSub(){ return TOPICS[activeTopic].subs[activeSub]; }
+function currentSection(){
+  const sub = currentSub();
+  if(sub.type === "nested") return sub.subsubs[activeSubsub];
+  return sub;
+}
+
+// ---- per-tab drawing storage: намальоване на кожній вкладці (і на кожному
+// питанні тесту) зберігається окремо, тож перехід на іншу вкладку й назад
+// не стирає написане, а показує саме те, що було на ній ----
+const drawStore = {};
+function sectionKey(){
+  const sec = currentSection();
+  let k = activeTopic + '__' + activeSub + '__' + activeSubsub;
+  if(sec.type === "quiz") k += '__q' + quizIdx;
+  return k;
+}
+function saveCurrentDrawing(){
+  if(window.getDrawingSnapshot) drawStore[sectionKey()] = window.getDrawingSnapshot();
+}
+function restoreCurrentDrawing(){
+  if(window.setDrawingSnapshot) window.setDrawingSnapshot(drawStore[sectionKey()] || null);
+}
+
+function renderTopics(){
+  if(TOPIC_ORDER.length <= 1){
+    topictoggle.innerHTML = "";
+    topictoggle.style.display = "none";
+    return;
+  }
+  topictoggle.style.display = "flex";
+  topictoggle.innerHTML = TOPIC_ORDER.map(key => `
+    <button class="${key===activeTopic?'active':''}" data-key="${key}">${TOPICS[key].label}</button>
+  `).join('');
+  topictoggle.querySelectorAll('button').forEach(btn=>{
+    attachTapToggle(btn, ()=>{
+      saveCurrentDrawing();
+      activeTopic = btn.dataset.key;
+      resetNav();
+      renderAll();
+    });
+  });
+}
+
+function renderSubs(){
+  const subs = TOPICS[activeTopic].subs;
+  if(subs.length <= 1){
+    subtabbar.innerHTML = "";
+    subtabbar.style.display = "none";
+    return;
+  }
+  subtabbar.style.display = "flex";
+  subtabbar.innerHTML = subs.map((s,i)=>`
+    <button class="tab ${i===activeSub?'active':''}" data-i="${i}">
+      <span class="dot">${s.dot}</span>${s.tab}
+    </button>`).join('');
+  subtabbar.querySelectorAll('.tab').forEach(btn=>{
+    attachTapToggle(btn, ()=>{
+      saveCurrentDrawing();
+      activeSub = +btn.dataset.i;
+      activeSubsub = 0;
+      resetQuiz();
+      renderAll();
+    });
+  });
+}
+
+function renderSubSubs(){
+  const sub = currentSub();
+  if(sub.type !== "nested"){ subsubtabbar.innerHTML = ""; subsubtabbar.style.display = "none"; return; }
+  subsubtabbar.style.display = "flex";
+  subsubtabbar.innerHTML = sub.subsubs.map((s,i)=>`
+    <button class="tab ${i===activeSubsub?'active':''}" data-i="${i}">
+      <span class="dot">${s.dot}</span>${s.tab}
+    </button>`).join('');
+  subsubtabbar.querySelectorAll('.tab').forEach(btn=>{
+    attachTapToggle(btn, ()=>{
+      saveCurrentDrawing();
+      activeSubsub = +btn.dataset.i;
+      resetQuiz();
+      renderSubSubs();
+      renderContent();
+    });
+  });
+}
+
+function renderContent(){
+  const s = currentSection();
+  let html = `<p class="section-title">${s.title}</p>${s.intro ? `<p class="section-intro">${s.intro}</p>` : ''}`;
+  if(s.type === "cards"){
+    html += `<div class="cardgrid">${s.cards.map((c)=>`
+      <div class="flip" data-kind="card">        <div class="flip-inner">
+          <div class="flip-face flip-front">
+            <div class="flip-rule">${c.rule}</div>
+            <div class="flip-desc">${c.desc||''}</div>
+            <div class="flip-hint">натисни →</div>
+          </div>
+          <div class="flip-face flip-back">
+            ${c.examples.map(e=>`<div class="flip-example">${e.word}${e.ipa?' '+e.ipa:''}</div>${e.note?`<div class="flip-note">${e.note}</div>`:''}`).join('')}
+          </div>
+        </div>
+      </div>`).join('')}</div>`;
+    if(s.mnemo) html += `<div class="mnemo">${s.mnemo}</div>`;
+  }
+
+  if(s.type === "exceptions"){
+    html += `<div class="chiprow">${s.words.map((w)=>`
+      <div class="chip" data-kind="chip">
+        <div class="w">${w.word}</div>
+        <div class="ipa">${w.ipa}</div>
+      </div>`).join('')}</div>`;
+  }
+
+  if(s.type === "table"){
+    html += `<div class="combo-table">${s.rows.map((r)=>`
+      <div class="combo-row" data-kind="row">
+        <span class="combo-write">${r.write}</span>
+        <span class="combo-say">${r.say}</span>
+        <span class="combo-example">${r.example}</span>
+        <span class="combo-ipa">${r.ipa}</span>
+      </div>`).join('')}</div>`;
+  }
+
+  if(s.type === "quiz"){
+    lessonArea.innerHTML = html;
+    renderQuiz(s);
+    syncCanvasAfterRender();
     return;
   }
 
-  const q = QUESTIONS[qIdx];
-  const rec = answers[qIdx];
-  const {correct, answered} = scoreOverall();
-  const isFlagged = !!flags[qIdx];
-
-  let segs = '';
-  QUESTIONS.forEach((_,i)=>{
-    const r = answers[i];
-    let cls = i===qIdx ? 'current' : (r ? (r.correct?'done-correct':'done-wrong') : '');
-    segs += `<div class="seg ${cls}" data-i="${i}"></div>`;
+  lessonArea.innerHTML = html;
+  lessonArea.querySelectorAll('[data-kind="card"], [data-kind="chip"], [data-kind="row"]').forEach(el=>{
+    attachTapToggle(el, ()=>{ el.classList.toggle('open'); });
   });
+  syncCanvasAfterRender();
+}
 
-  quizArea.innerHTML = `
-    <div class="progress-row">
-      <div class="qnum">${studentName} · Питання ${qIdx+1} з ${total}</div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        ${!reviewMode ? `<button id="flagBtn" type="button" title="Позначити, якщо незрозуміло" style="background:${isFlagged?'#FFE27A':'none'};border:none;cursor:pointer;font-size:13px;line-height:1;padding:4px 7px;border-radius:8px;opacity:${isFlagged?'1':'0.3'};">❓</button>` : ''}
-        <div class="score">${correct}/${answered||0}</div>
-      </div>
-    </div>
-    ${reviewMode && isFlagged ? `<p class="sub" style="color:#B8860B;font-weight:700;margin:0 0 6px;">❓ Учень позначив це питання як незрозуміле</p>` : ''}
-    <div class="segbar">${segs}</div>
+function syncCanvasAfterRender(){
+  // дає верстці "осісти", а тоді підганяє розмір канвасу малювання під нову висоту сторінки,
+  // і відновлює те, що було намальоване саме на цій вкладці (якщо було)
+  if(window.resizeDrawCanvas){
+    requestAnimationFrame(()=> requestAnimationFrame(()=>{
+      window.resizeDrawCanvas();
+      restoreCurrentDrawing();
+    }));
+  }
+}
+
+function quizScore(qs){
+  let correct = 0, answered = 0;
+  qs.forEach((_,i)=>{ const r = quizAnswers[i]; if(r){ answered++; if(r.correct) correct++; } });
+  return {correct, answered, total: qs.length};
+}
+
+function renderQuiz(s){
+  const total = s.questions.length;
+
+  if(quizIdx >= total){
+    const {correct} = quizScore(s.questions);
+    const extra = document.createElement('div');
+    extra.innerHTML = `
+      <div class="done-screen">
+        <div class="ring"><div class="big">${correct}/${total}</div></div>
+        <p class="section-intro" style="margin-top:10px;">${correct===total ? 'Ідеально! Матеріал засвоєно 🎉' : 'Непогано — можна ще раз пробігтись картками вище.'}</p>
+        <button class="btn primary" id="quizRestart" style="margin-top:6px;">Пройти ще раз</button>
+      </div>`;
+    lessonArea.appendChild(extra);
+    attachTapToggle(document.getElementById('quizRestart'), ()=>{ resetQuiz(); renderContent(); });
+    return;
+  }
+
+  const q = s.questions[quizIdx];
+  const rec = quizAnswers[quizIdx];
+
+  const box = document.createElement('div');
+  box.innerHTML = `
+    <div class="qprog">Питання ${quizIdx+1} з ${total}</div>
     <p class="qtext">${q.q}</p>
     <div class="options">
       ${q.opts.map((o,i)=>`
-        <button class="opt" data-i="${i}" ${(rec||reviewMode)?'disabled':''}>
-          <span class="tile"><span>${LETTERS[i]}</span></span><span>${renderOpt(o)}</span>
+        <button class="opt" data-i="${i}" ${rec?'disabled':''}>
+          <span class="tile"><span>${LETTERS[i]}</span></span><span>${o}</span>
         </button>`).join('')}
     </div>
-    <div class="feedback ${rec ? 'show '+(rec.correct?'ok':'bad') : (reviewMode ? 'show bad' : '')}" id="fb">
-      ${rec
-        ? (rec.correct ? `<span><b>Правильно.</b> Відповідь — ${LETTERS[q.a]}.</span>` : `<span>Правильна відповідь — ${LETTERS[q.a]}.</span>`)
-        : (reviewMode ? `<span>Учень не відповів. Правильна відповідь — ${LETTERS[q.a]}.</span>` : '')}
+    <div class="feedback ${rec?'show '+(rec.correct?'ok':'bad'):''}">
+      ${rec ? (rec.correct ? `<span><b>Правильно.</b></span>` : `<span>Правильна відповідь — ${LETTERS[q.a]}. ${q.opts[q.a]}</span>`) : ''}
     </div>
     <div class="nav-row">
-      <button class="btn ghost" id="prevBtn" ${qIdx===0?'disabled':''}>← Назад</button>
-      <button class="btn primary" id="nextBtn" ${(rec||reviewMode)?'':'disabled'}>${qIdx===total-1?'До результату':'Далі →'}</button>
-    </div>
-    ${reviewMode ? '' : `
-    <div class="reset-row">
-      <button class="btn ghost small" id="finishBtn">Завершити і надіслати результат</button>
-      <button class="btn ghost small" id="changeNameBtn">Змінити ім'я</button>
-    </div>`}
-  `;
+      <button class="btn ghost" id="quizPrev" ${quizIdx===0?'disabled':''}>← Назад</button>
+      <button class="btn primary" id="quizNext" ${rec?'':'disabled'}>${quizIdx===total-1?'До результату':'Далі →'}</button>
+    </div>`;
+  lessonArea.appendChild(box);
 
   if(rec){
-    quizArea.querySelectorAll('.opt').forEach((btn,i)=>{
+    box.querySelectorAll('.opt').forEach((btn,i)=>{
       const tile = btn.querySelector('.tile');
-      if(i===q.a){
-        btn.classList.add('correct');
-        tile.insertAdjacentHTML('beforeend', '<span class="badge ok">✓</span>');
-      } else if(i===rec.picked){
-        btn.classList.add('wrong');
-        tile.insertAdjacentHTML('beforeend', '<span class="badge no">✕</span>');
-      } else {
-        btn.classList.add('dim');
-      }
-    });
-  } else if(reviewMode){
-    quizArea.querySelectorAll('.opt').forEach((btn,i)=>{
-      const tile = btn.querySelector('.tile');
-      if(i===q.a){
-        btn.classList.add('correct');
-        tile.insertAdjacentHTML('beforeend', '<span class="badge ok">✓</span>');
-      } else {
-        btn.classList.add('dim');
-      }
+      if(i===q.a){ btn.classList.add('correct'); tile.insertAdjacentHTML('beforeend','<span class="badge ok">✓</span>'); }
+      else if(i===rec.picked){ btn.classList.add('wrong'); tile.insertAdjacentHTML('beforeend','<span class="badge no">✕</span>'); }
+      else { btn.classList.add('dim'); }
     });
   }
 
-  quizArea.querySelectorAll('.opt').forEach(btn=>{
-    btn.onclick = ()=>{
-      if(reviewMode) return;
-      if(answers[qIdx]) return;
+  box.querySelectorAll('.opt').forEach(btn=>{
+    attachTapToggle(btn, ()=>{
+      if(quizAnswers[quizIdx]) return;
       const picked = +btn.dataset.i;
-      answers[qIdx] = {picked, correct: picked===q.a};
-      saveProgress_();
-      renderQuiz();
-    };
+      quizAnswers[quizIdx] = {picked, correct: picked===q.a};
+      renderContent();
+    });
   });
-  document.getElementById('prevBtn').onclick = ()=>{ qIdx--; saveProgress_(); renderQuiz(); };
-  document.getElementById('nextBtn').onclick = ()=>{ qIdx++; saveProgress_(); renderQuiz(); };
-  if(!reviewMode){
-    const flagBtn = document.getElementById('flagBtn');
-    if(flagBtn) flagBtn.onclick = ()=>{
-      flags[qIdx] = !flags[qIdx];
-      saveProgress_();
-      renderQuiz();
-    };
-    document.getElementById('finishBtn').onclick = ()=>{
-      const {answered} = scoreOverall();
-      const msg = answered===0
-        ? 'Ти ще не відповів на жодне питання. Завершити тест зараз?'
-        : `Завершити тест зараз і надіслати результат (відповідено на ${answered} із ${total})?`;
-      if(confirm(msg)){
-        finished = true;
-        saveProgress_();
-        renderQuiz();
-      }
-    };
-    document.getElementById('changeNameBtn').onclick = async ()=>{
-      await clearStoredName();
-      started = false;
-      renderNameScreen(studentName);
-    };
-  }
-  quizArea.querySelectorAll('.seg').forEach(d=>{
-    d.onclick = ()=>{ qIdx = +d.dataset.i; saveProgress_(); renderQuiz(); };
-  });
+  const prevBtn = document.getElementById('quizPrev');
+  const nextBtn = document.getElementById('quizNext');
+  if(prevBtn) attachTapToggle(prevBtn, ()=>{ saveCurrentDrawing(); quizIdx--; renderContent(); });
+  if(nextBtn) attachTapToggle(nextBtn, ()=>{ saveCurrentDrawing(); quizIdx++; renderContent(); });
 }
 
-async function init(){
-  if(parseReviewParam()){
-    renderQuiz();
-    return;
-  }
-  const urlParams = new URLSearchParams(location.search);
-  const fromUrl = urlParams.get('student');
-  if(fromUrl){
-    studentName = fromUrl;
-    started = true;
-    const saved = loadProgress_();
-    if(saved){
-      answers = saved.answers || {};
-      flags = saved.flags || {};
-      qIdx = typeof saved.qIdx === 'number' ? saved.qIdx : _hwStartIdx;
-      finished = !!saved.finished;
-    } else {
-      qIdx = _hwStartIdx;
-    }
-    renderQuiz();
-    return;
-  }
-  const saved = await getStoredName();
-  if(saved){
-    studentName = saved;
-    started = true;
-  }
-  renderQuiz();
+// ---- надійне розпізнавання "тапу", яке не залежить від click-події
+// (Safari може відкласти click після дотику, а поки триває малювання пером,
+// клацання по інтерфейсу взагалі не потрібні) — визначено тут, ЩЕ ДО
+// першого renderAll(), щоб картки з першого ж рендеру одразу
+// використовували цю логіку, а не тимчасовий запасний onclick ----
+function attachTapToggle(el, handler){
+  let sx = 0, sy = 0, penTap = false, tracking = false;
+  el.addEventListener('pointerdown', (e)=>{
+    tracking = true;
+    sx = e.clientX; sy = e.clientY;
+    penTap = e.pointerType === 'pen';
+  }, {passive:true});
+  el.addEventListener('pointerup', (e)=>{
+    if(!tracking) return;
+    tracking = false;
+    if(penTap && window.isDrawingActive && window.isDrawingActive()) return;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    if(Math.hypot(dx,dy) > 10) return;
+    handler(e);
+  });
 }
-init();
+window.attachTapToggle = attachTapToggle;
+
+function renderAll(){
+  renderTopics();
+  renderSubs();
+  renderSubSubs();
+  renderContent();
+}
+
+renderAll();
 
 // ======================================================================
 // МАЛЮВАННЯ ПОВЕРХ ЕКРАНА (режим "учитель")
+//
+// Ця версія навмисно побудована один в один за робочим прикладом, який
+// підтвердив, що пише без затримок і що кнопка з панеллю не зникають і не
+// роздуваються під час зуму. Різниця з попередніми спробами:
+//   • НІЯКОГО втручання в touch-action — воно завжди 'auto', як типово
+//     в браузері. preventDefault() на самому дотику пером і так гарантує,
+//     що перо не гортає й не зумить сторінку; більше нічого чіпати не
+//     треба, а зайві обмеження touch-action, судячи з усього, і були
+//     причиною затримки між буквами.
+//   • НІЯКОЇ JS-компенсації позиції/розміру кнопки й панелі під час
+//     pinch-zoom. Вони — звичайний CSS position:fixed. Раніше спроби
+//     "виправити" це власним кодом лише ламали те, що й так працювало.
+//   • Малювання — просте, пряме, растрове (як у прикладі), без черг і
+//     буферизації.
+// Єдине, що збережено понад приклад: чорнило кожної вкладки зберігається
+// окремо (бо в цьому уроці, на відміну від прикладу, є кілька вкладок) —
+// через ті самі getDrawingSnapshot/setDrawingSnapshot, які вже викликає
+// зовнішній скрипт при перемиканні вкладок.
 // ======================================================================
 (function(){
   const canvas = document.getElementById('drawCanvas');
   const ctx = canvas.getContext('2d');
   const toggleBtn = document.getElementById('drawToggleBtn');
   const toolbar = document.getElementById('drawToolbar');
+  const toolbarMini = document.getElementById('drawToolbarMini');
+  const minimizeBtn = document.getElementById('minimizeBtn');
+  const xthinBtn = document.getElementById('xthinBtn');
   const thinBtn = document.getElementById('thinBtn');
   const thickBtn = document.getElementById('thickBtn');
   const eraserBtn = document.getElementById('eraserBtn');
@@ -1066,6 +857,8 @@ init();
   let eraserMode = false;
   let lastX = 0, lastY = 0;
   let activePointerId = null;
+
+  window.isDrawingActive = function(){ return drawingActive; };
 
   function currentDocHeight(){
     return Math.max(
@@ -1098,6 +891,7 @@ init();
       ctx.drawImage(prev, 0, 0, prev.width / devicePixelRatio, prev.height / devicePixelRatio);
     }
   }
+  window.resizeDrawCanvas = resizeCanvas;
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
   window.addEventListener('orientationchange', resizeCanvas);
@@ -1109,14 +903,46 @@ init();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   };
 
+  // сумісний з рештою сторінки API: чорнило кожної вкладки зберігається й
+  // відновлюється окремо при перемиканні вкладок (викликається з
+  // зовнішнього скрипту через saveCurrentDrawing()/restoreCurrentDrawing())
+  window.getDrawingSnapshot = function(){
+    try{
+      return (canvas.width && canvas.height) ? canvas.toDataURL('image/png') : null;
+    }catch(e){ return null; }
+  };
+  window.setDrawingSnapshot = function(dataURL){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if(!dataURL) return;
+    const img = new Image();
+    img.onload = function(){
+      ctx.drawImage(img, 0, 0, canvas.width / devicePixelRatio, canvas.height / devicePixelRatio);
+    };
+    img.src = dataURL;
+  };
+
   function setActive(on){
     drawingActive = on;
     toolbar.classList.toggle('show', on);
+    toolbar.classList.remove('mini');
+    if(toolbarMini) toolbarMini.classList.remove('show');
     toggleBtn.classList.toggle('on', on);
     toggleBtn.title = on ? 'Вимкнути малювання' : 'Малювати';
   }
-
   toggleBtn.addEventListener('click', ()=> setActive(!drawingActive));
+
+  if(minimizeBtn && toolbarMini){
+    minimizeBtn.addEventListener('click', ()=>{
+      toolbar.classList.remove('show');
+      toolbar.classList.add('mini');
+      toolbarMini.classList.add('show');
+    });
+    toolbarMini.addEventListener('click', ()=>{
+      toolbar.classList.remove('mini');
+      toolbar.classList.add('show');
+      toolbarMini.classList.remove('show');
+    });
+  }
 
   swatches.forEach(sw=>{
     sw.addEventListener('click', ()=>{
@@ -1128,15 +954,22 @@ init();
     });
   });
 
+  if(xthinBtn){
+    xthinBtn.addEventListener('click', ()=>{
+      currentWidth = 2;
+      [xthinBtn,thinBtn,thickBtn].forEach(b=>b.classList.remove('selected'));
+      xthinBtn.classList.add('selected');
+    });
+  }
   thinBtn.addEventListener('click', ()=>{
-    currentWidth = 4;
+    currentWidth = xthinBtn ? 5 : 4;
+    [xthinBtn,thinBtn,thickBtn].forEach(b=>b&&b.classList.remove('selected'));
     thinBtn.classList.add('selected');
-    thickBtn.classList.remove('selected');
   });
   thickBtn.addEventListener('click', ()=>{
-    currentWidth = 12;
+    currentWidth = xthinBtn ? 11 : 12;
+    [xthinBtn,thinBtn,thickBtn].forEach(b=>b&&b.classList.remove('selected'));
     thickBtn.classList.add('selected');
-    thinBtn.classList.remove('selected');
   });
   eraserBtn.addEventListener('click', ()=>{
     eraserMode = !eraserMode;
@@ -1156,7 +989,7 @@ init();
   }
 
   function isOnControls(e){
-    return !!(e.target.closest && e.target.closest('#drawToolbar, #drawToggleBtn'));
+    return !!(e.target.closest && e.target.closest('#drawToolbar, #drawToolbarMini, #drawToggleBtn'));
   }
 
   document.addEventListener('pointerdown', (e)=>{
