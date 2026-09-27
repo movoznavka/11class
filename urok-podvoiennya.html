@@ -216,23 +216,6 @@
                              taps/clicks on real UI underneath always pass through */
   }
 
-  #drawDebug{
-    position:fixed;
-    top:8px;
-    left:8px;
-    z-index:10000;
-    background:rgba(19,33,59,0.82);
-    color:#fff;
-    font-family:'Manrope',monospace;
-    font-size:12px;
-    font-weight:700;
-    padding:5px 10px;
-    border-radius:10px;
-    pointer-events:none;
-    display:none;
-  }
-  #drawDebug.show{display:block;}
-
   #drawToggleBtn{
     position:fixed;
     right:20px;
@@ -419,8 +402,6 @@
 
 <!-- ==== Малювання поверх екрана (для вчителя) ==== -->
 <canvas id="drawCanvas"></canvas>
-<div id="drawDebug"></div>
-
 <button id="drawToggleBtn" title="Малювати">
   <svg id="drawIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M4 20L4.6 16.6C4.7 15.9 5.03 15.26 5.55 14.79L15.3 5.7C16.09 4.96 17.34 4.99 18.09 5.78L18.34 6.04C19.08 6.83 19.04 8.08 18.25 8.81L8.5 17.9C8 18.37 7.37 18.66 6.7 18.75L4 20Z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/>
@@ -496,9 +477,9 @@ const TOPICS = {
         title: "Коли подвоюється суфікс",
         intro: "",
         cards: [
-          {rule: "Суфікси -анн-, -янн-, -енн-, -онн-", desc: "прикметники, вищий вияв ознаки", examples: [{word: "страшенний"}, {word: "здоровенний"}, {word: "силенний"}, {word: "численний"}]},
-          {rule: "Суфікси -ан-, -ян-, -ен-, -он-", desc: "дієприкметники, незавершена дія — без подвоєння", examples: [{word: "вихований"}, {word: "сказаний"}, {word: "варений"}, {word: "печений"}]},
-          {rule: "Не плутати", desc: "прикметник (ознака) подвоюється, дієприкметник (дія) — ні", examples: [{word: "несказанна (прикметник)"}, {word: "несказана (дієприкметник)"}, {word: "нездоланний (прикметник)"}, {word: "нездоланий (дієприкметник)"}]}
+          {rule: "Прикметники", desc: "(вищий вияв ознаки) — <b>з подвоєнням</b>", examples: []},
+          {rule: "Дієприкметники", desc: "(незавершена дія) — <b>без подвоєння</b>", examples: []},
+          {rule: "-анн-, -янн-, -енн-, -онн- та -ан-, -ян-, -ен-, -он-", desc: "залежить від наголосу", examples: [{word: "несказа́нна"}, {word: "неска́зана"}, {word: "нездола́нний"}, {word: "нездо́ланий"}]}
         ]
       },
       {
@@ -521,15 +502,22 @@ const TOPICS = {
         title: "Подовження приголосних",
         intro: "Відбувається наприкінці слів перед я, ю, є після д, т, з, с, ч, ш, ж, ц, л, н — коли приголосний стоїть між голосними.",
         cards: [
-          {rule: "Родовий відмінок множини [ей]", desc: "подовження зникає", examples: [{word: "стаття → статей"}, {word: "породілля → породілей"}]},
-          {rule: "Родовий відмінок множини [нульове закінчення]", desc: "подовження зникає", examples: [{word: "обличчя → облич"}]},
+          {rule: "Слово має мати у кінці я, ю, є", desc: "подовжується приголосний, що стоїть між голосними перед я, ю, є", examples: [{word: "життя"}, {word: "обличчя"}, {word: "знання"}]},
           {rule: "Родовий відмінок [ів]", desc: "виняток: подовження залишається", examples: [{word: "суддя → суддів"}]},
-          {rule: "Між приголосними подовження не відбувається", desc: "приголосний стоїть у групі, а не між голосними", examples: [{word: "радістю"}, {word: "Поволжя"}]},
-          {rule: "Винятки", desc: "подовження не відбувається, хоч умови ніби підходять", examples: [{word: "попадя"}, {word: "кутя"}]}
+          {rule: "Між приголосними подовження не відбувається", desc: "приголосний стоїть у групі, а не між голосними", examples: [{word: "радістю"}, {word: "Поволжя"}]}
         ]
       },
       {
-        id: "l-lyty", tab: "Лити, льон", dot: "2", type: "cards",
+        id: "l-exc", tab: "Винятки", dot: "2", type: "exceptions",
+        title: "Винятки",
+        intro: "Подовження не відбувається, хоч умови ніби підходять. Тисни на слово.",
+        words: [
+          {word: "попадя", ipa: "без подовження"},
+          {word: "кутя", ipa: "без подовження"}
+        ]
+      },
+      {
+        id: "l-lyty", tab: "Лити, льон", dot: "3", type: "cards",
         title: "Подовження у формах лити та льон",
         intro: "",
         cards: [
@@ -548,12 +536,15 @@ const TOPICS = {
         intro: "Ці слова не підпорядковуються загальним правилам подвоєння. Тисни, щоб побачити пояснення.",
         words: [
           {word: "довгожданий", ipa: "без подвоєння"},
-          {word: "священик → священний", ipa: "за новим правописом узаконено подвоєння"},
+          {word: "священник", ipa: "варіант написання слова «священик» — подвоєння узаконено новим правописом"},
+          {word: "священний", ipa: "«святий» — подвоєння за загальним правилом (суфікс -енн-)"},
           {word: "дзвіниця", ipa: "без подвоєння"},
           {word: "овва!", ipa: "з подвоєнням"},
           {word: "бовван", ipa: "з подвоєнням"},
           {word: "ссавці", ipa: "з подвоєнням"},
-          {word: "Ганна", ipa: "з подвоєнням (власне ім'я)"}
+          {word: "Ганна", ipa: "з подвоєнням (власне ім'я)"},
+          {word: "навіжений", ipa: "без подвоєння"},
+          {word: "шалений", ipa: "без подвоєння"}
         ]
       }
     ]
@@ -612,12 +603,12 @@ function renderTopics(){
     <button class="${key===activeTopic?'active':''}" data-key="${key}">${TOPICS[key].label}</button>
   `).join('');
   topictoggle.querySelectorAll('button').forEach(btn=>{
-    btn.onclick = ()=>{
+    attachTapToggle(btn, ()=>{
       saveCurrentDrawing();
       activeTopic = btn.dataset.key;
       resetNav();
       renderAll();
-    };
+    });
   });
 }
 
@@ -634,13 +625,13 @@ function renderSubs(){
       <span class="dot">${s.dot}</span>${s.tab}
     </button>`).join('');
   subtabbar.querySelectorAll('.tab').forEach(btn=>{
-    btn.onclick = ()=>{
+    attachTapToggle(btn, ()=>{
       saveCurrentDrawing();
       activeSub = +btn.dataset.i;
       activeSubsub = 0;
       resetQuiz();
       renderAll();
-    };
+    });
   });
 }
 
@@ -653,13 +644,13 @@ function renderSubSubs(){
       <span class="dot">${s.dot}</span>${s.tab}
     </button>`).join('');
   subsubtabbar.querySelectorAll('.tab').forEach(btn=>{
-    btn.onclick = ()=>{
+    attachTapToggle(btn, ()=>{
       saveCurrentDrawing();
       activeSubsub = +btn.dataset.i;
       resetQuiz();
       renderSubSubs();
       renderContent();
-    };
+    });
   });
 }
 
@@ -709,7 +700,7 @@ function renderContent(){
 
   lessonArea.innerHTML = html;
   lessonArea.querySelectorAll('[data-kind="card"], [data-kind="chip"], [data-kind="row"]').forEach(el=>{
-    el.onclick = ()=>{ el.classList.toggle('open'); };
+    attachTapToggle(el, ()=>{ el.classList.toggle('open'); });
   });
   syncCanvasAfterRender();
 }
@@ -744,7 +735,7 @@ function renderQuiz(s){
         <button class="btn primary" id="quizRestart" style="margin-top:6px;">Пройти ще раз</button>
       </div>`;
     lessonArea.appendChild(extra);
-    document.getElementById('quizRestart').onclick = ()=>{ resetQuiz(); renderContent(); };
+    attachTapToggle(document.getElementById('quizRestart'), ()=>{ resetQuiz(); renderContent(); });
     return;
   }
 
@@ -780,18 +771,41 @@ function renderQuiz(s){
   }
 
   box.querySelectorAll('.opt').forEach(btn=>{
-    btn.onclick = ()=>{
+    attachTapToggle(btn, ()=>{
       if(quizAnswers[quizIdx]) return;
       const picked = +btn.dataset.i;
       quizAnswers[quizIdx] = {picked, correct: picked===q.a};
       renderContent();
-    };
+    });
   });
   const prevBtn = document.getElementById('quizPrev');
   const nextBtn = document.getElementById('quizNext');
-  if(prevBtn) prevBtn.onclick = ()=>{ saveCurrentDrawing(); quizIdx--; renderContent(); };
-  if(nextBtn) nextBtn.onclick = ()=>{ saveCurrentDrawing(); quizIdx++; renderContent(); };
+  if(prevBtn) attachTapToggle(prevBtn, ()=>{ saveCurrentDrawing(); quizIdx--; renderContent(); });
+  if(nextBtn) attachTapToggle(nextBtn, ()=>{ saveCurrentDrawing(); quizIdx++; renderContent(); });
 }
+
+// ---- надійне розпізнавання "тапу", яке не залежить від click-події
+// (Safari може відкласти click після дотику, а поки триває малювання пером,
+// клацання по інтерфейсу взагалі не потрібні) — визначено тут, ЩЕ ДО
+// першого renderAll(), щоб картки з першого ж рендеру одразу
+// використовували цю логіку, а не тимчасовий запасний onclick ----
+function attachTapToggle(el, handler){
+  let sx = 0, sy = 0, penTap = false, tracking = false;
+  el.addEventListener('pointerdown', (e)=>{
+    tracking = true;
+    sx = e.clientX; sy = e.clientY;
+    penTap = e.pointerType === 'pen';
+  }, {passive:true});
+  el.addEventListener('pointerup', (e)=>{
+    if(!tracking) return;
+    tracking = false;
+    if(penTap && window.isDrawingActive && window.isDrawingActive()) return;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    if(Math.hypot(dx,dy) > 10) return;
+    handler(e);
+  });
+}
+window.attachTapToggle = attachTapToggle;
 
 function renderAll(){
   renderTopics();
