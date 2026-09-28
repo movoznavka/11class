@@ -162,6 +162,25 @@
     .twocol-cell{font-size:14px;padding:12px 8px;}
   }
 
+  /* three columns: разом / окремо / з дефісом */
+  .threecol{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+  @media(max-width:700px){.threecol{grid-template-columns:1fr;}}
+  .threecol-col{background:var(--bg-soft);border-radius:18px;padding:16px 16px 18px;}
+  .threecol-head{
+    font-family:'Manrope',sans-serif;font-weight:800;font-size:17px;color:var(--c2-b);
+    text-align:center;margin:0 0 12px;padding-bottom:10px;
+    border-bottom:1.5px solid rgba(36,23,54,0.1);
+  }
+  .threecol-bullets{margin:0 0 12px;padding-left:18px;font-size:13px;line-height:1.5;color:var(--ink-soft);}
+  .threecol-bullets li{margin-bottom:4px;}
+  .threecol-bullets b{color:var(--ink);}
+  .threecol-words{font-family:'Manrope',sans-serif;font-weight:700;font-size:14.5px;line-height:1.65;color:var(--ink);}
+  .threecol-note{
+    margin-top:12px;padding:9px 12px;border-radius:12px;font-size:13px;line-height:1.5;
+    background:linear-gradient(155deg, rgba(242,201,76,.25), rgba(184,134,11,.12));color:var(--ink);
+  }
+  .threecol-note b{color:var(--c4-b);font-family:'Manrope',sans-serif;}
+
   /* mini quiz */
   .qtext{font-family:'Manrope',sans-serif;font-size:18px;font-weight:700;line-height:1.4;margin:0 0 18px;}
   .options{display:flex;flex-direction:column;gap:10px;}
@@ -542,11 +561,39 @@ const TOPICS = {
         ]
       }
     ]
+  },
+  pravopys: {
+    label: "Правопис",
+    subs: [
+      {
+        id: "p-table", tab: "Разом · окремо · з дефісом", dot: "1", type: "threecol",
+        title: "Правопис сполучників",
+        intro: "Сполучники пишемо разом, окремо або через дефіс — залежно від того, яка це група і що є їхнім другим компонентом.",
+        cols: [
+          {
+            title: "Разом",
+            bullets: ["порівняльні сполучники;", "складні сполучники"],
+            words: "мовби, мовбито, наче, начебто, немов, немовби, немовбито, неначе, неначебто, ніби, нібито; притому, причому, теж, отож"
+          },
+          {
+            title: "Окремо",
+            bullets: ["сполучники, у яких другим компонентом є <b>що, б, би, як, ж, же</b>"],
+            words: "дарма що, так що, тому що, або ж, бо ж, отже ж, коли б, хоча б, хоч би, з того часу як",
+            note: "<b>Але:</b> мовби, ніби, отож"
+          },
+          {
+            title: "З дефісом",
+            bullets: ["деякі сполучники, у яких другим компонентом є частки <b>-но, -то, -от</b>"],
+            words: "тільки-но, тим-то, тому-то, якби-то, отож-то, як-от"
+          }
+        ]
+      }
+    ]
   }
 };
 
 const LETTERS = ["А","Б","В","Г"];
-const TOPIC_ORDER = ["main","omonimy"];
+const TOPIC_ORDER = ["main","omonimy","pravopys"];
 
 let activeTopic = "main";
 let activeSub = 0;
@@ -686,6 +733,16 @@ function renderContent(){
         <div class="twocol-cell">${p.left}</div>
         <div class="twocol-cell">${p.right}</div>`).join('')}
     </div>`;
+  }
+
+  if(s.type === "threecol"){
+    html += `<div class="threecol">${s.cols.map(c => `
+      <div class="threecol-col">
+        <div class="threecol-head">${c.title}</div>
+        ${c.bullets ? `<ul class="threecol-bullets">${c.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>` : ''}
+        <div class="threecol-words">${c.words}</div>
+        ${c.note ? `<div class="threecol-note">${c.note}</div>` : ''}
+      </div>`).join('')}</div>`;
   }
 
   if(s.type === "quiz"){
