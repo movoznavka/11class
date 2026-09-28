@@ -59,7 +59,7 @@
   /* level 1: топіки */
   .topictoggle{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
   .topictoggle button{
-    flex:1 1 calc(50% - 5px);min-width:140px;padding:15px;border-radius:20px;border:none;background:var(--card);
+    flex:1 1 calc(33.333% - 7px);min-width:140px;padding:15px;border-radius:20px;border:none;background:var(--card);
     font-family:'Manrope',sans-serif;font-weight:800;font-size:13.5px;color:var(--ink-soft);
     cursor:pointer;box-shadow:0 8px 18px -14px rgba(19,33,59,.3);
     display:flex;align-items:center;justify-content:center;gap:8px;
@@ -203,35 +203,13 @@
   footer{text-align:center;margin-top:22px;font-size:12.5px;color:var(--ink-soft);font-weight:500;}
 
   /* ===================== DRAWING / TEACHER MODE ===================== */
-  /* Canvas is positioned over the whole DOCUMENT (not just the viewport),
-     so ink scrolls together with the page content instead of staying
-     glued to the screen. Its size is recalculated after every content
-     change (see resizeCanvas() below). */
   #drawCanvas{
     position:absolute;
     top:0;
     left:0;
     z-index:9998;
-    pointer-events:none; /* drawing is handled via window-level listeners so
-                             taps/clicks on real UI underneath always pass through */
-  }
-
-  #drawDebug{
-    position:fixed;
-    top:8px;
-    left:8px;
-    z-index:10000;
-    background:rgba(19,33,59,0.82);
-    color:#fff;
-    font-family:'Manrope',monospace;
-    font-size:12px;
-    font-weight:700;
-    padding:5px 10px;
-    border-radius:10px;
     pointer-events:none;
-    display:none;
   }
-  #drawDebug.show{display:block;}
 
   #drawToggleBtn{
     position:fixed;
@@ -302,35 +280,6 @@
     opacity:1;
     pointer-events:auto;
   }
-  /* панель згорнута, але малювання лишається увімкненим */
-  #drawToolbar.mini{
-    transform:translateX(-50%) translateY(130%) scale(0.94);
-    opacity:0;
-    pointer-events:none;
-  }
-  #drawToolbarMini{
-    position:fixed;
-    left:50%;
-    bottom:20px;
-    transform:translateX(-50%) translateY(130%) scale(0.9);
-    opacity:0;
-    width:40px;height:26px;
-    border-radius:14px;
-    border:1px solid rgba(255,255,255,0.5);
-    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));
-    box-shadow:0 10px 20px -10px var(--c1-sh);
-    display:flex;align-items:center;justify-content:center;
-    cursor:pointer;
-    z-index:9999;
-    transition:transform .25s cubic-bezier(.34,1.56,.64,1), opacity .2s ease;
-    pointer-events:none;
-  }
-  #drawToolbarMini svg{width:18px;height:18px;}
-  #drawToolbarMini.show{
-    transform:translateX(-50%) translateY(0) scale(1);
-    opacity:1;
-    pointer-events:auto;
-  }
   .swatch{
     position:relative;
     width:25px;height:25px;
@@ -372,9 +321,8 @@
     border-radius:50%;
     background:currentColor;
   }
-  #xthinBtn .dot{ width:3.5px; height:3.5px; }
-  #thinBtn .dot{ width:7px; height:7px; }
-  #thickBtn .dot{ width:12.5px; height:12.5px; }
+  #thinBtn .dot{ width:6px; height:6px; }
+  #thickBtn .dot{ width:12px; height:12px; }
   .tool-btn.selected{
     background:var(--c1-b);
     color:#fff;
@@ -419,8 +367,6 @@
 
 <!-- ==== Малювання поверх екрана (для вчителя) ==== -->
 <canvas id="drawCanvas"></canvas>
-<div id="drawDebug"></div>
-
 <button id="drawToggleBtn" title="Малювати">
   <svg id="drawIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M4 20L4.6 16.6C4.7 15.9 5.03 15.26 5.55 14.79L15.3 5.7C16.09 4.96 17.34 4.99 18.09 5.78L18.34 6.04C19.08 6.83 19.04 8.08 18.25 8.81L8.5 17.9C8 18.37 7.37 18.66 6.7 18.75L4 20Z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/>
@@ -433,8 +379,7 @@
   <button class="swatch" style="background:#17A863" data-color="#17A863"></button>
   <button class="swatch" style="background:#13213B" data-color="#13213B"></button>
   <div class="tool-sep"></div>
-  <button class="tool-btn selected" id="xthinBtn" title="Дуже тонка лінія"><span class="dot"></span></button>
-  <button class="tool-btn" id="thinBtn" title="Тонка лінія"><span class="dot"></span></button>
+  <button class="tool-btn selected" id="thinBtn" title="Тонка лінія"><span class="dot"></span></button>
   <button class="tool-btn" id="thickBtn" title="Товста лінія"><span class="dot"></span></button>
   <div class="tool-sep"></div>
   <button class="tool-btn" id="eraserBtn" title="Ластик">
@@ -450,18 +395,7 @@
       <path d="M7 7L7.6 19.2C7.63 19.9 8.2 20.5 8.9 20.5H15.1C15.8 20.5 16.37 19.9 16.4 19.2L17 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
   </button>
-  <div class="tool-sep"></div>
-  <button class="tool-btn" id="minimizeBtn" title="Згорнути панель">
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  </button>
 </div>
-<button id="drawToolbarMini" title="Розгорнути панель">
-  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M6 15L12 9L18 15" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>
-</button>
 
 <script>
 /* ============================================================
@@ -486,14 +420,21 @@ const TOPICS = {
         intro: "",
         cards: [
           {rule: "Утворені від складних іменників, що пишуться разом", desc: "", examples: [{word: "лісостеповий"}]},
-          {rule: "Іменник + прикметник", desc: "довгі хвилі", examples: [{word: "довгохвильовий"}]},
-          {rule: "Друге слово дієслівного походження", desc: "", examples: [{word: "деревообробний"}]},
-          {rule: "Прислівник + дієприкметник/прикметник", desc: "", examples: [{word: "важкодоступний"}]},
-          {rule: "Основне смислове навантаження передає останнє слово", desc: "", examples: [{word: "хлібобулочний"}, {word: "хитромудрий"}, {word: "глухонімий"}, {word: "залізобетонний"}]},
-          {rule: "Одна частина залежить від іншої (можна поставити питання)", desc: "народна (яка?) поезія → народнопоетичний", examples: [{word: "народнопоетичний"}]},
+          {rule: "Слово + слово (які відрізняються за лексичним значенням)", desc: "", examples: [{word: "довгохвильовий"}, {word: "деревообробний"}, {word: "важкодоступний"}, {word: "народнопоетичний"}]},
           {rule: "З першою частиною верхньо-, багато-, давньо-, мало-, нижньо-, ново-, складно-, старо-, вище-", desc: "", examples: [{word: "старослов'янський"}, {word: "вищезгаданий"}]},
-          {rule: "З кінцевою частиною -сотий, -тисячний, -мільйонний", desc: "", examples: [{word: "стосотий"}, {word: "трьохтисячний"}]},
-          {rule: "Суспільнокорисний, але суспільно-політичний", desc: "коли друге слово залежить від першого — разом; коли слова рівноправні — через дефіс", examples: [{word: "суспільнокорисний"}, {word: "суспільно-політичний"}]}
+          {rule: "З кінцевою частиною -сотий, -тисячний, -мільйонний", desc: "", examples: [{word: "стосотий"}, {word: "трьохтисячний"}]}
+        ]
+      },
+      {
+        id: "a-razom-exc", tab: "Винятки", dot: "2", type: "exceptions",
+        title: "Винятки",
+        intro: "Ці слова пишуться разом. Тисни на слово.",
+        words: [
+          {word: "хлібобулочний", ipa: "пишеться разом"},
+          {word: "хитромудрий", ipa: "пишеться разом"},
+          {word: "глухонімий", ipa: "пишеться разом"},
+          {word: "залізобетонний", ipa: "пишеться разом"},
+          {word: "зловорожий", ipa: "пишеться разом"}
         ]
       }
     ]
@@ -508,11 +449,38 @@ const TOPICS = {
         cards: [
           {rule: "Утворені від складних іменників, що пишуться через дефіс", desc: "", examples: [{word: "генерал-губернаторський"}]},
           {rule: "З частками -іко, -іко", desc: "", examples: [{word: "фізико-математичний"}]},
-          {rule: "Воєнно-, військово-", desc: "але окремі слова — разом (винятки)", examples: [{word: "воєнно-політичний"}, {word: "але: військовослужбовець, військовозобов'язаний"}]},
-          {rule: "Відтінки кольору, смаку, проміжні сторони світу", desc: "колір+колір, смак+смак, сторона+сторона", examples: [{word: "лимоннокислий"}, {word: "південнокримський"}, {word: "західноукраїнський"}]},
+          {rule: "Воєнно-, військово-", desc: "", examples: [{word: "воєнно-політичний"}, {word: "<span style='color:#FF6B6B'>АЛЕ: військовослужбовець, військовозобов'язаний, військовополонений</span>"}]},
+          {rule: "Слово (смак, сторона світу, продукт...) + слово (смак, сторона світу, продукт...)", desc: "колір+колір, смак+смак, сторона+сторона", examples: [{word: "кисло-солодкий"}, {word: "<span style='color:#FF6B6B'>АЛЕ: лимоннокислий</span>"}, {word: "північно-західний"}, {word: "<span style='color:#FF6B6B'>АЛЕ: південнокримський</span>"}, {word: "молочно-сирний"}]},
+          {rule: "Колір + колір або відтінок + відтінок", desc: "на другому місці завжди колір", examples: [{word: "жовто-синій"}, {word: "гарячо-жовтий"}, {word: "багряно-бузковий"}, {word: "<span style='color:#FF6B6B'>АЛЕ: жовтогарячий</span>"}]},
           {rule: "Утворені від рівнозначних слів (можна поєднати сполучником і)", desc: "і культурний, і технічний", examples: [{word: "культурно-технічний"}]},
           {rule: "Іменник + дієслово з префіксом", desc: "", examples: [{word: "контрольно-вимірювальний"}]},
           {rule: "Числівник (цифрами) + іменник", desc: "", examples: [{word: "20-річний"}, {word: "5-поверховий"}]}
+        ]
+      }
+    ]
+  },
+  susp: {
+    label: "Суспільно-, усесвітньо-",
+    subs: [
+      {
+        id: "a-susp-main", tab: "Правило", dot: "1", type: "cards",
+        title: "Суспільно-, усесвітньо- разом чи через дефіс",
+        intro: "",
+        cards: [
+          {rule: "Суспільно важливий", desc: "<svg width=\"120\" height=\"42\" viewBox=\"0 0 120 42\" style=\"display:block;margin:0 auto;overflow:visible;color:var(--ink);\"><path d=\"M108 6 C 108 32 14 32 14 14\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\"/><path d=\"M14 14 L 8 7 M14 14 L 22 11\" stroke=\"currentColor\" stroke-width=\"1.6\" fill=\"none\" stroke-linecap=\"round\"/></svg><div style=\"margin-top:2px;\">важливий для суспільства ✓</div>", examples: [{word: "суспільно важливий"}]},
+          {rule: "Суспільно-політичний", desc: "<div style=\"display:flex;align-items:center;justify-content:center;gap:5px;font-family:'Manrope',sans-serif;font-weight:800;color:var(--ink);margin-bottom:6px;font-size:12.5px;\">суспільно <span style=\"opacity:.5;\">↔ і ↔</span> політичний</div>рівноправні, однакового рівня поняття — через дефіс", examples: [{word: "суспільно-політичний"}]},
+          {rule: "Усесвітньо відомий", desc: "<svg width=\"120\" height=\"42\" viewBox=\"0 0 120 42\" style=\"display:block;margin:0 auto;overflow:visible;color:var(--ink);\"><path d=\"M108 6 C 108 32 14 32 14 14\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\"/><path d=\"M14 14 L 8 7 M14 14 L 22 11\" stroke=\"currentColor\" stroke-width=\"1.6\" fill=\"none\" stroke-linecap=\"round\"/></svg><div style=\"margin-top:2px;\">відомий у всьому світі ✓</div>", examples: [{word: "усесвітньо відомий"}]},
+          {rule: "Усесвітньо-історичний", desc: "<div style=\"display:flex;align-items:center;justify-content:center;gap:5px;font-family:'Manrope',sans-serif;font-weight:800;color:var(--ink);margin-bottom:6px;font-size:12.5px;\">усесвітньо <span style=\"opacity:.5;\">↔ і ↔</span> історичний</div>рівноправні поняття — через дефіс", examples: [{word: "усесвітньо-історичний"}]}
+        ]
+      },
+      {
+        id: "a-susp-exc", tab: "Винятки", dot: "2", type: "exceptions",
+        title: "Винятки",
+        intro: "Ці слова завжди пишуться окремо. Тисни на слово.",
+        words: [
+          {word: "абсолютно", ipa: "абсолютно новий — завжди окремо"},
+          {word: "діаметрально", ipa: "діаметрально протилежний — завжди окремо"},
+          {word: "хімічно", ipa: "хімічно чистий — завжди окремо"}
         ]
       }
     ]
@@ -520,7 +488,7 @@ const TOPICS = {
 };
 
 const LETTERS = ["А","Б","В","Г"];
-const TOPIC_ORDER = ["razom","defis"];
+const TOPIC_ORDER = ["razom","defis","susp"];
 
 let activeTopic = "razom";
 let activeSub = 0;
@@ -764,32 +732,15 @@ renderAll();
 // ======================================================================
 // МАЛЮВАННЯ ПОВЕРХ ЕКРАНА (режим "учитель")
 //
-// Ця версія навмисно побудована один в один за робочим прикладом, який
-// підтвердив, що пише без затримок і що кнопка з панеллю не зникають і не
-// роздуваються під час зуму. Різниця з попередніми спробами:
-//   • НІЯКОГО втручання в touch-action — воно завжди 'auto', як типово
-//     в браузері. preventDefault() на самому дотику пером і так гарантує,
-//     що перо не гортає й не зумить сторінку; більше нічого чіпати не
-//     треба, а зайві обмеження touch-action, судячи з усього, і були
-//     причиною затримки між буквами.
-//   • НІЯКОЇ JS-компенсації позиції/розміру кнопки й панелі під час
-//     pinch-zoom. Вони — звичайний CSS position:fixed. Раніше спроби
-//     "виправити" це власним кодом лише ламали те, що й так працювало.
-//   • Малювання — просте, пряме, растрове (як у прикладі), без черг і
-//     буферизації.
-// Єдине, що збережено понад приклад: чорнило кожної вкладки зберігається
-// окремо (бо в цьому уроці, на відміну від прикладу, є кілька вкладок) —
-// через ті самі getDrawingSnapshot/setDrawingSnapshot, які вже викликає
-// зовнішній скрипт при перемиканні вкладок.
+// Малює ЛИШЕ Apple Pencil (pointerType === 'pen'). Палець і миша завжди
+// проходять крізь canvas без змін — можна гортати, перевертати картки й
+// робити pinch-zoom навіть коли режим малювання ввімкнено.
 // ======================================================================
 (function(){
   const canvas = document.getElementById('drawCanvas');
   const ctx = canvas.getContext('2d');
   const toggleBtn = document.getElementById('drawToggleBtn');
   const toolbar = document.getElementById('drawToolbar');
-  const toolbarMini = document.getElementById('drawToolbarMini');
-  const minimizeBtn = document.getElementById('minimizeBtn');
-  const xthinBtn = document.getElementById('xthinBtn');
   const thinBtn = document.getElementById('thinBtn');
   const thickBtn = document.getElementById('thickBtn');
   const eraserBtn = document.getElementById('eraserBtn');
@@ -802,22 +753,20 @@ renderAll();
   let currentWidth = 4;
   let eraserMode = false;
   let lastX = 0, lastY = 0;
-  let activePointerId = null;
+  const MOVE_THRESHOLD = 2; // px — щоб дрібне тремтіння пера не лишало крапку при кліку
 
-  window.isDrawingActive = function(){ return drawingActive; };
-
-  function currentDocHeight(){
-    return Math.max(
-      document.documentElement.scrollHeight,
-      document.body.scrollHeight,
-      window.innerHeight
-    );
+  function docSize(){
+    return {
+      w: document.documentElement.clientWidth,
+      h: Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
+    };
   }
 
   function resizeCanvas(){
-    const docWidth = document.documentElement.clientWidth;
-    const docHeight = currentDocHeight();
+    const dpr = window.devicePixelRatio || 1;
+    const {w, h} = docSize();
 
+    // зберігаємо вже намальоване
     const prev = document.createElement('canvas');
     prev.width = canvas.width;
     prev.height = canvas.height;
@@ -825,33 +774,29 @@ renderAll();
       prev.getContext('2d').drawImage(canvas, 0, 0);
     }
 
-    canvas.width = docWidth * devicePixelRatio;
-    canvas.height = docHeight * devicePixelRatio;
-    canvas.style.width = docWidth + 'px';
-    canvas.style.height = docHeight + 'px';
-    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    canvas.width = Math.max(1, Math.round(w * dpr));
+    canvas.height = Math.max(1, Math.round(h * dpr));
+    ctx.setTransform(dpr,0,0,dpr,0,0);
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
     if(prev.width && prev.height){
-      ctx.drawImage(prev, 0, 0, prev.width / devicePixelRatio, prev.height / devicePixelRatio);
+      ctx.drawImage(prev, 0, 0, prev.width / dpr, prev.height / dpr);
     }
   }
   window.resizeDrawCanvas = resizeCanvas;
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
-  window.addEventListener('orientationchange', resizeCanvas);
-  if(window.ResizeObserver){
-    new ResizeObserver(()=> resizeCanvas()).observe(document.body);
-  }
+  window.addEventListener('orientationchange', ()=> setTimeout(resizeCanvas, 200));
+  window.addEventListener('load', resizeCanvas);
 
   window.clearDrawing = function(){
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   };
 
-  // сумісний з рештою сторінки API: чорнило кожної вкладки зберігається й
-  // відновлюється окремо при перемиканні вкладок (викликається з
-  // зовнішнього скрипту через saveCurrentDrawing()/restoreCurrentDrawing())
+  // ---- знімок малюнка для збереження/відновлення per-вкладка ----
   window.getDrawingSnapshot = function(){
     try{
       return (canvas.width && canvas.height) ? canvas.toDataURL('image/png') : null;
@@ -862,33 +807,25 @@ renderAll();
     if(!dataURL) return;
     const img = new Image();
     img.onload = function(){
-      ctx.drawImage(img, 0, 0, canvas.width / devicePixelRatio, canvas.height / devicePixelRatio);
+      const d = window.devicePixelRatio || 1;
+      ctx.drawImage(img, 0, 0, canvas.width / d, canvas.height / d);
     };
     img.src = dataURL;
   };
 
   function setActive(on){
     drawingActive = on;
+    canvas.classList.toggle('active', on);
     toolbar.classList.toggle('show', on);
-    toolbar.classList.remove('mini');
-    if(toolbarMini) toolbarMini.classList.remove('show');
     toggleBtn.classList.toggle('on', on);
     toggleBtn.title = on ? 'Вимкнути малювання' : 'Малювати';
+    const ta = on ? 'pinch-zoom' : 'auto';
+    document.documentElement.style.touchAction = ta;
+    document.body.style.touchAction = ta;
+    if(on) resizeCanvas();
   }
-  toggleBtn.addEventListener('click', ()=> setActive(!drawingActive));
 
-  if(minimizeBtn && toolbarMini){
-    minimizeBtn.addEventListener('click', ()=>{
-      toolbar.classList.remove('show');
-      toolbar.classList.add('mini');
-      toolbarMini.classList.add('show');
-    });
-    toolbarMini.addEventListener('click', ()=>{
-      toolbar.classList.remove('mini');
-      toolbar.classList.add('show');
-      toolbarMini.classList.remove('show');
-    });
-  }
+  toggleBtn.addEventListener('click', ()=> setActive(!drawingActive));
 
   swatches.forEach(sw=>{
     sw.addEventListener('click', ()=>{
@@ -900,22 +837,15 @@ renderAll();
     });
   });
 
-  if(xthinBtn){
-    xthinBtn.addEventListener('click', ()=>{
-      currentWidth = 2;
-      [xthinBtn,thinBtn,thickBtn].forEach(b=>b.classList.remove('selected'));
-      xthinBtn.classList.add('selected');
-    });
-  }
   thinBtn.addEventListener('click', ()=>{
-    currentWidth = xthinBtn ? 5 : 4;
-    [xthinBtn,thinBtn,thickBtn].forEach(b=>b&&b.classList.remove('selected'));
+    currentWidth = 4;
     thinBtn.classList.add('selected');
+    thickBtn.classList.remove('selected');
   });
   thickBtn.addEventListener('click', ()=>{
-    currentWidth = xthinBtn ? 11 : 12;
-    [xthinBtn,thinBtn,thickBtn].forEach(b=>b&&b.classList.remove('selected'));
+    currentWidth = 12;
     thickBtn.classList.add('selected');
+    thinBtn.classList.remove('selected');
   });
   eraserBtn.addEventListener('click', ()=>{
     eraserMode = !eraserMode;
@@ -926,36 +856,24 @@ renderAll();
   });
 
   function pointerPos(e){
-    const rect = canvas.getBoundingClientRect();
-    return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-      pressure: e.pressure || 0.5,
-    };
+    return { x: e.pageX, y: e.pageY, pressure: e.pressure || 0.5 };
   }
 
-  function isOnControls(e){
-    return !!(e.target.closest && e.target.closest('#drawToolbar, #drawToolbarMini, #drawToggleBtn'));
-  }
+  function isPen(e){ return e.pointerType === 'pen'; }
 
-  document.addEventListener('pointerdown', (e)=>{
-    if(!drawingActive) return;
-    if(e.pointerType !== 'pen') return;
-    if(isOnControls(e)) return;
-
-    e.preventDefault();
+  window.addEventListener('pointerdown', (e)=>{
+    if(!drawingActive || !isPen(e)) return;
     isDrawing = true;
-    activePointerId = e.pointerId;
     const p = pointerPos(e);
     lastX = p.x; lastY = p.y;
-  }, { passive: false });
+  }, {passive:true});
 
-  document.addEventListener('pointermove', (e)=>{
-    if(!drawingActive || !isDrawing) return;
-    if(e.pointerId !== activePointerId) return;
-
-    e.preventDefault();
+  window.addEventListener('pointermove', (e)=>{
+    if(!drawingActive || !isDrawing || !isPen(e)) return;
     const p = pointerPos(e);
+    const dx = p.x - lastX, dy = p.y - lastY;
+    if(Math.hypot(dx,dy) < MOVE_THRESHOLD) return;
+    e.preventDefault();
     ctx.globalCompositeOperation = eraserMode ? 'destination-out' : 'source-over';
     ctx.strokeStyle = currentColor;
     const pressureFactor = 0.6 + (p.pressure || 0.5) * 0.8;
@@ -965,21 +883,13 @@ renderAll();
     ctx.lineTo(p.x, p.y);
     ctx.stroke();
     lastX = p.x; lastY = p.y;
-  }, { passive: false });
+  }, {passive:false});
 
   function stopDrawing(e){
-    if(e && e.pointerId !== undefined && e.pointerId !== activePointerId) return;
     isDrawing = false;
-    activePointerId = null;
   }
-  document.addEventListener('pointerup', stopDrawing);
-  document.addEventListener('pointercancel', stopDrawing);
-
-  document.addEventListener('touchmove', function(e){
-    if(drawingActive && e.touches && e.touches[0] && e.touches[0].touchType === 'stylus'){
-      e.preventDefault();
-    }
-  }, { passive: false });
+  window.addEventListener('pointerup', stopDrawing);
+  window.addEventListener('pointercancel', stopDrawing);
 })();
 </script>
 </body>
