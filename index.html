@@ -840,6 +840,15 @@ function applyAccessAndRender_(studentCode, allowed, displayName){
       pill.setAttribute('href', appendStudentParam_(pill.getAttribute('href'), displayName));
     }
   });
+
+  // Загальні тести розділу / підрозділу і тест на відповідність —
+  // теж мають отримати ?student=, інакше сторінка питає ім'я вручну.
+  document.querySelectorAll('.block-test-pill, .subgroup-test-pill').forEach(function(a){
+    const h = a.getAttribute('href');
+    if (h && h !== '#' && h.indexOf('student=') === -1) {
+      a.setAttribute('href', appendStudentParam_(h, displayName));
+    }
+  });
   document.querySelectorAll('.subgroup').forEach(function(sg){
     if (!sg.querySelector('.card')) sg.remove();
   });
