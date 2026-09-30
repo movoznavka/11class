@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Морфологія · Відповідність</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#D0E9FC;
+    --bg-soft:#E4F2FC;
+    --card:#FFFFFF;
+    --ink:#13213B;
+    --ink-soft:#6478A0;
+    --line: rgba(19,33,59,0.08);
+
+    --c1-a:#A5B4FC; --c1-b:#6366F1; --c1-sh: rgba(99,102,241,0.45);
+    --c3-a:#5FE0A8; --c3-b:#17A863; --c3-sh: rgba(23,168,99,0.4);
+    --c2-b:#E5484D;
+
+    --correct-bg:#E6F8EE;
+    --correct-ink:#128A54;
+    --wrong-bg:#FDECEC;
+    --wrong-ink:#D8393E;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    padding:28px 16px 64px;
+  }
+  .wrap{max-width:720px;margin:0 auto;}
+
+  .topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding-bottom:16px;
+    margin-bottom:22px;
+    border-bottom:1.5px solid rgba(19,33,59,0.14);
+  }
+  .kicker{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:12.5px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--ink);
+    opacity:.55;
+  }
+  .kicker.tag{opacity:.4;}
+
+  .review-banner{
+    display:none;
+    align-items:center;
+    gap:8px;
+    background:#FFF4E0;
+    color:#8A5A00;
+    font-family:'Manrope',sans-serif;
+    font-weight:700;
+    font-size:13px;
+    padding:10px 16px;
+    border-radius:14px;
+    margin-bottom:16px;
+  }
+  .review-banner.show{display:flex;}
+
+  h1{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:clamp(26px,6vw,38px);
+    line-height:1.05;
+    letter-spacing:-0.01em;
+    margin:0 0 8px;
+    text-transform:uppercase;
+  }
+  h1 .hl{color:var(--c1-b);}
+  .sub{color:var(--ink-soft);font-size:15px;max-width:52ch;margin:0 0 18px;font-weight:500;}
+
+  .card{
+    background:var(--card);
+    border-radius:28px;
+    padding:26px 22px;
+    box-shadow: 0 20px 44px -28px rgba(19,33,59,0.35);
+  }
+
+  .progress-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:16px;
+  }
+  .qnum{
+    font-family:'Manrope',sans-serif;
+    font-weight:700;
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+  .score{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:12.5px;
+    color:var(--c3-b);
+    background:var(--correct-bg);
+    padding:6px 13px;
+    border-radius:999px;
+  }
+
+  .segbar{display:flex;gap:3px;margin-bottom:22px;flex-wrap:wrap;}
+  .seg{
+    flex:1;
+    min-width:6px;
+    height:6px;
+    border-radius:999px;
+    background:var(--bg-soft);
+    cursor:pointer;
+  }
+  .seg.current{background:var(--c1-b);}
+  .seg.done-correct{background:var(--c3-b);}
+  .seg.done-partial{background:#F5A623;}
+  .seg.done-wrong{background:var(--c2-b);}
+
+  .qtext{
+    font-family:'Manrope',sans-serif;
+    font-size:18px;
+    font-weight:700;
+    line-height:1.55;
+    margin:0 0 20px;
+    letter-spacing:-0.005em;
+  }
+  .qtext .num{
+    font-weight:800;
+  }
+  .qtext .num1{color:var(--c1-b);}
+  .qtext .num2{color:#13213B;}
+  .qtext .num3{color:#8B5CF6;}
+  .qtext .num4{color:#2563EB;}
+
+  .match-box{
+    background:var(--bg-soft);
+    border-radius:22px;
+    padding:16px;
+    margin-bottom:18px;
+  }
+
+  .match-row{
+    display:grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .match-row:last-child{margin-bottom:0;}
+
+  .match-left{
+    background:var(--card);
+    border-radius:16px;
+    padding:11px 14px;
+    font-family:'Manrope',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    color:var(--ink);
+  }
+  .match-left .n{color:var(--c1-b);margin-right:4px;}
+
+  .arrow{
+    color:var(--ink-soft);
+    font-size:16px;
+    opacity:.6;
+  }
+
+  .letters{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+  }
+  .letter-btn{
+    width:34px;height:34px;
+    border-radius:10px;
+    border:1.5px dashed rgba(99,102,241,0.4);
+    background:var(--card);
+    color:var(--ink-soft);
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:13px;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:transform .12s ease, background .15s ease, border-color .15s ease;
+  }
+  .letter-btn:hover{transform:translateY(-1px);}
+  .letter-btn.picked{
+    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));
+    color:#fff;
+    border:1.5px solid transparent;
+  }
+  .letter-btn.correct{
+    background:var(--correct-bg);
+    color:var(--correct-ink);
+    border:1.5px solid var(--correct-ink);
+  }
+  .letter-btn.wrong{
+    background:var(--wrong-bg);
+    color:var(--wrong-ink);
+    border:1.5px solid var(--wrong-ink);
+  }
+  .letter-btn[disabled]{cursor:default;}
+  .letter-btn[disabled]:hover{transform:none;}
+
+  .opts-legend{
+    background:var(--bg-soft);
+    border-radius:18px;
+    padding:14px 16px;
+    margin-bottom:18px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--ink);
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+  }
+  .opts-legend .row{display:flex;gap:8px;align-items:baseline;}
+  .opts-legend .l{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    color:var(--c1-b);
+    min-width:16px;
+  }
+
+  .feedback{
+    margin-top:6px;
+    padding:13px 16px;
+    border-radius:16px;
+    font-size:14px;
+    font-weight:600;
+    display:none;
+    flex-direction:column;
+    gap:4px;
+  }
+  .feedback.show{display:flex;}
+  .feedback.ok{background:var(--correct-bg);color:var(--correct-ink);}
+  .feedback.bad{background:var(--wrong-bg);color:var(--wrong-ink);}
+  .feedback.mixed{background:#FFF4E0;color:#8A5A00;}
+
+  .nav-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:22px;
+  }
+  .btn{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:13px;
+    padding:12px 22px;
+    border-radius:999px;
+    border:none;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .btn.primary{
+    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));
+    color:#fff;
+    box-shadow:0 10px 20px -8px var(--c1-sh);
+  }
+  .btn.ghost{background:transparent;color:var(--ink-soft);}
+  .btn:disabled{opacity:.3;cursor:default;box-shadow:none;}
+  .btn.small{
+    font-size:12px;
+    padding:8px 4px;
+    opacity:.55;
+    text-decoration:underline;
+    text-underline-offset:2px;
+  }
+  .btn.small:hover{opacity:.85;}
+  .reset-row{
+    text-align:center;
+    margin-top:6px;
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+
+  .done-screen{text-align:center;padding:16px 0;}
+  .done-screen .ring{
+    width:120px;height:120px;
+    margin:0 auto 18px;
+    border-radius:50%;
+    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));
+    box-shadow:0 16px 30px -12px var(--c1-sh);
+    display:flex;align-items:center;justify-content:center;
+    position:relative;
+  }
+  .done-screen .ring::before{
+    content:'';
+    position:absolute;
+    top:6px;left:10px;right:10px;
+    height:46%;
+    border-radius:50% 50% 60% 60%;
+    background:linear-gradient(to bottom, rgba(255,255,255,0.5), rgba(255,255,255,0));
+  }
+  .done-screen .big{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:28px;
+    color:#fff;
+    position:relative;
+    z-index:1;
+  }
+  .done-screen .send-status{
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin-top:10px;
+    min-height:18px;
+  }
+  .done-screen .send-status.ok{color:var(--correct-ink);}
+  .done-screen .send-status.bad{color:var(--wrong-ink);}
+
+  .name-screen{padding:6px 0;}
+  .name-screen label{
+    display:block;
+    font-family:'Manrope',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    margin-bottom:10px;
+    color:var(--ink);
+  }
+  .name-screen input{
+    width:100%;
+    padding:14px 16px;
+    border-radius:16px;
+    border:1.5px solid var(--line);
+    background:var(--bg-soft);
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    font-weight:500;
+    color:var(--ink);
+    outline:none;
+    margin-bottom:18px;
+  }
+  .name-screen input:focus{border-color:var(--c1-b);}
+
+  footer{
+    text-align:center;
+    margin-top:22px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-weight:500;
+  }
+
+  @media (max-width:420px){
+    .match-row{grid-template-columns: 1fr auto;}
+    .letters{grid-column:1 / -1;justify-content:flex-start;margin-top:2px;}
+    .match-left{font-size:13px;}
+  }
+
+  /* ===================== DRAWING / TEACHER MODE ===================== */
+  #drawCanvas{
+    position:fixed; inset:0; width:100vw; height:100vh;
+    z-index:9998; touch-action:none; pointer-events:none;
+  }
+  #drawCanvas.active{ pointer-events:auto; }
+  #drawToggleBtn{
+    position:fixed; right:20px; bottom:20px; width:58px;height:58px;
+    border-radius:50%; border:1px solid rgba(255,255,255,0.5);
+    background:
+      linear-gradient(150deg, rgba(255,255,255,0.35), rgba(255,255,255,0) 60%),
+      linear-gradient(155deg,var(--c1-a),var(--c1-b));
+    backdrop-filter: blur(10px) saturate(160%);
+    -webkit-backdrop-filter: blur(10px) saturate(160%);
+    box-shadow: 0 14px 28px -10px var(--c1-sh), inset 0 1px 1px rgba(255,255,255,0.6), inset 0 -6px 10px -4px rgba(0,0,0,0.15);
+    color:#fff; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; z-index:9999;
+    transition:transform .18s cubic-bezier(.34,1.56,.64,1), background .2s ease, box-shadow .2s ease;
+  }
+  #drawToggleBtn svg{ width:24px;height:24px; display:block; transition:transform .25s ease, opacity .15s ease; }
+  #drawToggleBtn:active{transform:scale(0.90);}
+  #drawToggleBtn.on{
+    background:
+      linear-gradient(150deg, rgba(255,255,255,0.35), rgba(255,255,255,0) 60%),
+      linear-gradient(155deg,#FF8A65,var(--c2-b));
+    box-shadow: 0 14px 28px -10px rgba(229,72,77,0.55), inset 0 1px 1px rgba(255,255,255,0.6), inset 0 -6px 10px -4px rgba(0,0,0,0.15);
+  }
+  #drawToggleBtn.on svg{ transform:rotate(90deg); }
+  #drawToolbar{
+    position:fixed; left:50%; bottom:22px;
+    transform:translateX(-50%) translateY(130%) scale(0.94);
+    opacity:0; display:flex; align-items:center; gap:12px;
+    background: linear-gradient(150deg, rgba(255,255,255,0.6), rgba(255,255,255,0.15));
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border:1px solid rgba(255,255,255,0.7);
+    padding:9px 16px; border-radius:999px;
+    box-shadow: 0 24px 48px -20px rgba(19,33,59,0.45), inset 0 1px 1px rgba(255,255,255,0.9);
+    z-index:9999;
+    transition:transform .25s cubic-bezier(.34,1.56,.64,1), opacity .2s ease;
+    pointer-events:none;
+  }
+  #drawToolbar.show{ transform:translateX(-50%) translateY(0) scale(1); opacity:1; pointer-events:auto; }
+  .swatch{
+    position:relative; width:25px;height:25px; border-radius:50%; border:none;
+    box-shadow: 0 3px 8px -2px rgba(19,33,59,0.35), inset 0 1px 1px rgba(255,255,255,0.5);
+    cursor:pointer; padding:0;
+    transition:transform .15s cubic-bezier(.34,1.56,.64,1);
+  }
+  .swatch::after{
+    content:''; position:absolute; inset:-4px; border-radius:50%;
+    border:2px solid var(--ink); opacity:0; transform:scale(0.7);
+    transition:opacity .15s ease, transform .15s cubic-bezier(.34,1.56,.64,1);
+  }
+  .swatch.selected{ transform:scale(1.08); }
+  .swatch.selected::after{ opacity:1; transform:scale(1); }
+  .tool-btn{
+    width:34px;height:34px; border-radius:50%; border:none;
+    background:rgba(255,255,255,0.5); color:var(--ink);
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    transition:background .15s ease, color .15s ease, transform .15s cubic-bezier(.34,1.56,.64,1);
+  }
+  .tool-btn svg{ width:16px; height:16px; }
+  .tool-btn .dot{ border-radius:50%; background:currentColor; }
+  #thinBtn .dot{ width:6px; height:6px; }
+  #thickBtn .dot{ width:12px; height:12px; }
+  .tool-btn.selected{ background:var(--c1-b); color:#fff; transform:scale(1.06); }
+  .tool-sep{ width:1px; height:22px; background:rgba(19,33,59,0.14); }
+  @media (max-width:480px){
+    #drawToolbar{ max-width:94vw; overflow-x:auto; padding:8px 13px; gap:9px; }
+    .swatch{width:21px;height:21px;}
+    .tool-btn{width:30px;height:30px;}
+    .tool-btn svg{width:14px;height:14px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="kicker">Морфологія · Відповідність</div>
+    <div class="kicker tag" id="totalTag">13 завдань</div>
+  </div>
+
+  <div class="review-banner" id="reviewBanner">👀 Режим перегляду відповідей учня</div>
+
+  <h1>Частини <span class="hl">мови</span></h1>
+  <p class="sub">З'ясуйте, якою частиною мови є кожне з виділених слів у реченні.</p>
+
+  <div class="card">
+    <div id="quizArea"></div>
+  </div>
+
+  <footer>@movoznavka</footer>
+</div>
+
+<canvas id="drawCanvas"></canvas>
+<button id="drawToggleBtn" title="Малювати">
+  <svg id="drawIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4 20L4.6 16.6C4.7 15.9 5.03 15.26 5.55 14.79L15.3 5.7C16.09 4.96 17.34 4.99 18.09 5.78L18.34 6.04C19.08 6.83 19.04 8.08 18.25 8.81L8.5 17.9C8 18.37 7.37 18.66 6.7 18.75L4 20Z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/>
+    <path d="M13.5 7.5L16.5 10.3" stroke="white" stroke-width="1.7" stroke-linecap="round"/>
+  </svg>
+</button>
+<div id="drawToolbar">
+  <button class="swatch selected" style="background:#E5484D" data-color="#E5484D"></button>
+  <button class="swatch" style="background:#3355EE" data-color="#3355EE"></button>
+  <button class="swatch" style="background:#17A863" data-color="#17A863"></button>
+  <button class="swatch" style="background:#13213B" data-color="#13213B"></button>
+  <div class="tool-sep"></div>
+  <button class="tool-btn selected" id="thinBtn" title="Тонка лінія"><span class="dot"></span></button>
+  <button class="tool-btn" id="thickBtn" title="Товста лінія"><span class="dot"></span></button>
+  <div class="tool-sep"></div>
+  <button class="tool-btn" id="eraserBtn" title="Ластик">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M18.5 13.5L10.5 21.5H5.5L2.5 18.5C2.11 18.11 2.11 17.48 2.5 17.09L13.5 6.09C13.89 5.7 14.52 5.7 14.91 6.09L18.5 9.68C19.5 10.68 19.5 12.5 18.5 13.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M9 13.5L15 19.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <button class="tool-btn" id="clearBtn" title="Очистити все">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M5 7H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M9.5 7V4.8C9.5 4.36 9.86 4 10.3 4H13.7C14.14 4 14.5 4.36 14.5 4.8V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M7 7L7.7 18.6C7.75 19.42 8.42 20 9.24 20H14.76C15.58 20 16.25 19.42 16.3 18.6L17 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M10.3 10.5V16.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M13.7 10.5V16.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  </button>
+</div>
+
+<script>
+// ==========================================================================
+// Банк завдань "на відповідність": речення з чотирма виділеними словами,
+// потрібно визначити частину мови кожного. items — підписи чотирьох слів
+// (у порядку появи в реченні), opts — п'ять варіантів А-Д, ans — масив із
+// чотирьох індексів правильної відповіді (0=А,1=Б,2=В,3=Г,4=Д) для items[0..3].
+// ==========================================================================
+const QUESTIONS = [
+  {
+    q:"Сучасна людина, щоб бути <span class=\"num num1\">(1)успішною</span>, має вчитися <span class=\"num num2\">(2)впродовж</span> <span class=\"num num3\">(3)усього</span> життя, <span class=\"num num4\">(4)опановуючи</span> нові галузі знань.",
+    items:["успішною","впродовж","усього","опановуючи"],
+    opts:["займенник","прикметник","дієприкметник (форма дієслова)","дієприслівник (форма дієслова)","прийменник"],
+    ans:[1,4,0,3]
+  },
+  {
+    q:"Людська душа <span class=\"num num1\">(1)здатна</span> жити <span class=\"num num2\">(2)тільки</span> <span class=\"num num3\">(3)тоді</span>, коли торкається до <span class=\"num num4\">(4)іншої</span> душі.",
+    items:["здатна","тільки","тоді","іншої"],
+    opts:["займенник","дієслово","прислівник","прикметник","частка"],
+    ans:[3,4,2,0]
+  },
+  {
+    q:"Я хочу, щоб цвіла <span class=\"num num1\">(1)край</span> шляху квітка, і гула над нею <span class=\"num num2\">(2)працьовита</span> бджола, <span class=\"num num3\">(3)і</span> жайворон співав у високій <span class=\"num num4\">(4)блакиті</span>.",
+    items:["край","працьовита","і","блакиті"],
+    opts:["іменник","прикметник","дієприкметник (форма дієслова)","прийменник","сполучник"],
+    ans:[3,1,4,0]
+  },
+  {
+    q:"<span class=\"num num1\">(1)Чи</span> знаєте ви, <span class=\"num num2\">(2)що</span> український віночок — не просто краса, а й оберіг, бо в ньому <span class=\"num num3\">(3)є</span> <span class=\"num num4\">(4)така</span> чаклунська сила, що біль знімає.",
+    items:["Чи","що","є","така"],
+    opts:["прикметник","займенник","дієслово","сполучник","частка"],
+    ans:[4,3,2,1]
+  },
+  {
+    q:"Немає тих грошей, якими <span class=\"num num1\">(1)можна</span> б заплатити за людський розум і людське серце <span class=\"num num2\">(2)навіть</span> тоді, коли хтось думає, <span class=\"num num3\">(3)що</span> у світі все купується й <span class=\"num num4\">(4)усе</span> продається.",
+    items:["можна","навіть","що","усе"],
+    opts:["іменник","займенник","прислівник","сполучник","частка"],
+    ans:[2,4,3,1]
+  },
+  {
+    q:"Якщо <span class=\"num num1\">(1)свою</span> землю ти любитимеш, жар душі <span class=\"num num2\">(2)віддавши</span> їй <span class=\"num num3\">(3)сповна</span>, якщо в праці <span class=\"num num4\">(4)щирим</span> серцем грітимеш, то тебе пригріє і вона.",
+    items:["свою","віддавши","сповна","щирим"],
+    opts:["прикметник","займенник","дієприкметник (форма дієслова)","дієприслівник (форма дієслова)","прислівник"],
+    ans:[1,3,4,0]
+  },
+  {
+    q:"Є дуже <span class=\"num num1\">(1)багато</span> людей, <span class=\"num num2\">(2)які</span> читають <span class=\"num num3\">(3)лише</span> для того, <span class=\"num num4\">(4)щоб</span> не думати.",
+    items:["багато","які","лише","щоб"],
+    opts:["займенник","числівник","прислівник","сполучник","частка"],
+    ans:[1,0,4,3]
+  },
+  {
+    q:"Тут завжди квітнуть мальви і жоржина, тут <span class=\"num num1\">(1)серед</span> цвіту золота бджола, <span class=\"num num2\">(2)тут</span> юності <span class=\"num num3\">(3)замріяна</span> стежина, <span class=\"num num4\">(4)що</span> вабить за околиці села.",
+    items:["серед","тут","замріяна","що"],
+    opts:["займенник","дієприкметник (форма дієслова)","прислівник","прийменник","сполучник"],
+    ans:[3,2,1,0]
+  },
+  {
+    q:"<span class=\"num num1\">(1)Тепліше</span> стає на серці, коли бачиш: ти не цілком <span class=\"num num2\">(2)одинокий</span> на світі, <span class=\"num num3\">(3)є</span> добрі люди, <span class=\"num num4\">(4)що</span> дбають про тебе.",
+    items:["Тепліше","одинокий","є","що"],
+    opts:["прикметник","займенник","дієслово","прислівник","сполучник"],
+    ans:[3,0,2,1]
+  },
+  {
+    q:"Українці мають усі підстави пишатися тим, що <span class=\"num num1\">(1)їхня</span> Батьківщина не раз переживала дні сили <span class=\"num num2\">(2)й</span> слави, мала <span class=\"num num3\">(3)справді</span> легендарних героїв, мужньо переносила найважчі випробування, коли гинули не <span class=\"num num4\">(4)сотні</span> й тисячі, а мільйони її дочок і синів.",
+    items:["їхня","й","справді","сотні"],
+    opts:["іменник","займенник","числівник","прислівник","сполучник"],
+    ans:[1,4,3,0]
+  },
+  {
+    q:"Мати вірила: земля все знає, <span class=\"num num1\">(1)що</span> говорить <span class=\"num num2\">(2)чи</span> думає чоловік, і на самоті тихенько розмовляла з нею, <span class=\"num num3\">(3)просячи</span>, щоб вона родила на долю всякого — і роботящого, і <span class=\"num num4\">(4)ледащого</span>.",
+    items:["що","чи","просячи","ледащого"],
+    opts:["іменник","прикметник","займенник","дієприслівник (форма дієслова)","сполучник"],
+    ans:[2,4,3,0]
+  },
+  {
+    q:"<span class=\"num num1\">(1)Перепрошую</span>, історія України та <span class=\"num num2\">(2)її</span> культури <span class=\"num num3\">(3)більш</span> цензурована, <span class=\"num num4\">(4)як</span> написана.",
+    items:["Перепрошую","її","більш","як"],
+    opts:["займенник","прислівник","сполучник","частка","вигук"],
+    ans:[4,0,1,2]
+  },
+  {
+    q:"Але правди в <span class=\"num num1\">(1)брехні</span> не розмішуй, не <span class=\"num num2\">(2)ганьби</span> все підряд без пуття, бо на світі <span class=\"num num3\">(3)той</span> наймудріший, хто <span class=\"num num4\">(4)найдужче</span> любить життя.",
+    items:["брехні","ганьби","той","найдужче"],
+    opts:["іменник","прикметник","займенник","прислівник","дієслово"],
+    ans:[0,4,2,3]
+  }
+  ,
+  {
+    q:"Добра звичка <span class=\"num num1\">(1)є</span> моральний <span class=\"num num2\">(2)капітал</span>, закладений людиною у <span class=\"num num3\">(3)свою</span> <span class=\"num num4\">(4)нервову</span> систему.",
+    items:["є","капітал","свою","нервову"],
+    opts:["частка","дієслово","іменник","прикметник","займенник"],
+    ans:[1,2,4,3]
+  },
+  {
+    q:"Людині треба два роки, <span class=\"num num1\">(1)щоб</span> навчитися говорити, і <span class=\"num num2\">(2)шістдесят</span> років, щоб <span class=\"num num3\">(3)навчитися</span> тримати язик <span class=\"num num4\">(4)за</span> зубами.",
+    items:["щоб","шістдесят","навчитися","за"],
+    opts:["дієслово","прийменник","сполучник","числівник","прислівник"],
+    ans:[2,3,0,1]
+  },
+  {
+    q:"Найголосніший барабан стає <span class=\"num num1\">(1)беззвучним</span>, якщо в нього <span class=\"num num2\">(2)не</span> бити, найрозумніша людина стає <span class=\"num num3\">(3)неуком</span>, якщо <span class=\"num num4\">(4)її</span> не навчати.",
+    items:["беззвучним","не","неуком","її"],
+    opts:["прислівник","займенник","частка","прикметник","іменник"],
+    ans:[3,2,4,1]
+  },
+  {
+    q:"Любов <span class=\"num num1\">(1)виникає</span> з <span class=\"num num2\">(2)любові</span>; <span class=\"num num3\">(3)якщо</span> хочу, щоб мене любили, я <span class=\"num num4\">(4)сам</span> перший люблю.",
+    items:["виникає","любові","якщо","сам"],
+    opts:["прикметник","дієслово","іменник","займенник","сполучник"],
+    ans:[1,2,4,3]
+  },
+  {
+    q:"Хто добре запалився, <span class=\"num num1\">(1)той</span> добре почав, <span class=\"num num2\">(2)а</span> добре почати — <span class=\"num num3\">(3)це</span> <span class=\"num num4\">(4)наполовину</span> завершити.",
+    items:["той","а","це","наполовину"],
+    opts:["частка","іменник","займенник","прислівник","сполучник"],
+    ans:[2,4,0,3]
+  },
+  {
+    q:"Митець повинен проводити <span class=\"num num1\">(1)багато</span> часу, <span class=\"num num2\">(2)дивлячись</span> на лінію горизонту, де <span class=\"num num3\">(3)океан</span> зустрічається <span class=\"num num4\">(4)з</span> небом.",
+    items:["багато","дивлячись","океан","з"],
+    opts:["іменник","частка","прийменник","числівник","дієприслівник (форма дієслова)"],
+    ans:[3,4,0,2]
+  },
+  {
+    q:"По весні 1663 року двоє <span class=\"num num1\">(1)подорожніх</span> <span class=\"num num2\">(2)верхи</span> на добрих конях наближались <span class=\"num num3\">(3)до</span> Києва з <span class=\"num num4\">(4)Білогородського</span> шляху.",
+    items:["подорожніх","верхи","до","Білогородського"],
+    opts:["іменник","дієприкметник (форма дієслова)","прийменник","прикметник","прислівник"],
+    ans:[0,4,2,3]
+  },
+  {
+    q:"Події пригодницького роману «Карбід» Андрія Любки розгортаються впродовж паркого <span class=\"num num1\">(1)й</span> тривожного літа 2015 року, коли у <span class=\"num num2\">(2)вигаданому</span> містечку <span class=\"num num3\">(3)Ведмедів</span> група ентузіастів <span class=\"num num4\">(4)вирішує</span> збудувати Фонтан Єдності з Європою.",
+    items:["й","вигаданому","Ведмедів","вирішує"],
+    opts:["дієслово","іменник","прикметник","сполучник","дієприкметник (форма дієслова)"],
+    ans:[3,4,1,0]
+  },
+  {
+    q:"Трилогія «Гобіт» зібрала у <span class=\"num num1\">(1)світовому</span> прокаті майже три <span class=\"num num2\">(2)мільярди</span> доларів, але вона <span class=\"num num3\">(3)не</span> відзначилася <span class=\"num num4\">(4)таким</span> успіхом у критиків, як «Володар перснів».",
+    items:["світовому","мільярди","не","таким"],
+    opts:["числівник","частка","прикметник","займенник","прислівник"],
+    ans:[4,0,1,3]
+  },
+  {
+    q:"<span class=\"num num1\">(1)Алло</span>, це сервісний центр? Учора, <span class=\"num num2\">(2)гуляючи</span> парком, я впустила недавно <span class=\"num num3\">(3)придбаний</span> смартфон і він розбився. <span class=\"num num4\">(4)Чи</span> діє в такому разі гарантія?",
+    items:["Алло","гуляючи","придбаний","Чи"],
+    opts:["прислівник","частка","дієприкметник (форма дієслова)","дієприслівник (форма дієслова)","вигук"],
+    ans:[4,3,2,1]
+  }
+];
+
+const LETTERS = ["А","Б","В","Г","Д"];
+
+// --- Telegram reporting config ---
+const LOG_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyDGcDVtwD0L8WW0zDIsXwYwwf6zp4XzmofzdI0wU-AhhfZIXbH2lOHquNSHI8cKRc7/exec";
+
+function logToSheet(payload){
+  try{
+    return fetch(LOG_WEBAPP_URL, {
+      method: 'POST',
+      headers: {'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    }).then(resp => resp.ok).catch(()=>false);
+  }catch(e){
+    return Promise.resolve(false);
+  }
+}
+
+let qIdx = 0;
+let answers = {}; // { qIndex: { picks:[0,1,null,3], checked:true/false } }
+let flags = {};
+let studentName = "";
+let started = false;
+let reportSent = false;
+let finished = false;
+let reviewMode = false;
+
+function progressKey_(){
+  return 'quizProgress::' + location.pathname + '::' + studentName;
+}
+function saveProgress_(){
+  try{
+    localStorage.setItem(progressKey_(), JSON.stringify({
+      answers, flags, qIdx, finished, ts: Date.now()
+    }));
+  }catch(e){}
+}
+function loadProgress_(){
+  try{
+    const raw = localStorage.getItem(progressKey_());
+    if(!raw) return null;
+    return JSON.parse(raw);
+  }catch(e){ return null; }
+}
+function clearProgress_(){
+  try{ localStorage.removeItem(progressKey_()); }catch(e){}
+}
+
+const quizArea = document.getElementById('quizArea');
+document.getElementById('totalTag').textContent = QUESTIONS.length + " завдань";
+
+// Підрахунок правильних/усіх СЛІВ (кожне питання дає 4 бали)
+function scoreOverall(){
+  let correct = 0, answeredQ = 0, totalWords = QUESTIONS.length * 4;
+  QUESTIONS.forEach((q,i)=>{
+    const rec = answers[i];
+    if(rec && rec.checked){
+      answeredQ++;
+      rec.picks.forEach((p,k)=>{ if(p===q.ans[k]) correct++; });
+    }
+  });
+  return {correct, answeredQ, totalWords, totalQ: QUESTIONS.length};
+}
+
+async function getStoredName(){
+  try{
+    const result = await window.storage.get('student_name_morfologiya_vidp');
+    return result ? result.value : null;
+  }catch(e){ return null; }
+}
+async function setStoredName(name){
+  try{ await window.storage.set('student_name_morfologiya_vidp', name); }catch(e){}
+}
+async function clearStoredName(){
+  try{ await window.storage.delete('student_name_morfologiya_vidp'); }catch(e){}
+}
+
+function buildReviewLink(){
+  const pairs = [];
+  QUESTIONS.forEach((_,i)=>{
+    const rec = answers[i];
+    if(rec && rec.checked) pairs.push(i + '-' + rec.picks.join('_'));
+  });
+  const ansStr = pairs.join(',');
+  const flagStr = Object.keys(flags).filter(i=>flags[i]).join(',');
+  const base = location.origin + location.pathname;
+  let url = `${base}?review=1&name=${encodeURIComponent(studentName)}&ans=${ansStr}`;
+  if(flagStr) url += `&flags=${flagStr}`;
+  return url;
+}
+
+function parseReviewParam(){
+  const params = new URLSearchParams(location.search);
+  if(params.get('review') !== '1') return false;
+  const name = params.get('name');
+  const ansParam = params.get('ans');
+  if(!ansParam) return false;
+
+  studentName = name || 'Учень';
+  answers = {};
+  ansParam.split(',').forEach(pair=>{
+    const idx = pair.indexOf('-');
+    const i = Number(pair.slice(0, idx));
+    const picks = pair.slice(idx+1).split('_').map(Number);
+    if(!Number.isNaN(i) && i >= 0 && i < QUESTIONS.length){
+      answers[i] = {picks, checked:true};
+    }
+  });
+
+  flags = {};
+  const flagsParam = params.get('flags');
+  if(flagsParam){
+    flagsParam.split(',').forEach(s=>{
+      const i = Number(s);
+      if(!Number.isNaN(i)) flags[i] = true;
+    });
+  }
+
+  started = true;
+  reviewMode = true;
+  qIdx = 0;
+  return true;
+}
+
+function renderNameScreen(prefill){
+  quizArea.innerHTML = `
+    <div class="name-screen">
+      <label for="nameInput">Як тебе звати?</label>
+      <input type="text" id="nameInput" placeholder="Ім'я" autocomplete="off" value="${prefill ? prefill.replace(/"/g,'&quot;') : ''}">
+      <button class="btn primary" id="startBtn" style="width:100%;justify-content:center;">Почати тест</button>
+    </div>
+  `;
+  const input = document.getElementById('nameInput');
+  const startBtn = document.getElementById('startBtn');
+  input.focus();
+  const go = async ()=>{
+    const val = input.value.trim();
+    studentName = val || "Без імені";
+    await setStoredName(studentName);
+    started = true;
+    const saved = loadProgress_();
+    if(saved){
+      answers = saved.answers || {};
+      flags = saved.flags || {};
+      qIdx = typeof saved.qIdx === 'number' ? saved.qIdx : 0;
+      finished = !!saved.finished;
+    } else {
+      answers = {}; flags = {}; qIdx = 0;
+    }
+    renderQuiz();
+  };
+  startBtn.onclick = go;
+  input.addEventListener('keydown', (e)=>{ if(e.key==='Enter') go(); });
+}
+
+async function sendTelegramReport(){
+  const {correct, totalWords, answeredQ, totalQ} = scoreOverall();
+  const wrongList = [];
+  const flaggedList = [];
+  QUESTIONS.forEach((q,i)=>{
+    const rec = answers[i];
+    if(rec && rec.checked){
+      const wrongWords = [];
+      rec.picks.forEach((p,k)=>{ if(p!==q.ans[k]) wrongWords.push(q.items[k]); });
+      if(wrongWords.length) wrongList.push((i+1) + " (" + wrongWords.join(', ') + ")");
+    }
+    if(flags[i]) flaggedList.push(i+1);
+  });
+
+  const reviewLink = buildReviewLink();
+  const statusEl = document.getElementById('sendStatus');
+
+  const ok = await logToSheet({
+    type: "quiz_result",
+    student: studentName,
+    testName: "Морфологія: відповідність (частини мови)",
+    correct, answered: totalWords ? undefined : undefined,
+    total: totalWords,
+    answeredCount: correct,
+    questionsAnswered: answeredQ,
+    questionsTotal: totalQ,
+    wrongList,
+    flaggedList,
+    reviewLink
+  });
+
+  if(ok){
+    reportSent = true;
+    clearProgress_();
+    if(statusEl){ statusEl.textContent = 'Результат надіслано вчителю ✓'; statusEl.className = 'send-status ok'; }
+  } else if(statusEl){
+    statusEl.innerHTML = 'Не вдалося надіслати результат (перевірте інтернет). Прогрес збережено, спробуйте ще раз.<br><button class="btn ghost small" id="retrySendBtn" style="margin-top:8px;">Спробувати ще раз</button>';
+    statusEl.className = 'send-status bad';
+    const retryBtn = document.getElementById('retrySendBtn');
+    if(retryBtn) retryBtn.onclick = ()=>{
+      statusEl.textContent = 'Надсилаємо результат...';
+      statusEl.className = 'send-status';
+      sendTelegramReport();
+    };
+  }
+}
+
+function renderQuiz(){
+  document.getElementById('reviewBanner').classList.toggle('show', reviewMode);
+
+  if(!started){ renderNameScreen(); return; }
+
+  const total = QUESTIONS.length;
+
+  if(qIdx >= total || finished){
+    const {correct, totalWords} = scoreOverall();
+    quizArea.innerHTML = `
+      <div class="done-screen">
+        <div class="ring"><div class="big">${correct}/${totalWords}</div></div>
+        <p class="sub" style="margin:0 auto 4px;">${studentName} · Морфологія · правильних слів із ${totalWords}</p>
+        ${reviewMode ? '' : `<div class="send-status" id="sendStatus">Надсилаємо результат...</div>
+        <button class="btn primary" id="restartBtn" style="margin-top:14px;">Пройти ще раз</button>`}
+      </div>`;
+    if(!reviewMode){
+      document.getElementById('restartBtn').onclick = ()=>{
+        answers = {}; flags = {};
+        qIdx = 0; reportSent = false; finished = false;
+        clearProgress_();
+        renderQuiz();
+      };
+      saveProgress_();
+      if(!reportSent){
+        sendTelegramReport();
+      }
+    }
+    return;
+  }
+
+  const q = QUESTIONS[qIdx];
+  const rec = answers[qIdx] || {picks:[null,null,null,null], checked:false};
+  const {correct, totalWords} = scoreOverall();
+  const isFlagged = !!flags[qIdx];
+  const allPicked = rec.picks.every(p=>p!==null && p!==undefined);
+  const locked = rec.checked || reviewMode;
+
+  let segs = '';
+  QUESTIONS.forEach((qq,i)=>{
+    const r = answers[i];
+    let cls = i===qIdx ? 'current' : '';
+    if(r && r.checked){
+      const numCorrect = r.picks.filter((p,k)=>p===qq.ans[k]).length;
+      cls = i===qIdx ? 'current' : (numCorrect===4 ? 'done-correct' : (numCorrect===0 ? 'done-wrong' : 'done-partial'));
+    }
+    segs += `<div class="seg ${cls}" data-i="${i}"></div>`;
+  });
+
+  const legendHtml = q.opts.map((o,i)=>`<div class="row"><span class="l">${LETTERS[i]}</span><span>${o}</span></div>`).join('');
+
+  const rowsHtml = q.items.map((word,k)=>{
+    const picked = rec.picks[k];
+    let lettersHtml = '';
+    q.opts.forEach((_,li)=>{
+      let cls = 'letter-btn';
+      if(locked){
+        if(li===q.ans[k]) cls += ' correct';
+        else if(li===picked) cls += ' wrong';
+      } else if(li===picked){
+        cls += ' picked';
+      }
+      lettersHtml += `<button class="${cls}" data-k="${k}" data-li="${li}" ${locked?'disabled':''}>${LETTERS[li]}</button>`;
+    });
+    return `
+      <div class="match-row">
+        <div class="match-left"><span class="n">${k+1}.</span>${word}</div>
+        <div class="arrow">→</div>
+        <div class="letters">${lettersHtml}</div>
+      </div>`;
+  }).join('');
+
+  let fbHtml = '';
+  if(locked){
+    const numCorrect = rec.picks.filter((p,k)=>p===q.ans[k]).length;
+    const cls = numCorrect===4 ? 'ok' : (numCorrect===0 ? 'bad' : 'mixed');
+    fbHtml = `<div class="feedback show ${cls}"><span>Правильних відповідей: ${numCorrect} із 4.</span></div>`;
+  }
+
+  quizArea.innerHTML = `
+    <div class="progress-row">
+      <div class="qnum">${studentName} · Питання ${qIdx+1} з ${total}</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        ${!reviewMode ? `<button id="flagBtn" type="button" title="Позначити, якщо незрозуміло" style="background:${isFlagged?'#FFE27A':'none'};border:none;cursor:pointer;font-size:13px;line-height:1;padding:4px 7px;border-radius:8px;opacity:${isFlagged?'1':'0.3'};">❓</button>` : ''}
+        <div class="score">${correct}/${totalWords}</div>
+      </div>
+    </div>
+    ${reviewMode && isFlagged ? `<p class="sub" style="color:#B8860B;font-weight:700;margin:0 0 6px;">❓ Учень позначив це питання як незрозуміле</p>` : ''}
+    <div class="segbar">${segs}</div>
+    <p class="qtext">З'ясуйте, якою частиною мови є кожне з виділених слів.<br>${q.q}</p>
+    <div class="match-box">${rowsHtml}</div>
+    <div class="opts-legend">${legendHtml}</div>
+    ${fbHtml}
+    <div class="nav-row">
+      <button class="btn ghost" id="prevBtn" ${qIdx===0?'disabled':''}>← Назад</button>
+      ${locked
+        ? `<button class="btn primary" id="nextBtn">${qIdx===total-1?'До результату':'Далі →'}</button>`
+        : `<button class="btn primary" id="checkBtn" ${allPicked?'':'disabled'}>Перевірити</button>`}
+    </div>
+    ${reviewMode ? '' : `
+    <div class="reset-row">
+      <button class="btn ghost small" id="finishBtn">Завершити і надіслати результат</button>
+      <button class="btn ghost small" id="changeNameBtn">Змінити ім'я</button>
+    </div>`}
+  `;
+
+  if(!locked){
+    quizArea.querySelectorAll('.letter-btn').forEach(btn=>{
+      btn.onclick = ()=>{
+        const k = +btn.dataset.k;
+        const li = +btn.dataset.li;
+        if(!answers[qIdx]) answers[qIdx] = {picks:[null,null,null,null], checked:false};
+        answers[qIdx].picks[k] = li;
+        saveProgress_();
+        renderQuiz();
+      };
+    });
+    const checkBtn = document.getElementById('checkBtn');
+    if(checkBtn) checkBtn.onclick = ()=>{
+      answers[qIdx].checked = true;
+      saveProgress_();
+      renderQuiz();
+    };
+  }
+
+  document.getElementById('prevBtn').onclick = ()=>{ qIdx--; clearDrawing(); renderQuiz(); };
+  const nextBtn = document.getElementById('nextBtn');
+  if(nextBtn) nextBtn.onclick = ()=>{ qIdx++; clearDrawing(); renderQuiz(); };
+
+  if(!reviewMode){
+    const flagBtn = document.getElementById('flagBtn');
+    if(flagBtn) flagBtn.onclick = ()=>{
+      flags[qIdx] = !flags[qIdx];
+      saveProgress_();
+      renderQuiz();
+    };
+    document.getElementById('finishBtn').onclick = ()=>{
+      const answeredQ = Object.keys(answers).filter(i=>answers[i].checked).length;
+      const msg = answeredQ===0
+        ? 'Ти ще не відповів на жодне питання. Завершити тест зараз?'
+        : `Завершити тест зараз і надіслати результат (перевірено ${answeredQ} із ${total} питань)?`;
+      if(confirm(msg)){
+        finished = true;
+        saveProgress_();
+        renderQuiz();
+      }
+    };
+    document.getElementById('changeNameBtn').onclick = async ()=>{
+      await clearStoredName();
+      started = false;
+      renderNameScreen(studentName);
+    };
+  }
+
+  quizArea.querySelectorAll('.seg').forEach(d=>{
+    d.onclick = ()=>{ qIdx = +d.dataset.i; saveProgress_(); renderQuiz(); };
+  });
+}
+
+async function init(){
+  if(parseReviewParam()){
+    renderQuiz();
+    return;
+  }
+  const fromUrl = new URLSearchParams(location.search).get('student');
+  if(fromUrl){
+    studentName = fromUrl;
+    started = true;
+    const saved = loadProgress_();
+    if(saved){
+      answers = saved.answers || {};
+      flags = saved.flags || {};
+      qIdx = typeof saved.qIdx === 'number' ? saved.qIdx : 0;
+      finished = !!saved.finished;
+    }
+    renderQuiz();
+    return;
+  }
+  const saved = await getStoredName();
+  if(saved){
+    studentName = saved;
+    started = true;
+    const savedProgress = loadProgress_();
+    if(savedProgress){
+      answers = savedProgress.answers || {};
+      flags = savedProgress.flags || {};
+      qIdx = typeof savedProgress.qIdx === 'number' ? savedProgress.qIdx : 0;
+      finished = !!savedProgress.finished;
+    }
+  }
+  renderQuiz();
+}
+init();
+
+// ======================================================================
+// МАЛЮВАННЯ ПОВЕРХ ЕКРАНА (режим "учитель")
+// ======================================================================
+(function(){
+  const canvas = document.getElementById('drawCanvas');
+  const ctx = canvas.getContext('2d');
+  const toggleBtn = document.getElementById('drawToggleBtn');
+  const toolbar = document.getElementById('drawToolbar');
+  const thinBtn = document.getElementById('thinBtn');
+  const thickBtn = document.getElementById('thickBtn');
+  const eraserBtn = document.getElementById('eraserBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const swatches = document.querySelectorAll('.swatch');
+
+  let drawingActive = false;
+  let isDrawing = false;
+  let currentColor = "#E5484D";
+  let currentWidth = 4;
+  let eraserMode = false;
+  let lastX = 0, lastY = 0;
+
+  function resizeCanvas(){
+    const prev = document.createElement('canvas');
+    prev.width = canvas.width;
+    prev.height = canvas.height;
+    prev.getContext('2d').drawImage(canvas, 0, 0);
+
+    canvas.width = window.innerWidth * devicePixelRatio;
+    canvas.height = window.innerHeight * devicePixelRatio;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    ctx.drawImage(prev, 0, 0, prev.width / devicePixelRatio, prev.height / devicePixelRatio);
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  window.clearDrawing = function(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  };
+
+  function setActive(on){
+    drawingActive = on;
+    canvas.classList.toggle('active', on);
+    toolbar.classList.toggle('show', on);
+    toggleBtn.classList.toggle('on', on);
+    toggleBtn.title = on ? 'Вимкнути малювання' : 'Малювати';
+  }
+
+  toggleBtn.addEventListener('click', ()=> setActive(!drawingActive));
+
+  swatches.forEach(sw=>{
+    sw.addEventListener('click', ()=>{
+      swatches.forEach(s=>s.classList.remove('selected'));
+      sw.classList.add('selected');
+      currentColor = sw.dataset.color;
+      eraserMode = false;
+      eraserBtn.classList.remove('selected');
+    });
+  });
+
+  thinBtn.addEventListener('click', ()=>{
+    currentWidth = 4;
+    thinBtn.classList.add('selected');
+    thickBtn.classList.remove('selected');
+  });
+  thickBtn.addEventListener('click', ()=>{
+    currentWidth = 12;
+    thickBtn.classList.add('selected');
+    thinBtn.classList.remove('selected');
+  });
+  eraserBtn.addEventListener('click', ()=>{
+    eraserMode = !eraserMode;
+    eraserBtn.classList.toggle('selected', eraserMode);
+  });
+  clearBtn.addEventListener('click', ()=>{
+    window.clearDrawing();
+  });
+
+  function pointerPos(e){
+    return { x: e.clientX, y: e.clientY, pressure: e.pressure || 0.5 };
+  }
+
+  canvas.addEventListener('pointerdown', (e)=>{
+    if(!drawingActive) return;
+    isDrawing = true;
+    const p = pointerPos(e);
+    lastX = p.x; lastY = p.y;
+    canvas.setPointerCapture(e.pointerId);
+  });
+
+  canvas.addEventListener('pointermove', (e)=>{
+    if(!drawingActive || !isDrawing) return;
+    const p = pointerPos(e);
+    ctx.globalCompositeOperation = eraserMode ? 'destination-out' : 'source-over';
+    ctx.strokeStyle = currentColor;
+    const pressureFactor = 0.6 + (p.pressure || 0.5) * 0.8;
+    ctx.lineWidth = (eraserMode ? currentWidth * 3 : currentWidth) * pressureFactor;
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+    lastX = p.x; lastY = p.y;
+  });
+
+  function stopDrawing(e){ isDrawing = false; }
+  canvas.addEventListener('pointerup', stopDrawing);
+  canvas.addEventListener('pointercancel', stopDrawing);
+  canvas.addEventListener('pointerleave', stopDrawing);
+})();
+</script>
+</body>
+</html>
