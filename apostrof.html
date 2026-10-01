@@ -355,16 +355,12 @@
 
   /* ===================== DRAWING / TEACHER MODE ===================== */
   #drawCanvas{
-    position:fixed;
-    inset:0;
-    width:100vw;
-    height:100vh;
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
     z-index:9998;
-    touch-action:none;
     pointer-events:none;
-  }
-  #drawCanvas.active{
-    pointer-events:auto;
   }
 
   #drawToggleBtn{
@@ -1085,25 +1081,45 @@ init();
   let currentWidth = 4;
   let eraserMode = false;
   let lastX = 0, lastY = 0;
+  let activePointerId = null;
+
+  function currentDocHeight(){
+    return Math.max(
+      document.documentElement.scrollHeight,
+      document.body.scrollHeight,
+      window.innerHeight
+    );
+  }
 
   function resizeCanvas(){
+    const docWidth = document.documentElement.clientWidth;
+    const docHeight = currentDocHeight();
+
     const prev = document.createElement('canvas');
     prev.width = canvas.width;
     prev.height = canvas.height;
-    prev.getContext('2d').drawImage(canvas, 0, 0);
+    if(canvas.width && canvas.height){
+      prev.getContext('2d').drawImage(canvas, 0, 0);
+    }
 
-    canvas.width = window.innerWidth * devicePixelRatio;
-    canvas.height = window.innerHeight * devicePixelRatio;
-    canvas.style.width = window.innerWidth + 'px';
-    canvas.style.height = window.innerHeight + 'px';
-    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+    canvas.width = docWidth * devicePixelRatio;
+    canvas.height = docHeight * devicePixelRatio;
+    canvas.style.width = docWidth + 'px';
+    canvas.style.height = docHeight + 'px';
+    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
-    ctx.drawImage(prev, 0, 0, prev.width / devicePixelRatio, prev.height / devicePixelRatio);
+    if(prev.width && prev.height){
+      ctx.drawImage(prev, 0, 0, prev.width / devicePixelRatio, prev.height / devicePixelRatio);
+    }
   }
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
+  window.addEventListener('orientationchange', resizeCanvas);
+  if(window.ResizeObserver){
+    new ResizeObserver(()=> resizeCanvas()).observe(document.body);
+  }
 
   window.clearDrawing = function(){
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -1111,7 +1127,6 @@ init();
 
   function setActive(on){
     drawingActive = on;
-    canvas.classList.toggle('active', on);
     toolbar.classList.toggle('show', on);
     toggleBtn.classList.toggle('on', on);
     toggleBtn.title = on ? 'Вимкнути малювання' : 'Малювати';
@@ -1148,19 +1163,35 @@ init();
   });
 
   function pointerPos(e){
-    return { x: e.clientX, y: e.clientY, pressure: e.pressure || 0.5 };
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+      pressure: e.pressure || 0.5,
+    };
   }
 
-  canvas.addEventListener('pointerdown', (e)=>{
+  function isOnControls(e){
+    return !!(e.target.closest && e.target.closest('#drawToolbar, #drawToggleBtn'));
+  }
+
+  document.addEventListener('pointerdown', (e)=>{
     if(!drawingActive) return;
+    if(e.pointerType !== 'pen') return;
+    if(isOnControls(e)) return;
+
+    e.preventDefault();
     isDrawing = true;
+    activePointerId = e.pointerId;
     const p = pointerPos(e);
     lastX = p.x; lastY = p.y;
-    canvas.setPointerCapture(e.pointerId);
-  });
+  }, { passive: false });
 
-  canvas.addEventListener('pointermove', (e)=>{
+  document.addEventListener('pointermove', (e)=>{
     if(!drawingActive || !isDrawing) return;
+    if(e.pointerId !== activePointerId) return;
+
+    e.preventDefault();
     const p = pointerPos(e);
     ctx.globalCompositeOperation = eraserMode ? 'destination-out' : 'source-over';
     ctx.strokeStyle = currentColor;
@@ -1171,14 +1202,21 @@ init();
     ctx.lineTo(p.x, p.y);
     ctx.stroke();
     lastX = p.x; lastY = p.y;
-  });
+  }, { passive: false });
 
   function stopDrawing(e){
+    if(e && e.pointerId !== undefined && e.pointerId !== activePointerId) return;
     isDrawing = false;
+    activePointerId = null;
   }
-  canvas.addEventListener('pointerup', stopDrawing);
-  canvas.addEventListener('pointercancel', stopDrawing);
-  canvas.addEventListener('pointerleave', stopDrawing);
+  document.addEventListener('pointerup', stopDrawing);
+  document.addEventListener('pointercancel', stopDrawing);
+
+  document.addEventListener('touchmove', function(e){
+    if(drawingActive && e.touches && e.touches[0] && e.touches[0].touchType === 'stylus'){
+      e.preventDefault();
+    }
+  }, { passive: false });
 })();
 </script>
 </body>
