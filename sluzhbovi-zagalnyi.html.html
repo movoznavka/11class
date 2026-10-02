@@ -176,7 +176,7 @@ function renderQuiz(){
         <button class="btn primary" id="restartBtn">Пройти ще раз</button>
       </div>`;
     document.getElementById('restartBtn').onclick = ()=>{
-      answers = {}; qIdx = 0; window.__matchSelected=null; newOrder(); renderQuiz();
+      answers = {}; qIdx = 0; window.__matchSelected=null; window.__partial={}; newOrder(); renderQuiz();
     };
     return;
   }
@@ -193,7 +193,9 @@ function renderQuiz(){
   });
 
   if(q.type === 'match'){
-    const picks = rec ? rec.picks : [null,null,null,null];
+    window.__partial = window.__partial || {};
+    if(!window.__partial[qIdx]) window.__partial[qIdx] = [null,null,null,null];
+    const picks = rec ? rec.picks : window.__partial[qIdx];
     const revealed = !!rec;
     let selected = (typeof window.__matchSelected === 'number') ? window.__matchSelected : null;
 
@@ -220,7 +222,7 @@ function renderQuiz(){
       let cls = 'match-opt-card';
       if(revealed) cls += ' disabled';
       else if(selected===li) cls += ' active';
-      rightHtml += `<div class="${cls}" data-l="${li}">${LETTERS[li]}. ${l}</div>`;
+      rightHtml += `<div class="${cls}" data-l="${li}" ${revealed?'':'draggable="true"'}>${LETTERS[li]}. ${l}</div>`;
     });
 
     quizArea.innerHTML = `
@@ -246,20 +248,28 @@ function renderQuiz(){
           renderQuiz();
         };
       });
+      const place = (n, li)=>{
+        picks[n] = li;
+        window.__matchSelected = null;
+        if(picks.every(p=>p!==null)){
+          const isCorrect = picks.every((p,i)=>p===q.answer[i]);
+          answers[qIdx] = {picks:picks.slice(), correct:isCorrect};
+        }
+        renderQuiz();
+      };
+      quizArea.querySelectorAll('.match-opt-card').forEach(card=>{
+        card.ondragstart = e=>{ e.dataTransfer.setData('text/plain', card.dataset.l); e.dataTransfer.effectAllowed='move'; };
+      });
       quizArea.querySelectorAll('.match-answer-box').forEach(box=>{
+        const n = +box.dataset.n;
+        box.ondragover = e=>{ e.preventDefault(); };
+        box.ondrop = e=>{ e.preventDefault(); const v = e.dataTransfer.getData('text/plain'); if(v!=='') place(n, +v); };
         box.onclick = ()=>{
-          const n = +box.dataset.n;
           if(selected===null){
             if(picks[n]!==null){ picks[n]=null; renderQuiz(); }
             return;
           }
-          picks[n] = selected;
-          window.__matchSelected = null;
-          if(picks.every(p=>p!==null)){
-            const isCorrect = picks.every((p,i)=>p===q.answer[i]);
-            answers[qIdx] = {picks, correct:isCorrect};
-          }
-          renderQuiz();
+          place(n, selected);
         };
       });
     }
