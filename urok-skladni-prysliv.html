@@ -59,7 +59,7 @@
   /* level 1: топіки */
   .topictoggle{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
   .topictoggle button{
-    flex:1 1 calc(33.333% - 7px);min-width:140px;padding:15px;border-radius:20px;border:none;background:var(--card);
+    flex:1 1 calc(25% - 8px);min-width:140px;padding:15px;border-radius:20px;border:none;background:var(--card);
     font-family:'Manrope',sans-serif;font-weight:800;font-size:13.5px;color:var(--ink-soft);
     cursor:pointer;box-shadow:0 8px 18px -14px rgba(19,33,59,.3);
     display:flex;align-items:center;justify-content:center;gap:8px;
@@ -109,6 +109,67 @@
 
   .mnemo{margin-top:16px;font-size:13px;line-height:1.55;color:var(--ink-soft);}
   .mnemo b{color:var(--ink);}
+
+  /* речення-картки зі стрілками */
+  .cardgrid.tallgrid .flip{height:176px;}
+  .flip-front .line{
+    position:relative;padding-top:34px;
+    font-family:'Manrope',sans-serif;font-weight:800;font-size:15px;line-height:1.4;color:var(--ink);
+  }
+  .flip-front .line .w.hl{color:var(--c1-b);}
+  .flip-back.razom{background:linear-gradient(155deg,var(--c3-a),var(--c3-b));}
+  .flip-back.okremo .flip-rule, .flip-back.razom .flip-rule{font-size:17px;}
+
+  .mnemo{font-size:14px;}
+  .hlw{color:#FFF3B0;text-decoration:underline;text-decoration-skip-ink:none;text-underline-offset:3px;}
+  .flip.wide{grid-column:1/-1;}
+  .cardgrid .flip.wide{height:248px;}
+  .flip.wide .flip-back{gap:2px;}
+  .flip.wide .flip-front{padding-left:24px;}
+  .cardgrid .flip.wide.slim{height:176px;}
+  .flip.wide.slim .flip-front{padding-left:18px;}
+  .flip-back .line{
+    position:relative;padding-top:34px;
+    font-family:'Manrope',sans-serif;font-weight:800;font-size:16px;line-height:1.3;color:#fff;
+  }
+  .flip-back .line .w.hl{color:#FFF3B0;text-decoration:underline;text-decoration-skip-ink:none;text-underline-offset:3px;}
+  .flip-back svg.arrows{color:#fff;}
+  .flip-front svg.arrows{color:#C2410C;}
+  .line svg.arrows{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;pointer-events:none;}
+  .back-but{font-family:'Manrope',sans-serif;font-weight:800;font-size:12px;letter-spacing:.12em;opacity:.8;margin:6px 0 0;}
+  .back-fin{font-family:'Manrope',sans-serif;font-weight:800;font-size:13px;margin-top:14px;background:rgba(255,255,255,.22);padding:5px 14px;border-radius:999px;}
+
+  .cardgrid .flip.listcard{height:290px;}
+  .listcard .flip-back{align-items:stretch;text-align:left;overflow-y:auto;}
+  .wordlist{font-size:14px;font-weight:600;line-height:1.6;}
+  .wordlist span{white-space:nowrap;}
+  @media(max-width:560px){.cardgrid .flip.listcard{height:430px;}}
+
+  .chips-title{font-family:'Manrope',sans-serif;font-weight:800;font-size:16px;margin:6px 0 12px;}
+  .chipgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:24px;}
+  .wchip{
+    background:var(--bg-soft);border-radius:16px;padding:13px 16px;
+    font-family:'Manrope',sans-serif;font-weight:800;font-size:14px;line-height:1.3;
+    display:flex;align-items:center;
+  }
+  .wchip.span2{grid-column:span 2;}
+
+  .cols{display:flex;justify-content:center;width:100%;}
+  .col{text-align:center;padding:0 18px;}
+  .col+.col{border-left:1px solid rgba(255,255,255,.4);}
+  .col-t{font-family:'Manrope',sans-serif;font-weight:800;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;opacity:.8;margin-bottom:6px;}
+  .cols .flip-example{margin-bottom:2px;}
+
+  .stack{grid-column:1/-1;display:flex;flex-direction:column;gap:0;}
+  .stack .flip-face{border-radius:20px 20px 0 0;}
+  .attached{background:var(--bg-soft);border-radius:0 0 20px 20px;padding:4px 18px 16px;}
+  .attached .chips-title{margin:0 0 8px;font-size:12.5px;color:var(--ink-soft);}
+  .chiprow2{display:flex;flex-wrap:wrap;gap:8px;}
+  .chiprow2 .wchip{
+    padding:7px 14px;font-size:13px;border-radius:12px;
+    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));color:#fff;
+    box-shadow:0 8px 16px -10px var(--c1-sh);
+  }
 
   /* flip cards */
   .cardgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
@@ -203,17 +264,12 @@
   footer{text-align:center;margin-top:22px;font-size:12.5px;color:var(--ink-soft);font-weight:500;}
 
   /* ===================== DRAWING / TEACHER MODE ===================== */
-  /* Canvas is positioned over the whole DOCUMENT (not just the viewport),
-     so ink scrolls together with the page content instead of staying
-     glued to the screen. Its size is recalculated after every content
-     change (see resizeCanvas() below). */
   #drawCanvas{
     position:absolute;
     top:0;
     left:0;
     z-index:9998;
-    pointer-events:none; /* drawing is handled via window-level listeners so
-                             taps/clicks on real UI underneath always pass through */
+    pointer-events:none;
   }
 
   #drawDebug{
@@ -302,7 +358,6 @@
     opacity:1;
     pointer-events:auto;
   }
-  /* панель згорнута, але малювання лишається увімкненим */
   #drawToolbar.mini{
     transform:translateX(-50%) translateY(130%) scale(0.94);
     opacity:0;
@@ -467,13 +522,10 @@
 /* ============================================================
    ЯК ДОДАТИ ЧИ ЗМІНИТИ МАТЕРІАЛ
    Весь контент живе в об'єкті TOPICS нижче.
-   Структура: TOPICS.suffix / TOPICS.noun / ... → subs [ ... ].
+   Структура: TOPICS.razom / TOPICS.defis / ... → subs [ ... ].
    Кожен розділ — один об'єкт { ... }.
-   Щоб додати картку/слово/питання — скопіюй існуючий блок
-   { ... } всередині потрібного масиву (cards / words / questions)
-   і зміни текст між лапками.
-   Щоб додати новий підрозділ (вкладку) — скопіюй один об'єкт
-   зі списку subs цілком і зміни tab / title / вміст.
+   Тип "text" — просто речення (масив sentences).
+   Тип "cards" — картки, що перевертаються.
    ============================================================ */
 
 const TOPICS = {
@@ -481,19 +533,17 @@ const TOPICS = {
     label: "Разом",
     subs: [
       {
-        id: "p-razom", tab: "Правило", dot: "1", type: "cards",
-        title: "Складні прислівники пишемо разом",
+        id: "p-razom", tab: "Правило", dot: "1", type: "text",
+        title: "",
         intro: "",
+        sentences: [
+          {words:["Зіграли","унічию."], arrow:{from:0,to:1,q:"як?"}, hl:[1], note:"прислівник — разом", kind:"razom"},
+          {words:["Підніматися","угору."], arrow:{from:0,to:1,q:"куди?"}, hl:[1], note:"прислівник — разом", kind:"razom"},
+          {words:["У","нічию","душу","не","зазирнеш."], arrow:{from:2,to:1,q:"яку?"}, hl:[0,1], note:"займенник (інша частина мови) — окремо", kind:"okremo"},
+          {words:["Підніматися","у гору","Говерлу."], arrow:{from:0,to:1,q:"у що?"}, hl:[1], note:"іменник (інша частина мови) — окремо", kind:"okremo"}
+        ],
         cards: [
-          {rule: "Прийменник + прислівник", desc: "", examples: [{word: "віднині"}]},
-          {rule: "Прийменник + іменник", desc: "", examples: [{word: "безвісти"}, {word: "вбік"}, {word: "але: подивився в бік (окремо, пряме значення)"}]},
-          {rule: "На-гора", desc: "виняток: пишеться через дефіс", examples: [{word: "на-гора"}]},
-          {rule: "Прийменник + короткий прикметник", desc: "", examples: [{word: "віддавна"}]},
-          {rule: "Прийменник + числівник", desc: "", examples: [{word: "удвоє"}]},
-          {rule: "Прийменник + займенник", desc: "", examples: [{word: "унічию"}, {word: "утім"}, {word: "але: у нічию душу не зазирнеш (окремо)"}]},
-          {rule: "Прийменник + прийменник + інша частина мови", desc: "", examples: [{word: "вдосвіта"}, {word: "завбільшки"}]},
-          {rule: "Утворені з кількох основ", desc: "", examples: [{word: "нашвидкуруч"}, {word: "натщесерце"}]},
-          {rule: "Утворені приєднанням часток аби-, ані-, де-, чи-, що-, як-", desc: "", examples: [{word: "абиколи"}, {word: "анітрохи"}, {word: "дедалі"}, {word: "щосили"}, {word: "якомога"}]}
+          {rule: "Утворені приєднанням часток аби-, ані-, де-, чи-, що-, як-", desc: "", examples: [{word: "абиколи"}, {word: "анітрохи"}, {word: "дедалі"}, {word: "деінде"}, {word: "щосили"}, {word: "якомога"}]}
         ]
       }
     ]
@@ -506,14 +556,23 @@ const TOPICS = {
         title: "Складні прислівники пишемо через дефіс",
         intro: "",
         cards: [
-          {rule: "По- + -ому, -ему, -єму, -е, -и", desc: "", examples: [{word: "по-нашому"}, {word: "по-твоєму"}, {word: "по-українськи"}]},
-          {rule: "По-перше – але по перше [число]", desc: "вставне слово через дефіс, а буквальне число — окремо", examples: [{word: "По-перше, ти зрозуміла."}, {word: "Відпочиваємо по перше вересня."}]},
-          {rule: "Де-факто, де-юре, по-латині", desc: "стійкі книжні вирази", examples: [{word: "де-факто = по-фактичному"}, {word: "де-юре = по-юридичному"}]},
-          {rule: "Казна-, хтозна- (бозна-), будь-, -небудь, то, от, таки", desc: "", examples: [{word: "казна-хто"}, {word: "хтозна-як"}, {word: "як-от"}, {word: "де-таки"}]},
-          {rule: "По- + порядковий числівник", desc: "але «по перше число» (буквальне число) — окремо", examples: [{word: "по-перше"}, {word: "по-друге"}]},
-          {rule: "Утворені повторенням однакових, синонімічних чи антонімічних слів", desc: "", examples: [{word: "десь-інде"}, {word: "часто-густо"}, {word: "з діда-прадіда"}]},
-          {rule: "Стійкі вирази-винятки", desc: "але: рік у рік, день у день, раз у раз (окремо)", examples: [{word: "віч-на-віч"}, {word: "пліч-о-пліч"}, {word: "хоч-не-хоч"}, {word: "як-не-як"}, {word: "де-не-де"}]}
-        ]
+          {rule: "По- + -ому, -ему, -єму, -е, -и", desc: "по-нашому, по-твоєму, по-українськи", wide: true, parts: [
+            {words: ["Співаємо","по-українському."], arrow: {from:0,to:1,q:"як?"}, hl:[1]},
+            {text: "АЛЕ:", cls: "but"},
+            {words: ["Зробимо","по українському","звичаю."], arrow: {from:2,to:1,q:"якому?"}, hl:[1]},
+            {text: "прикметник — пишемо окремо", cls: "fin"}
+          ]},
+          {rule: "Де-факто, де-юре, по-латині", desc: "стійкі книжні вирази", examples: [
+            {word: "де-факто = <span class='hlw'>по</span>-фактичн<span class='hlw'>ому</span>"},
+            {word: "де-юре = <span class='hlw'>по</span>-юридичн<span class='hlw'>ому</span>"},
+            {word: "по-латині = <span class='hlw'>по</span>-латинськ<span class='hlw'>и</span>"}
+          ]},
+          {rule: "Казна-, хтозна- (бозна-)*, -бо, -но, -то, -от, -таки", desc: "дефіс ставлю залюбки", examples: [{word: "казна-хто"}, {word: "хтозна-як"}, {word: "як-от"}, {word: "де-таки"}]},
+          {rule: "Повторення одного й того самого слова", desc: "", examples: [{word: "віч-на-віч"}, {word: "пліч-о-пліч"}, {word: "хоч-не-хоч"}, {word: "як-не-як"}, {word: "де-не-де"}], chipsLabel: "Винятки — пишемо окремо:", chips: ["рік у рік", "день у день", "раз у раз", "сам на сам", "один на один"]},
+          {rule: "Утворені поєднанням синонімів чи близьких за значенням слів", desc: "", examples: [{word: "десь-інде"}, {word: "часто-густо"}, {word: "з діда-прадіда"}]},
+          {rule: "На-гора", desc: "виняток: пишеться через дефіс", examples: [{word: "на-гора"}]}
+        ],
+        mnemo: "<b>*</b> Казна-, хтозна- (бозна-), будь-, -небудь — про дефіс ти не забудь; -бо, -но, -то, -от, -таки — дефіс ставлю залюбки."
       }
     ]
   },
@@ -524,13 +583,25 @@ const TOPICS = {
         id: "p-okremo", tab: "Правило", dot: "1", type: "cards",
         title: "Складні прислівники пишемо окремо",
         intro: "",
+        chipsBlock: {title: "Якщо між частинами можна вставити означення", list: ["без відома", "без кінця", "без кінця-краю", "без ліку", "без сумніву", "без угаву", "без упину", "в міру", "в ногу", "до вподоби", "до загину", "до ладу", "до останку", "до побачення", "до пуття", "до речі", "до смаку", "до снаги", "до сьогодні", "за кордон", "за кордоном", "з переляку", "з радості", "на бігу", "на весну", "на відмінно", "на диво", "на жаль", "на зло", "на льоту", "на око", "на поруки", "на радість", "на самоті", "на світанку", "на сором", "на ходу", "на шкоду", "на щастя", "над силу", "під силу", "по закону", "по змозі", "по правді", "по сусідству", "по суті", "по черзі", "уві сні", "у стократ"]},
         cards: [
-          {rule: "Якщо між частинами можна вставити означення", desc: "", examples: [{word: "без відома"}, {word: "на жаль"}, {word: "на щастя"}, {word: "в обмін"}]},
-          {rule: "Прийменник + прикметник чоловічого роду", desc: "", examples: [{word: "в цілому (цілий)"}, {word: "в основному (основний)"}, {word: "в середньому"}]},
-          {rule: "Праворуч, ліворуч", desc: "пишуться разом, хоч історично походять від «по праву руку», «по ліву руку»", examples: [{word: "праворуч"}, {word: "ліворуч"}]},
-          {rule: "Деінде чи десь-інде?", desc: "деінде — одне слово, десь-інде — через дефіс (повторення)", examples: [{word: "деінде"}, {word: "десь-інде"}]},
-          {rule: "Не плутати: по-друге / по двоє / надвоє", desc: "вставне слово, числівник окремо і прислівник разом — різні слова", examples: [{word: "по-друге (вставне слово)"}, {word: "по двоє (окремо)"}, {word: "надвоє (разом)"}]},
-          {rule: "Стійкі словосполучення у різних відмінкових формах", desc: "", examples: [{word: "сама собою"}, {word: "чин чином"}, {word: "одним одна"}, {word: "сама самотою"}]}
+                    {rule: "Утворені сполученням прийменника з прикметником чоловічого роду", desc: "", examples: [{word: "в цілому (цілий)"}, {word: "в основному (основний)"}, {word: "в середньому (середній)"}]},
+          {rule: "Слова, які стоять у різних відмінкових формах", desc: "", examples: [{word: "сама собою"}, {word: "чин чином"}, {word: "одним одна"}, {word: "сама самотою"}]}
+        ]
+      }
+    ]
+  },
+  chyslivnyk: {
+    label: "Прийменник + числівник",
+    subs: [
+      {
+        id: "p-chyslivnyk", tab: "Правило", dot: "1", type: "cards",
+        title: "Прийменник + числівник",
+        intro: "",
+        cards: [
+          {rule: "по-друге, по-третє", desc: "", examples: [{word: "думки 💭", note: "пишемо через дефіс"}]},
+          {rule: "по двоє, по троє", desc: "", examples: [{word: "ставимо стільці 🪑", note: "пишемо окремо"}]},
+          {rule: "надвоє, натроє", desc: "", examples: [{word: "розрізаємо торт 🍰", note: "пишемо разом"}]}
         ]
       }
     ]
@@ -538,7 +609,7 @@ const TOPICS = {
 };
 
 const LETTERS = ["А","Б","В","Г"];
-const TOPIC_ORDER = ["razom","defis","okremo"];
+const TOPIC_ORDER = ["razom","defis","okremo","chyslivnyk"];
 
 let activeTopic = "razom";
 let activeSub = 0;
@@ -561,9 +632,7 @@ function currentSection(){
   return sub;
 }
 
-// ---- per-tab drawing storage: намальоване на кожній вкладці (і на кожному
-// питанні тесту) зберігається окремо, тож перехід на іншу вкладку й назад
-// не стирає написане, а показує саме те, що було на ній ----
+// ---- per-tab drawing storage ----
 const drawStore = {};
 function sectionKey(){
   const sec = currentSection();
@@ -640,22 +709,62 @@ function renderSubSubs(){
   });
 }
 
-function renderContent(){
-  const s = currentSection();
-  let html = `<p class="section-title">${s.title}</p>${s.intro ? `<p class="section-intro">${s.intro}</p>` : ''}`;
-  if(s.type === "cards"){
-    html += `<div class="cardgrid">${s.cards.map((c)=>`
-      <div class="flip" data-kind="card">        <div class="flip-inner">
+function lineHtml(t){
+  return `<div class="line" data-arrow='${JSON.stringify(t.arrow)}'><svg class="arrows"></svg>${t.words.map((w,i)=>{
+    const m = w.match(/^(.*?)([.,!?]*)$/);
+    return `<span class="w${(t.hl||[]).includes(i)?' hl':''}" data-i="${i}">${m[1]}</span>${m[2]}`;
+  }).join(' ')}</div>`;
+}
+
+function stackHtml(c){
+  return `<div class="stack">${flipCard(c)}<div class="attached"><p class="chips-title">${c.chipsLabel||''}</p><div class="chiprow2">${c.chips.map(w=>`<div class="wchip">${w}</div>`).join('')}</div></div></div>`;
+}
+
+function flipCard(c){
+  const back = c.parts
+    ? c.parts.map(p=> p.words ? lineHtml(p) : `<div class="back-${p.cls}">${p.text}</div>`).join('')
+    : c.cols
+    ? `<div class="cols">${c.cols.map(col=>`<div class="col"><div class="col-t">${col.title}</div>${col.items.map(i=>`<div class="flip-example">${i}</div>`).join('')}</div>`).join('')}</div>`
+    : c.list
+    ? `<div class="wordlist">${c.list.map(w=>`<span>${w}</span>`).join(', ')}</div>`
+    : c.examples.map(e=>`<div class="flip-example">${e.word}${e.ipa?' '+e.ipa:''}</div>${e.note?`<div class="flip-note">${e.note}</div>`:''}`).join('');
+  return `
+      <div class="flip${c.wide?' wide':''}${c.slim?' slim':''}${c.list?' listcard':''}" data-kind="card">
+        <div class="flip-inner">
           <div class="flip-face flip-front">
             <div class="flip-rule">${c.rule}</div>
             <div class="flip-desc">${c.desc||''}</div>
             <div class="flip-hint">натисни →</div>
           </div>
-          <div class="flip-face flip-back">
-            ${c.examples.map(e=>`<div class="flip-example">${e.word}${e.ipa?' '+e.ipa:''}</div>${e.note?`<div class="flip-note">${e.note}</div>`:''}`).join('')}
+          <div class="flip-face flip-back">${back}</div>
+        </div>
+      </div>`;
+}
+
+function renderContent(){
+  const s = currentSection();
+  let html = `${s.title ? `<p class="section-title">${s.title}</p>` : ''}${s.intro ? `<p class="section-intro">${s.intro}</p>` : ''}`;
+
+  if(s.type === "text"){
+    html += `<div class="cardgrid tallgrid">${s.sentences.map((t,si)=>`
+      <div class="flip" data-kind="card">
+        <div class="flip-inner">
+          <div class="flip-face flip-front">
+            ${lineHtml(t)}
+            <div class="flip-hint">натисни →</div>
+          </div>
+          <div class="flip-face flip-back ${t.kind}">
+            <div class="flip-rule">${t.note}</div>
           </div>
         </div>
-      </div>`).join('')}</div>`;
+      </div>`).join('')}${(s.cards||[]).map(flipCard).join('')}</div>`;
+  }
+
+  if(s.type === "cards"){
+    if(s.chipsBlock){
+      html += `<p class="chips-title">${s.chipsBlock.title}</p><div class="chipgrid">${s.chipsBlock.list.map(w=>`<div class="wchip${w.length>20?' span2':''}">${w}</div>`).join('')}</div>`;
+    }
+    html += `<div class="cardgrid">${s.cards.map(c=>c.chips?stackHtml(c):flipCard(c)).join('')}</div>`;
     if(s.mnemo) html += `<div class="mnemo">${s.mnemo}</div>`;
   }
 
@@ -685,15 +794,38 @@ function renderContent(){
   }
 
   lessonArea.innerHTML = html;
+  drawArrows();
   lessonArea.querySelectorAll('[data-kind="card"], [data-kind="chip"], [data-kind="row"]').forEach(el=>{
     el.onclick = ()=>{ el.classList.toggle('open'); };
   });
   syncCanvasAfterRender();
 }
 
+let arrowSeq = 0;
+function drawArrows(){
+  document.querySelectorAll('.line[data-arrow]').forEach(line=>{
+    const a = JSON.parse(line.dataset.arrow);
+    const svg = line.querySelector('svg.arrows');
+    const ws = line.querySelectorAll('.w');
+    const w1 = ws[a.from], w2 = ws[a.to];
+    if(!svg || !w1 || !w2) return;
+    const x1 = w1.offsetLeft + w1.offsetWidth/2;
+    const x2 = w2.offsetLeft + w2.offsetWidth/2;
+    const y = Math.min(w1.offsetTop, w2.offsetTop) - 1;
+    const h = 18;
+    const cy = y - h*4/3;
+    const id = 'ah'+(++arrowSeq);
+    svg.innerHTML = `
+      <defs><marker id="${id}" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+        <path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+      <path d="M ${x1} ${y} C ${x1} ${cy}, ${x2} ${cy}, ${x2} ${y}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" marker-end="url(#${id})"/>
+      <text x="${(x1+x2)/2}" y="${y - h - 5}" text-anchor="middle" font-family="Manrope, sans-serif" font-weight="800" font-size="13" fill="currentColor">${a.q}</text>`;
+  });
+}
+window.addEventListener('resize', drawArrows);
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(drawArrows);
+
 function syncCanvasAfterRender(){
-  // дає верстці "осісти", а тоді підганяє розмір канвасу малювання під нову висоту сторінки,
-  // і відновлює те, що було намальоване саме на цій вкладці (якщо було)
   if(window.resizeDrawCanvas){
     requestAnimationFrame(()=> requestAnimationFrame(()=>{
       window.resizeDrawCanvas();
@@ -781,24 +913,6 @@ renderAll();
 
 // ======================================================================
 // МАЛЮВАННЯ ПОВЕРХ ЕКРАНА (режим "учитель")
-//
-// Ця версія навмисно побудована один в один за робочим прикладом, який
-// підтвердив, що пише без затримок і що кнопка з панеллю не зникають і не
-// роздуваються під час зуму. Різниця з попередніми спробами:
-//   • НІЯКОГО втручання в touch-action — воно завжди 'auto', як типово
-//     в браузері. preventDefault() на самому дотику пером і так гарантує,
-//     що перо не гортає й не зумить сторінку; більше нічого чіпати не
-//     треба, а зайві обмеження touch-action, судячи з усього, і були
-//     причиною затримки між буквами.
-//   • НІЯКОЇ JS-компенсації позиції/розміру кнопки й панелі під час
-//     pinch-zoom. Вони — звичайний CSS position:fixed. Раніше спроби
-//     "виправити" це власним кодом лише ламали те, що й так працювало.
-//   • Малювання — просте, пряме, растрове (як у прикладі), без черг і
-//     буферизації.
-// Єдине, що збережено понад приклад: чорнило кожної вкладки зберігається
-// окремо (бо в цьому уроці, на відміну від прикладу, є кілька вкладок) —
-// через ті самі getDrawingSnapshot/setDrawingSnapshot, які вже викликає
-// зовнішній скрипт при перемиканні вкладок.
 // ======================================================================
 (function(){
   const canvas = document.getElementById('drawCanvas');
@@ -867,9 +981,6 @@ renderAll();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   };
 
-  // сумісний з рештою сторінки API: чорнило кожної вкладки зберігається й
-  // відновлюється окремо при перемиканні вкладок (викликається з
-  // зовнішнього скрипту через saveCurrentDrawing()/restoreCurrentDrawing())
   window.getDrawingSnapshot = function(){
     try{
       return (canvas.width && canvas.height) ? canvas.toDataURL('image/png') : null;
