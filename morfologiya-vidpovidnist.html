@@ -361,6 +361,24 @@
     .match-left{font-size:13px;}
   }
 
+
+  /* --- формат як у тесті зі службових частин мови --- */
+  .match-grid{display:flex;gap:18px;align-items:flex-start;background:var(--bg-soft);border-radius:20px;padding:16px;margin-bottom:18px;}
+  .match-col{flex:1;display:flex;flex-direction:column;gap:10px;min-width:0;}
+  .match-word-row{display:flex;align-items:center;gap:8px;}
+  .match-word-card{flex:1;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:11px 14px;font-family:'Manrope',sans-serif;font-weight:700;font-size:14px;color:var(--ink);min-width:0;}
+  .match-word-card b{color:var(--c1-b);margin-right:4px;}
+  .match-arrow{color:var(--ink-soft);font-size:16px;flex-shrink:0;}
+  .ans-box{flex:1;min-height:44px;border:1.5px dashed var(--c1-a);border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;font-weight:800;font-size:13px;cursor:pointer;background:#fff;color:var(--c1-b);padding:6px 8px;text-align:center;}
+  .ans-box.filled{border-style:solid;background:#EFEBFF;}
+  .ans-box.correct{border-color:var(--correct-ink);background:var(--correct-bg);color:var(--correct-ink);cursor:default;}
+  .ans-box.wrong{border-color:var(--wrong-ink);background:var(--wrong-bg);color:var(--wrong-ink);cursor:default;}
+  .opt-card{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;font-family:'Manrope',sans-serif;font-weight:700;font-size:14px;cursor:pointer;color:var(--ink);}
+  .opt-card.active{border-color:var(--c1-b);background:#EFEBFF;box-shadow:0 0 0 3px rgba(108,76,241,0.15);}
+  .opt-card.used{opacity:.45;}
+  .opt-card.disabled{cursor:default;}
+  @media (max-width:560px){ .match-grid{flex-direction:column;} .match-word-card,.opt-card{font-size:13px;} }
+
   /* ===================== DRAWING / TEACHER MODE ===================== */
   #drawCanvas{
     position:fixed; inset:0; width:100vw; height:100vh;
@@ -930,7 +948,7 @@ function renderQuiz(){
       </div>`;
     if(!reviewMode){
       document.getElementById('restartBtn').onclick = ()=>{
-        answers = {}; flags = {};
+        answers = {}; flags = {}; window.__sel=null;
         qIdx = 0; reportSent = false; finished = false;
         clearProgress_();
         renderQuiz();
@@ -961,27 +979,30 @@ function renderQuiz(){
     segs += `<div class="seg ${cls}" data-i="${i}"></div>`;
   });
 
-  const legendHtml = q.opts.map((o,i)=>`<div class="row"><span class="l">${LETTERS[i]}</span><span>${o}</span></div>`).join('');
-
-  const rowsHtml = q.items.map((word,k)=>{
-    const picked = rec.picks[k];
-    let lettersHtml = '';
-    q.opts.forEach((_,li)=>{
-      let cls = 'letter-btn';
-      if(locked){
-        if(li===q.ans[k]) cls += ' correct';
-        else if(li===picked) cls += ' wrong';
-      } else if(li===picked){
-        cls += ' picked';
+  const sel = (typeof window.__sel === 'number') ? window.__sel : null;
+  const isP = v => v!==null && v!==undefined;
+  const leftHtml = q.items.map((word,k)=>{
+    const pk = rec.picks[k];
+    let bc = 'ans-box', label = isP(pk) ? LETTERS[pk] : '?';
+    if(locked){
+      if(pk===q.ans[k]) bc += ' filled correct';
+      else {
+        bc += ' filled wrong';
+        label = isP(pk) ? LETTERS[pk]+' → '+LETTERS[q.ans[k]] : LETTERS[q.ans[k]];
       }
-      lettersHtml += `<button class="${cls}" data-k="${k}" data-li="${li}" ${locked?'disabled':''}>${LETTERS[li]}</button>`;
-    });
-    return `
-      <div class="match-row">
-        <div class="match-left"><span class="n">${k+1}.</span>${word}</div>
-        <div class="arrow">→</div>
-        <div class="letters">${lettersHtml}</div>
-      </div>`;
+    } else if(isP(pk)) bc += ' filled';
+    return `<div class="match-word-row">
+      <div class="match-word-card"><b>${k+1}.</b>${word}</div>
+      <div class="match-arrow">→</div>
+      <div class="${bc}" data-k="${k}">${label}</div>
+    </div>`;
+  }).join('');
+  const rightHtml = q.opts.map((o,li)=>{
+    let cls = 'opt-card';
+    if(locked) cls += ' disabled';
+    else if(sel===li) cls += ' active';
+    else if(rec.picks.includes(li)) cls += ' used';
+    return `<div class="${cls}" data-l="${li}" ${locked?'':'draggable="true"'}>${LETTERS[li]}. ${o}</div>`;
   }).join('');
 
   let fbHtml = '';
@@ -1002,8 +1023,10 @@ function renderQuiz(){
     ${reviewMode && isFlagged ? `<p class="sub" style="color:#B8860B;font-weight:700;margin:0 0 6px;">❓ Учень позначив це питання як незрозуміле</p>` : ''}
     <div class="segbar">${segs}</div>
     <p class="qtext">З'ясуйте, якою частиною мови є кожне з виділених слів.<br>${q.q}</p>
-    <div class="match-box">${rowsHtml}</div>
-    <div class="opts-legend">${legendHtml}</div>
+    <div class="match-grid">
+      <div class="match-col">${leftHtml}</div>
+      <div class="match-col">${rightHtml}</div>
+    </div>
     ${fbHtml}
     <div class="nav-row">
       <button class="btn ghost" id="prevBtn" ${qIdx===0?'disabled':''}>← Назад</button>
@@ -1019,14 +1042,26 @@ function renderQuiz(){
   `;
 
   if(!locked){
-    quizArea.querySelectorAll('.letter-btn').forEach(btn=>{
-      btn.onclick = ()=>{
-        const k = +btn.dataset.k;
-        const li = +btn.dataset.li;
-        if(!answers[qIdx]) answers[qIdx] = {picks:[null,null,null,null], checked:false};
-        answers[qIdx].picks[k] = li;
-        saveProgress_();
-        renderQuiz();
+    const place = (k, li)=>{
+      if(!answers[qIdx]) answers[qIdx] = {picks:[null,null,null,null], checked:false};
+      const pk = answers[qIdx].picks;
+      pk.forEach((v,i)=>{ if(v===li) pk[i]=null; }); // один варіант — одне віконце
+      pk[k] = li;
+      window.__sel = null;
+      saveProgress_();
+      renderQuiz();
+    };
+    quizArea.querySelectorAll('.opt-card').forEach(card=>{
+      card.onclick = ()=>{ window.__sel = (window.__sel===+card.dataset.l) ? null : +card.dataset.l; renderQuiz(); };
+      card.ondragstart = e=>{ e.dataTransfer.setData('text/plain', card.dataset.l); e.dataTransfer.effectAllowed='move'; };
+    });
+    quizArea.querySelectorAll('.ans-box').forEach(box=>{
+      const k = +box.dataset.k;
+      box.ondragover = e=>e.preventDefault();
+      box.ondrop = e=>{ e.preventDefault(); const v=e.dataTransfer.getData('text/plain'); if(v!=='') place(k,+v); };
+      box.onclick = ()=>{
+        if(typeof window.__sel === 'number'){ place(k, window.__sel); return; }
+        if(isP(rec.picks[k])){ answers[qIdx].picks[k]=null; saveProgress_(); renderQuiz(); }
       };
     });
     const checkBtn = document.getElementById('checkBtn');
@@ -1037,9 +1072,9 @@ function renderQuiz(){
     };
   }
 
-  document.getElementById('prevBtn').onclick = ()=>{ qIdx--; clearDrawing(); renderQuiz(); };
+  document.getElementById('prevBtn').onclick = ()=>{ window.__sel=null; qIdx--; clearDrawing(); renderQuiz(); };
   const nextBtn = document.getElementById('nextBtn');
-  if(nextBtn) nextBtn.onclick = ()=>{ qIdx++; clearDrawing(); renderQuiz(); };
+  if(nextBtn) nextBtn.onclick = ()=>{ window.__sel=null; qIdx++; clearDrawing(); renderQuiz(); };
 
   if(!reviewMode){
     const flagBtn = document.getElementById('flagBtn');
@@ -1067,7 +1102,7 @@ function renderQuiz(){
   }
 
   quizArea.querySelectorAll('.seg').forEach(d=>{
-    d.onclick = ()=>{ qIdx = +d.dataset.i; saveProgress_(); renderQuiz(); };
+    d.onclick = ()=>{ window.__sel=null; qIdx = +d.dataset.i; saveProgress_(); renderQuiz(); };
   });
 }
 
