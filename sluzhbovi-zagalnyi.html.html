@@ -238,10 +238,19 @@ function renderQuiz(){
       </div>
       <div class="nav-row">
         <button class="btn ghost" id="prevBtn" ${qIdx===0?'disabled':''}>← Назад</button>
-        <button class="btn primary" id="nextBtn" ${rec?'':'disabled'}>${qIdx===total-1?'До результату':'Далі →'}</button>
+        ${revealed
+          ? `<button class="btn primary" id="nextBtn">${qIdx===total-1?'До результату':'Далі →'}</button>`
+          : `<button class="btn primary" id="checkBtn" ${picks.every(p=>p!==null)?'':'disabled'}>Перевірити</button>`}
       </div>`;
 
     if(!revealed){
+      const cb = document.getElementById('checkBtn');
+      if(cb) cb.onclick = ()=>{
+        const isCorrect = picks.every((p,i)=>p===q.answer[i]);
+        answers[qIdx] = {picks:picks.slice(), correct:isCorrect};
+        window.__matchSelected = null;
+        renderQuiz();
+      };
       quizArea.querySelectorAll('.match-opt-card').forEach(card=>{
         card.onclick = ()=>{
           window.__matchSelected = +card.dataset.l;
@@ -249,12 +258,9 @@ function renderQuiz(){
         };
       });
       const place = (n, li)=>{
+        picks.forEach((v,i)=>{ if(v===li) picks[i]=null; }); // один варіант — одне віконце
         picks[n] = li;
         window.__matchSelected = null;
-        if(picks.every(p=>p!==null)){
-          const isCorrect = picks.every((p,i)=>p===q.answer[i]);
-          answers[qIdx] = {picks:picks.slice(), correct:isCorrect};
-        }
         renderQuiz();
       };
       quizArea.querySelectorAll('.match-opt-card').forEach(card=>{
@@ -305,7 +311,8 @@ function renderQuiz(){
   }
 
   document.getElementById('prevBtn').onclick = ()=>{ window.__matchSelected=null; qIdx--; renderQuiz(); };
-  document.getElementById('nextBtn').onclick = ()=>{ window.__matchSelected=null; qIdx++; renderQuiz(); };
+  const nb = document.getElementById('nextBtn');
+  if(nb) nb.onclick = ()=>{ window.__matchSelected=null; qIdx++; renderQuiz(); };
 }
 
 renderQuiz();
