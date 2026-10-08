@@ -8,89 +8,60 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#D0E9FC;
-    --bg-soft:#E4F2FC;
-    --card:#FFFFFF;
-    --ink:#13213B;
-    --ink-soft:#6478A0;
-    --line: rgba(19,33,59,0.08);
-
-    --c1-a:#C084FC; --c1-b:#9333EA; --c1-sh: rgba(147,51,234,0.45);
-    --c3-a:#5FE0A8; --c3-b:#17A863; --c3-sh: rgba(23,168,99,0.4);
-    --c2-b:#E5484D;
-    --c4-a:#FFB86C; --c4-b:#F5820D;
-
-    --correct-bg:#E6F8EE;
-    --correct-ink:#128A54;
-    --wrong-bg:#FDECEC;
-    --wrong-ink:#D8393E;
+    --bg:#D0E9FC;--bg-soft:#E4F2FC;--card:#FFFFFF;--ink:#13213B;--ink-soft:#6478A0;--line:rgba(19,33,59,0.08);
+    --c1-a:#C084FC;--c1-b:#9333EA;--c1-sh:rgba(147,51,234,0.45);
+    --c3-a:#5FE0A8;--c3-b:#17A863;--c3-sh:rgba(23,168,99,0.4);
+    --c2-b:#E5484D;--c4-a:#FFB86C;--c4-b:#F5820D;
+    --correct-bg:#E6F8EE;--correct-ink:#128A54;--wrong-bg:#FDECEC;--wrong-ink:#D8393E;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
-  body{
-    background:var(--bg);
-    color:var(--ink);
-    font-family:'Inter', sans-serif;
-    min-height:100vh;
-    padding:28px 16px 64px;
-    position:relative;
-  }
+  body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-height:100vh;padding:28px 16px 64px;position:relative;}
   .wrap{max-width:760px;margin:0 auto;}
-
-  .topbar{
-    display:flex;justify-content:space-between;align-items:center;
-    padding-bottom:16px;margin-bottom:22px;
-    border-bottom:1.5px solid rgba(19,33,59,0.14);
-  }
-  .kicker{
-    font-family:'Manrope',sans-serif;font-weight:800;font-size:12.5px;
-    letter-spacing:.12em;text-transform:uppercase;color:var(--ink);opacity:.55;
-  }
+  .topbar{display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;margin-bottom:22px;border-bottom:1.5px solid rgba(19,33,59,0.14);}
+  .kicker{font-family:'Manrope',sans-serif;font-weight:800;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);opacity:.55;}
   .kicker.tag{opacity:.4;}
-
-  h1{
-    font-family:'Manrope',sans-serif;font-weight:800;
-    font-size:clamp(22px,5.2vw,34px);line-height:1.1;letter-spacing:-0.01em;
-    margin:0 0 8px;text-transform:uppercase;
-  }
+  h1{font-family:'Manrope',sans-serif;font-weight:800;font-size:clamp(22px,5.2vw,34px);line-height:1.1;letter-spacing:-0.01em;margin:0 0 8px;text-transform:uppercase;}
   h1 .hl{color:var(--c1-b);}
   .sub{color:var(--ink-soft);font-size:15px;max-width:56ch;margin:0 0 22px;font-weight:500;}
 
   /* tabs */
   .tabbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
-  .tab{
-    padding:10px 15px 10px 10px;border-radius:999px;border:none;background:var(--card);
-    color:var(--ink-soft);font-family:'Manrope',sans-serif;font-weight:800;font-size:12.5px;
-    cursor:pointer;display:flex;align-items:center;gap:8px;
-    box-shadow: 0 8px 18px -14px rgba(19,33,59,0.3);
-  }
-  .tab .dot{
-    width:22px;height:22px;border-radius:8px;background:rgba(147,51,234,.1);color:var(--c1-b);
-    display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;
-  }
-  .tab.active{
-    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));color:#fff;
-    box-shadow:0 10px 20px -10px var(--c1-sh);
-  }
+  .tab{padding:10px 15px 10px 10px;border-radius:999px;border:none;background:var(--card);color:var(--ink-soft);font-family:'Manrope',sans-serif;font-weight:800;font-size:12.5px;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 8px 18px -14px rgba(19,33,59,0.3);}
+  .tab .dot{width:22px;height:22px;border-radius:8px;background:rgba(147,51,234,.1);color:var(--c1-b);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;}
+  .tab.active{background:linear-gradient(155deg,var(--c1-a),var(--c1-b));color:#fff;box-shadow:0 10px 20px -10px var(--c1-sh);}
   .tab.active .dot{background:rgba(255,255,255,.25);color:#fff;}
 
-  .card{
-    background:var(--card);border-radius:28px;padding:28px 24px;
-    box-shadow: 0 20px 44px -28px rgba(19,33,59,0.35);
-  }
+  /* кнопки-фільтри закінчень (О Е Є Ю) */
+  .pillbar{display:flex;gap:8px;flex-wrap:wrap;margin:-6px 0 20px;}
+  .pillbar:empty{display:none;}
+  .pill{width:auto;padding:0 18px;height:42px;border-radius:999px;white-space:nowrap;border:none;background:var(--card);color:var(--c1-b);font-family:'Manrope',sans-serif;font-weight:800;font-size:13.5px;letter-spacing:.01em;cursor:pointer;box-shadow:0 8px 18px -14px rgba(19,33,59,0.3);transition:transform .12s ease;}
+  .pill:hover{transform:translateY(-1px);}
+  .pill.active{background:linear-gradient(155deg,var(--c1-a),var(--c1-b));color:#fff;box-shadow:0 10px 20px -10px var(--c1-sh);}
 
+  .card{background:var(--card);border-radius:28px;padding:28px 24px;box-shadow:0 20px 44px -28px rgba(19,33,59,0.35);}
   .section-title{font-family:'Manrope',sans-serif;font-weight:800;font-size:20px;letter-spacing:-0.005em;margin:0 0 8px;}
   .section-intro{color:var(--ink-soft);font-size:14.5px;line-height:1.6;margin:0 0 18px;}
   .section-intro b{color:var(--ink);}
-
-  .callout{
-    background:linear-gradient(155deg, rgba(255,184,108,.22), rgba(245,130,13,.10));
-    border-radius:18px;padding:14px 18px;margin-bottom:20px;font-size:13.5px;line-height:1.55;color:var(--ink);
-  }
+  .callout{background:linear-gradient(155deg,rgba(255,184,108,.22),rgba(245,130,13,.10));border-radius:18px;padding:14px 18px;margin-bottom:20px;font-size:13.5px;line-height:1.55;color:var(--ink);}
   .callout b{color:var(--c4-b);font-family:'Manrope',sans-serif;}
+
+  /* нерухома картка (правило + приклади) */
+  .static-card{background:var(--bg-soft);border-radius:20px;padding:24px 26px;}
+  .sc-rule{font-family:'Manrope',sans-serif;font-weight:800;font-size:19px;line-height:1.35;padding-bottom:14px;margin-bottom:16px;border-bottom:1.5px solid rgba(19,33,59,0.1);}
+  .sc-rule::first-letter{text-transform:uppercase;}
+  .sc-rule.next{margin-top:26px;}
+  .static-card .chip{background:#fff;}
+  .sc-ex{font-family:'Manrope',sans-serif;font-weight:700;font-size:20px;line-height:1.3;margin-bottom:10px;color:var(--c1-b);}
+  .sc-ex:last-child{margin-bottom:0;}
+  .sc-note{font-size:13px;color:var(--ink-soft);font-weight:500;line-height:1.4;margin:-4px 0 10px;}
+  .sc-note.main{margin:14px 0 0;padding-top:12px;border-top:1.5px solid rgba(19,33,59,0.1);}
 
   /* flip cards */
   .cardgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .cardgrid.single{grid-template-columns:1fr;}
+  .cardgrid.single .flip{height:260px;}
+  .cardgrid.single .flip-front .flip-desc{font-family:'Manrope',sans-serif;font-weight:800;font-size:19px;line-height:1.35;opacity:1;margin-top:0;}
   @media(max-width:640px){.cardgrid{grid-template-columns:1fr;}}
   .flip{perspective:1200px;height:230px;cursor:pointer;}
   .flip-inner{position:relative;width:100%;height:100%;transition:transform .5s cubic-bezier(.4,.2,.2,1);transform-style:preserve-3d;}
@@ -106,62 +77,26 @@
   .flip-hint{position:absolute;bottom:9px;right:14px;font-size:10px;font-weight:700;opacity:.4;}
 
   /* exceptions chips */
-  .group-title{
-    font-family:'Manrope',sans-serif;
-    font-weight:800;
-    font-size:13px;
-    letter-spacing:.04em;
-    text-transform:uppercase;
-    color:var(--c1-b);
-    margin:22px 0 12px;
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    padding:5px 14px 5px 12px;
-    border-radius:999px;
-    background: rgba(147,51,234,0.10);
-  }
+  .group-title{font-family:'Manrope',sans-serif;font-weight:800;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--c1-b);margin:22px 0 12px;display:inline-flex;align-items:center;gap:8px;padding:5px 14px 5px 12px;border-radius:999px;background:rgba(147,51,234,0.10);}
   .group-title:first-child{margin-top:0;}
-  .group-title::before{
-    content:'';
-    width:6px;height:6px;
-    border-radius:50%;
-    background:var(--c1-b);
-  }
+  .group-title::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--c1-b);}
   .chiprow{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:6px;}
   .chip{background:var(--bg-soft);border-radius:16px;padding:13px 18px;cursor:pointer;min-width:126px;transition:background .2s;}
   .chip .w{font-family:'Manrope',sans-serif;font-weight:800;font-size:14.5px;}
   .chip .ipa{font-size:12.5px;color:#fff;font-weight:700;margin-top:5px;display:none;}
-  .chip.open{background:linear-gradient(155deg, var(--c4-a), var(--c4-b));}
+  .chip.open{background:linear-gradient(155deg,var(--c4-a),var(--c4-b));}
   .chip.open .w{color:#fff;}
   .chip.open .ipa{display:block;}
 
   /* mini quiz */
   .qtext{font-family:'Manrope',sans-serif;font-size:18px;font-weight:700;line-height:1.4;margin:0 0 18px;}
   .options{display:flex;flex-direction:column;gap:10px;}
-  .opt{
-    display:flex;align-items:center;gap:13px;text-align:left;width:100%;
-    padding:9px 14px 9px 9px;border-radius:18px;border:none;background:var(--bg-soft);
-    cursor:pointer;font-family:'Inter',sans-serif;font-size:14.5px;font-weight:500;color:var(--ink);
-    transition:transform .12s ease, background .15s ease;
-  }
+  .opt{display:flex;align-items:center;gap:13px;text-align:left;width:100%;padding:9px 14px 9px 9px;border-radius:18px;border:none;background:var(--bg-soft);cursor:pointer;font-family:'Inter',sans-serif;font-size:14.5px;font-weight:500;color:var(--ink);transition:transform .12s ease,background .15s ease;}
   .opt:hover{transform:translateY(-1px);}
   .opt[disabled]{cursor:default;}
   .opt[disabled]:hover{transform:none;}
-  .tile{
-    position:relative;width:30px;height:30px;min-width:30px;border-radius:10px;
-    display:flex;align-items:center;justify-content:center;
-    font-family:'Manrope',sans-serif;font-weight:800;font-size:13px;color:var(--c1-b);
-    background: linear-gradient(150deg, rgba(255,255,255,0.75), rgba(192,132,252,0.22));
-    backdrop-filter: blur(6px) saturate(160%);
-    border:1px solid rgba(255,255,255,0.7);
-    box-shadow: 0 4px 12px -7px var(--c1-sh), inset 0 1px 1px rgba(255,255,255,0.8);
-  }
-  .badge{
-    position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;
-    border:2px solid var(--card);display:flex;align-items:center;justify-content:center;
-    font-size:9.5px;font-weight:800;color:#fff;
-  }
+  .tile{position:relative;width:30px;height:30px;min-width:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;font-weight:800;font-size:13px;color:var(--c1-b);background:linear-gradient(150deg,rgba(255,255,255,0.75),rgba(192,132,252,0.22));backdrop-filter:blur(6px) saturate(160%);border:1px solid rgba(255,255,255,0.7);box-shadow:0 4px 12px -7px var(--c1-sh),inset 0 1px 1px rgba(255,255,255,0.8);}
+  .badge{position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;border:2px solid var(--card);display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;color:#fff;}
   .badge.ok{background:var(--c3-b);}
   .badge.no{background:var(--c2-b);}
   .opt.correct{background:var(--correct-bg);}
@@ -172,217 +107,45 @@
   .feedback.ok{background:var(--correct-bg);color:var(--correct-ink);}
   .feedback.bad{background:var(--wrong-bg);color:var(--wrong-ink);}
   .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:22px;}
-  .btn{
-    font-family:'Manrope',sans-serif;font-weight:800;font-size:13px;padding:12px 22px;
-    border-radius:999px;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;
-  }
+  .btn{font-family:'Manrope',sans-serif;font-weight:800;font-size:13px;padding:12px 22px;border-radius:999px;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;}
   .btn.primary{background:linear-gradient(155deg,var(--c1-a),var(--c1-b));color:#fff;box-shadow:0 10px 20px -8px var(--c1-sh);}
   .btn.ghost{background:transparent;color:var(--ink-soft);}
   .btn:disabled{opacity:.3;cursor:default;box-shadow:none;}
   .qprog{font-family:'Manrope',sans-serif;font-weight:700;font-size:13px;color:var(--ink-soft);margin-bottom:14px;}
-
   .done-screen{text-align:center;padding:16px 0;}
-  .done-screen .ring{
-    width:110px;height:110px;margin:0 auto 16px;border-radius:50%;
-    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));
-    box-shadow:0 16px 30px -12px var(--c1-sh);
-    display:flex;align-items:center;justify-content:center;position:relative;
-  }
+  .done-screen .ring{width:110px;height:110px;margin:0 auto 16px;border-radius:50%;background:linear-gradient(155deg,var(--c1-a),var(--c1-b));box-shadow:0 16px 30px -12px var(--c1-sh);display:flex;align-items:center;justify-content:center;position:relative;}
   .done-screen .big{font-family:'Manrope',sans-serif;font-weight:800;font-size:28px;color:#fff;}
-
   footer{text-align:center;margin-top:22px;font-size:12.5px;color:var(--ink-soft);font-weight:500;}
 
   /* ===================== DRAWING / TEACHER MODE ===================== */
-  /* Canvas is positioned over the whole DOCUMENT (not just the viewport),
-     so ink scrolls together with the page content instead of staying
-     glued to the screen. Its size is recalculated after every content
-     change (see resizeCanvas() below). */
-  #drawCanvas{
-    position:absolute;
-    top:0;
-    left:0;
-    z-index:9998;
-    pointer-events:none; /* drawing is handled via window-level listeners so
-                             taps/clicks on real UI underneath always pass through */
-  }
-
-  #drawDebug{
-    position:fixed;
-    top:8px;
-    left:8px;
-    z-index:10000;
-    background:rgba(19,33,59,0.82);
-    color:#fff;
-    font-family:'Manrope',monospace;
-    font-size:12px;
-    font-weight:700;
-    padding:5px 10px;
-    border-radius:10px;
-    pointer-events:none;
-    display:none;
-  }
+  #drawCanvas{position:absolute;top:0;left:0;z-index:9998;pointer-events:none;}
+  #drawDebug{position:fixed;top:8px;left:8px;z-index:10000;background:rgba(19,33,59,0.82);color:#fff;font-family:'Manrope',monospace;font-size:12px;font-weight:700;padding:5px 10px;border-radius:10px;pointer-events:none;display:none;}
   #drawDebug.show{display:block;}
-
-  #drawToggleBtn{
-    position:fixed;
-    right:20px;
-    bottom:20px;
-    width:58px;height:58px;
-    border-radius:50%;
-    border:1px solid rgba(255,255,255,0.5);
-    background:
-      linear-gradient(150deg, rgba(255,255,255,0.35), rgba(255,255,255,0) 60%),
-      linear-gradient(155deg,var(--c1-a),var(--c1-b));
-    backdrop-filter: blur(10px) saturate(160%);
-    -webkit-backdrop-filter: blur(10px) saturate(160%);
-    box-shadow:
-      0 14px 28px -10px var(--c1-sh),
-      inset 0 1px 1px rgba(255,255,255,0.6),
-      inset 0 -6px 10px -4px rgba(0,0,0,0.15);
-    color:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
-    z-index:9999;
-    transition:transform .18s cubic-bezier(.34,1.56,.64,1), background .2s ease, box-shadow .2s ease;
-  }
-  #drawToggleBtn svg{
-    width:24px;height:24px;
-    display:block;
-    transition:transform .25s ease, opacity .15s ease;
-  }
+  #drawToggleBtn{position:fixed;right:20px;bottom:20px;width:58px;height:58px;border-radius:50%;border:1px solid rgba(255,255,255,0.5);background:linear-gradient(150deg,rgba(255,255,255,0.35),rgba(255,255,255,0) 60%),linear-gradient(155deg,var(--c1-a),var(--c1-b));backdrop-filter:blur(10px) saturate(160%);-webkit-backdrop-filter:blur(10px) saturate(160%);box-shadow:0 14px 28px -10px var(--c1-sh),inset 0 1px 1px rgba(255,255,255,0.6),inset 0 -6px 10px -4px rgba(0,0,0,0.15);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:9999;transition:transform .18s cubic-bezier(.34,1.56,.64,1),background .2s ease,box-shadow .2s ease;}
+  #drawToggleBtn svg{width:24px;height:24px;display:block;transition:transform .25s ease,opacity .15s ease;}
   #drawToggleBtn:active{transform:scale(0.90);}
-  #drawToggleBtn.on{
-    background:
-      linear-gradient(150deg, rgba(255,255,255,0.35), rgba(255,255,255,0) 60%),
-      linear-gradient(155deg,#FF8A65,var(--c2-b));
-    box-shadow:
-      0 14px 28px -10px rgba(229,72,77,0.55),
-      inset 0 1px 1px rgba(255,255,255,0.6),
-      inset 0 -6px 10px -4px rgba(0,0,0,0.15);
-  }
-  #drawToggleBtn.on svg{ transform:rotate(90deg); }
-
-  #drawToolbar{
-    position:fixed;
-    left:50%;
-    bottom:22px;
-    transform:translateX(-50%) translateY(130%) scale(0.94);
-    opacity:0;
-    display:flex;
-    align-items:center;
-    gap:12px;
-    background:
-      linear-gradient(150deg, rgba(255,255,255,0.6), rgba(255,255,255,0.15));
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border:1px solid rgba(255,255,255,0.7);
-    padding:9px 16px;
-    border-radius:999px;
-    box-shadow:
-      0 24px 48px -20px rgba(19,33,59,0.45),
-      inset 0 1px 1px rgba(255,255,255,0.9);
-    z-index:9999;
-    transition:transform .25s cubic-bezier(.34,1.56,.64,1), opacity .2s ease;
-    pointer-events:none;
-  }
-  #drawToolbar.show{
-    transform:translateX(-50%) translateY(0) scale(1);
-    opacity:1;
-    pointer-events:auto;
-  }
-  /* панель згорнута, але малювання лишається увімкненим */
-  #drawToolbar.mini{
-    transform:translateX(-50%) translateY(130%) scale(0.94);
-    opacity:0;
-    pointer-events:none;
-  }
-  #drawToolbarMini{
-    position:fixed;
-    left:50%;
-    bottom:20px;
-    transform:translateX(-50%) translateY(130%) scale(0.9);
-    opacity:0;
-    width:40px;height:26px;
-    border-radius:14px;
-    border:1px solid rgba(255,255,255,0.5);
-    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));
-    box-shadow:0 10px 20px -10px var(--c1-sh);
-    display:flex;align-items:center;justify-content:center;
-    cursor:pointer;
-    z-index:9999;
-    transition:transform .25s cubic-bezier(.34,1.56,.64,1), opacity .2s ease;
-    pointer-events:none;
-  }
+  #drawToggleBtn.on{background:linear-gradient(150deg,rgba(255,255,255,0.35),rgba(255,255,255,0) 60%),linear-gradient(155deg,#FF8A65,var(--c2-b));box-shadow:0 14px 28px -10px rgba(229,72,77,0.55),inset 0 1px 1px rgba(255,255,255,0.6),inset 0 -6px 10px -4px rgba(0,0,0,0.15);}
+  #drawToggleBtn.on svg{transform:rotate(90deg);}
+  #drawToolbar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(130%) scale(0.94);opacity:0;display:flex;align-items:center;gap:12px;background:linear-gradient(150deg,rgba(255,255,255,0.6),rgba(255,255,255,0.15));backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border:1px solid rgba(255,255,255,0.7);padding:9px 16px;border-radius:999px;box-shadow:0 24px 48px -20px rgba(19,33,59,0.45),inset 0 1px 1px rgba(255,255,255,0.9);z-index:9999;transition:transform .25s cubic-bezier(.34,1.56,.64,1),opacity .2s ease;pointer-events:none;}
+  #drawToolbar.show{transform:translateX(-50%) translateY(0) scale(1);opacity:1;pointer-events:auto;}
+  #drawToolbar.mini{transform:translateX(-50%) translateY(130%) scale(0.94);opacity:0;pointer-events:none;}
+  #drawToolbarMini{position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(130%) scale(0.9);opacity:0;width:40px;height:26px;border-radius:14px;border:1px solid rgba(255,255,255,0.5);background:linear-gradient(155deg,var(--c1-a),var(--c1-b));box-shadow:0 10px 20px -10px var(--c1-sh);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:9999;transition:transform .25s cubic-bezier(.34,1.56,.64,1),opacity .2s ease;pointer-events:none;}
   #drawToolbarMini svg{width:18px;height:18px;}
-  #drawToolbarMini.show{
-    transform:translateX(-50%) translateY(0) scale(1);
-    opacity:1;
-    pointer-events:auto;
-  }
-  .swatch{
-    position:relative;
-    width:25px;height:25px;
-    border-radius:50%;
-    border:none;
-    box-shadow:
-      0 3px 8px -2px rgba(19,33,59,0.35),
-      inset 0 1px 1px rgba(255,255,255,0.5);
-    cursor:pointer;
-    padding:0;
-    transition:transform .15s cubic-bezier(.34,1.56,.64,1);
-  }
-  .swatch::after{
-    content:'';
-    position:absolute;
-    inset:-4px;
-    border-radius:50%;
-    border:2px solid var(--ink);
-    opacity:0;
-    transform:scale(0.7);
-    transition:opacity .15s ease, transform .15s cubic-bezier(.34,1.56,.64,1);
-  }
-  .swatch.selected{ transform:scale(1.08); }
-  .swatch.selected::after{ opacity:1; transform:scale(1); }
-  .tool-btn{
-    width:34px;height:34px;
-    border-radius:50%;
-    border:none;
-    background:rgba(255,255,255,0.5);
-    color:var(--ink);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
-    transition:background .15s ease, color .15s ease, transform .15s cubic-bezier(.34,1.56,.64,1);
-  }
-  .tool-btn svg{ width:16px; height:16px; }
-  .tool-btn .dot{
-    border-radius:50%;
-    background:currentColor;
-  }
-  #xthinBtn .dot{ width:3.5px; height:3.5px; }
-  #thinBtn .dot{ width:7px; height:7px; }
-  #thickBtn .dot{ width:12.5px; height:12.5px; }
-  .tool-btn.selected{
-    background:var(--c1-b);
-    color:#fff;
-    transform:scale(1.06);
-  }
-  .tool-sep{
-    width:1px;
-    height:22px;
-    background:rgba(19,33,59,0.14);
-  }
-
+  #drawToolbarMini.show{transform:translateX(-50%) translateY(0) scale(1);opacity:1;pointer-events:auto;}
+  .swatch{position:relative;width:25px;height:25px;border-radius:50%;border:none;box-shadow:0 3px 8px -2px rgba(19,33,59,0.35),inset 0 1px 1px rgba(255,255,255,0.5);cursor:pointer;padding:0;transition:transform .15s cubic-bezier(.34,1.56,.64,1);}
+  .swatch::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--ink);opacity:0;transform:scale(0.7);transition:opacity .15s ease,transform .15s cubic-bezier(.34,1.56,.64,1);}
+  .swatch.selected{transform:scale(1.08);}
+  .swatch.selected::after{opacity:1;transform:scale(1);}
+  .tool-btn{width:34px;height:34px;border-radius:50%;border:none;background:rgba(255,255,255,0.5);color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s ease,color .15s ease,transform .15s cubic-bezier(.34,1.56,.64,1);}
+  .tool-btn svg{width:16px;height:16px;}
+  .tool-btn .dot{border-radius:50%;background:currentColor;}
+  #xthinBtn .dot{width:3.5px;height:3.5px;}
+  #thinBtn .dot{width:7px;height:7px;}
+  #thickBtn .dot{width:12.5px;height:12.5px;}
+  .tool-btn.selected{background:var(--c1-b);color:#fff;transform:scale(1.06);}
+  .tool-sep{width:1px;height:22px;background:rgba(19,33,59,0.14);}
   @media (max-width:480px){
-    #drawToolbar{
-      max-width:94vw;
-      overflow-x:auto;
-      padding:8px 13px;
-      gap:9px;
-    }
+    #drawToolbar{max-width:94vw;overflow-x:auto;padding:8px 13px;gap:9px;}
     .swatch{width:21px;height:21px;}
     .tool-btn{width:30px;height:30px;}
     .tool-btn svg{width:14px;height:14px;}
@@ -400,6 +163,7 @@
   <p class="sub">Якого закінчення набуває іменник у кличному відмінку залежно від групи, роду й останнього звука основи.</p>
 
   <div class="tabbar" id="subtabbar"></div>
+  <div class="pillbar" id="pillbar"></div>
 
   <div class="card" id="lessonArea"></div>
 
@@ -455,12 +219,9 @@
 <script>
 /* ============================================================
    ЯК ДОДАТИ ЧИ ЗМІНИТИ МАТЕРІАЛ
-   Весь контент живе в масиві SECTIONS нижче — це вкладки уроку.
-   Щоб додати картку/слово/питання — скопіюй існуючий блок
-   { ... } всередині потрібного масиву (cards / words / questions)
-   і зміни текст між лапками.
-   Щоб додати нову вкладку — скопіюй один об'єкт зі SECTIONS
-   цілком і зміни tab / title / вміст.
+   Весь контент — у масиві SECTIONS (вкладки уроку).
+   pills — кнопки-фільтри під вкладками: label — що написано на
+   кнопці, card — номер картки зі списку cards (рахунок з 0).
    ============================================================ */
 
 const SECTIONS = [
@@ -468,26 +229,46 @@ const SECTIONS = [
     id: "kv-1", tab: "1 відміна", dot: "1", type: "cards",
     title: "Кличний відмінок: 1 відміна",
     intro: "Чол., жін., спільний рід із закінченням -а, -я в називному відмінку.",
+    pills: [{label:"Закінчення -О",card:0},{label:"Закінчення -Е",card:1},{label:"Закінчення -Є",card:2},{label:"Закінчення -Ю",card:3},{label:"Винятки",card:4}],
     cards: [
-      {rule: "Закінчення -О", desc: "іменники твердої групи", examples: [{word: "Галина → Галино"}, {word: "Микола → Миколо"}, {word: "староста → старосто"}]},
-      {rule: "Закінчення -Е", desc: "іменники м'якої та мішаної групи", examples: [{word: "воля → воле"}, {word: "душа → душе"}, {word: "Ілля → Ілле"}]},
-      {rule: "Закінчення -Є", desc: "після апострофа та голосного", examples: [{word: "Марія → Маріє"}, {word: "сім'я → сім'є"}]},
-      {rule: "Закінчення -Ю", desc: "деякі пестливі імена м'якої групи", examples: [{word: "бабуся → бабусю"}, {word: "матуся → матусю"}, {word: "Оля → Олю"}, {word: "Валя → Валю"}, {word: "Галя → Галю"}, {word: "Таня → Таню"}, {word: "Катя → Катю"}]},
-      {rule: "Винятки серед імен", desc: "схожі імена — різні закінчення", examples: [{word: "Катерина → Катерино"}, {word: "Катря → Катре"}, {word: "Настя → Насте"}, {word: "Олеся → Олесю"}]}
+      {rule: "Закінчення -О", desc: "іменники твердої групи", examples: [{word: "Галина → Галино"}, {word: "Микола → Миколо"}, {word: "староста → старосто"}, {word: "Катерина → Катерино"}]},
+      {rule: "Закінчення -Е", desc: "іменники м'якої та мішаної групи", examples: [{word: "воля → воле"}, {word: "душа → душе"}, {word: "Ілля → Ілле"}, {word: "Катря → Катре"}]},
+      {rule: "Закінчення -Є", desc: "Якщо слово закінчується на дві голосні або на апостроф і голосну", examples: [{word: "Марія → Маріє"}, {word: "сім'я → сім'є"}]},
+      {rule: "Закінчення -Ю", desc: "", groups: [
+        {desc: "Деякі пестливі назви м'якої групи", examples: [{word: "бабуся → бабусю"}, {word: "матуся → матусю"}]},
+        {desc: "Маленькі жіночі імена м'якої групи", examples: [{word: "Оля → Олю"}, {word: "Валя → Валю"}, {word: "Галя → Галю"}, {word: "Таня → Таню"}, {word: "Катя → Катю"}]}
+      ], examples: []},
+      {rule: "Винятки", desc: "", chips: true, examples: [{word: "Насте", from: "Настя"}, {word: "Олесю", from: "Олеся"}]}
     ]
   },
   {
     id: "kv-2", tab: "2 відміна", dot: "2", type: "cards",
+    pills: [{label:"Закінчення -У",card:0},{label:"Закінчення -Ю",card:1},{label:"Закінчення -Е",card:2},{label:"Іменники на -ЕЦЬ",card:3},{label:"Винятки",card:4}],
     title: "Кличний відмінок: 2 відміна",
     intro: "",
     cards: [
-      {rule: "Закінчення -У", desc: "тверда група з -к, -ик; на шиплячий ч, ш; іншомовні імена на г, к, х", examples: [{word: "полковник → полковнику"}, {word: "ударник → ударнику"}, {word: "читач → читачу"}, {word: "товариш → товаришу"}, {word: "Жак → Жаку"}]},
-      {rule: "Винятки на -У", desc: "", examples: [{word: "сину"}, {word: "тату"}, {word: "діду"}]},
-      {rule: "Закінчення -Ю", desc: "іменники м'якої групи", examples: [{word: "місяць → місяцю"}, {word: "біль → болю"}]},
-      {rule: "Закінчення -Й", desc: "після голосного", examples: [{word: "Андрій → Андрію"}, {word: "Сергій → Сергію"}, {word: "Юрій → Юрію"}]},
-      {rule: "Закінчення -Е", desc: "тверда група без суфіксів; власні назви на шиплячий; на -р, -ж", examples: [{word: "Голуб → Голубе"}, {word: "Іван → Іване"}, {word: "Довбуш → Довбуше"}, {word: "школяр → школяре"}, {word: "сторож → стороже"}]},
-      {rule: "Іменники на -ЕЦЬ", desc: "чергування ць → ч", examples: [{word: "швець → шевче"}, {word: "жнець → женче"}, {word: "кравець → кравче"}, {word: "хлопець → хлопче"}, {word: "молодець → молодче"}], note: "АЛЕ без чергування: боєць → бійцю, мудрець → мудрецю, знавець → знавцю"},
-      {rule: "Іменники на -АР / -ЯР", desc: "", examples: [{word: "лікар → лікарю"}, {word: "кобзар → кобзарю"}, {word: "столяр → столяре", note: "мішана група"}]}
+      {rule: "Закінчення -У", desc: "", examples: [], groups: [
+        {desc: "Тверда група з -к, -ик", examples: [{word: "полковник → полковнику"}, {word: "ударник → ударнику"}]},
+        {desc: "На шиплячий ч, ш", examples: [{word: "читач → читачу"}, {word: "товариш → товаришу"}]},
+        {desc: "Іншомовні імена на г, к, х", examples: [{word: "Жак → Жаку"}]}
+      ]},
+      {rule: "Закінчення -Ю", desc: "", examples: [], groups: [
+        {desc: "Іменники м'якої групи", examples: [{word: "місяць → місяцю"}, {word: "біль → болю"}]},
+        {desc: "Якщо слово закінчується на -й", examples: [{word: "Андрій → Андрію"}, {word: "Сергій → Сергію"}, {word: "Юрій → Юрію"}]}
+      ]},
+      {rule: "Закінчення -Е", desc: "", examples: [], groups: [
+        {desc: "Тверда група без суфіксів", examples: [{word: "Голуб → Голубе"}, {word: "Іван → Іване"}]},
+        {desc: "Власні назви на шиплячий", examples: [{word: "Довбуш → Довбуше"}]},
+        {desc: "На -р, -ж", examples: [{word: "школяр → школяре"}, {word: "сторож → стороже"}]}
+      ]},
+      {rule: "Іменники на -ЕЦЬ", desc: "", examples: [], groups: [
+        {desc: "Іменники на -ЕЦЬ: чергування ць → ч", examples: [{word: "швець → шевче"}, {word: "жнець → женче"}, {word: "кравець → кравче"}, {word: "хлопець → хлопче"}, {word: "молодець → молодче"}]},
+        {desc: "Але:", examples: [{word: "боєць → бійцю"}, {word: "мудрець → мудрецю"}, {word: "знавець → знавцю"}]}
+      ]},
+      {rule: "Винятки", desc: "", examples: [], groups: [
+        {desc: "Іменники на -АР / -ЯР", examples: [{word: "лікар → лікарю"}, {word: "кобзар → кобзарю"}, {word: "столяр → столяре", note: "мішана група"}]},
+        {desc: "Винятки на -У", chips: true, examples: [{word: "сину", from: "син"}, {word: "тату", from: "тато"}, {word: "діду", from: "дід"}]}
+      ]}
     ]
   }
 ];
@@ -497,12 +278,19 @@ const LETTERS = ["А","Б","В","Г"];
 let activeSection = 0;
 let quizIdx = 0;
 let quizAnswers = {};
+let activePill = null;
 
 const subtabbar = document.getElementById('subtabbar');
+const pillbar = document.getElementById('pillbar');
 const lessonArea = document.getElementById('lessonArea');
 
 function resetQuiz(){ quizIdx = 0; quizAnswers = {}; }
 function currentSection(){ return SECTIONS[activeSection]; }
+
+function visibleCards(s){
+  if(s.pills && activePill !== null) return [s.cards[activePill]];
+  return s.cards;
+}
 
 // ---- per-tab drawing storage ----
 const drawStore = {};
@@ -528,8 +316,26 @@ function renderTabs(){
     btn.onclick = ()=>{
       saveCurrentDrawing();
       activeSection = +btn.dataset.i;
+      activePill = null;
       resetQuiz();
       renderTabs();
+      renderContent();
+    };
+  });
+  renderPills();
+}
+
+function renderPills(){
+  const s = currentSection();
+  if(!s.pills){ pillbar.innerHTML = ''; return; }
+  pillbar.innerHTML = s.pills.map(p =>
+    `<button class="pill ${activePill===p.card?'active':''}" data-c="${p.card}">${p.label}</button>`
+  ).join('');
+  pillbar.querySelectorAll('.pill').forEach(btn=>{
+    btn.onclick = ()=>{
+      const c = +btn.dataset.c;
+      activePill = (activePill === c) ? null : c;
+      renderPills();
       renderContent();
     };
   });
@@ -537,14 +343,33 @@ function renderTabs(){
 
 function renderContent(){
   const s = currentSection();
-  let html = `<p class="section-title">${s.title}</p>${s.intro ? `<p class="section-intro">${s.intro}</p>` : ''}`;
+  if(s.pills && activePill === null){
+    lessonArea.innerHTML = '';
+    lessonArea.style.display = 'none';
+    syncCanvasAfterRender();
+    return;
+  }
+  lessonArea.style.display = '';
+  let html = s.pills ? '' : `<p class="section-title">${s.title}</p>${s.intro ? `<p class="section-intro">${s.intro}</p>` : ''}`;
   if(s.callout) html += `<div class="callout">${s.callout}</div>`;
 
-  if(s.type === "cards"){
-    html += `<div class="cardgrid">${s.cards.map((c)=>`
-      <div class="flip" data-kind="card">        <div class="flip-inner">
+  if(s.type === "cards" && s.pills){
+    const c = s.cards[activePill];
+    const exHtml = (list)=> list.map(e=>`<div class="sc-ex">${e.word}</div>${e.note?`<div class="sc-note">${e.note}</div>`:''}`).join('');
+    const chipHtml = (list)=> `<div class="chiprow">${list.map(e=>`<div class="chip" data-kind="chip"><div class="w">${e.word}</div><div class="ipa">${e.from ? 'від: '+e.from : ''}</div></div>`).join('')}</div>`;
+    const groups = c.groups || [{desc: c.desc || c.rule, examples: c.examples}];
+    html += `<div class="static-card">${groups.map((g,gi)=>`
+      <div class="sc-rule ${gi>0?'next':''}">${g.desc}</div>${(g.chips ?? c.chips) ? chipHtml(g.examples) : exHtml(g.examples)}`).join('')}
+      ${c.note?`<div class="sc-note main">${c.note}</div>`:''}
+    </div>`;
+  }
+
+  if(s.type === "cards" && !s.pills){
+    html += `<div class="cardgrid ${s.pills && activePill!==null ? 'single' : ''}">${visibleCards(s).map((c)=>`
+      <div class="flip" data-kind="card">
+        <div class="flip-inner">
           <div class="flip-face flip-front">
-            <div class="flip-rule">${c.rule}</div>
+            ${(s.pills && c.desc) ? '' : `<div class="flip-rule">${c.rule}</div>`}
             <div class="flip-desc">${c.desc||''}</div>
             <div class="flip-hint">натисни →</div>
           </div>
@@ -671,24 +496,9 @@ renderContent();
 
 // ======================================================================
 // МАЛЮВАННЯ ПОВЕРХ ЕКРАНА (режим "учитель")
-//
-// Ця версія навмисно побудована один в один за робочим прикладом, який
-// підтвердив, що пише без затримок і що кнопка з панеллю не зникають і не
-// роздуваються під час зуму. Різниця з попередніми спробами:
-//   • НІЯКОГО втручання в touch-action — воно завжди 'auto', як типово
-//     в браузері. preventDefault() на самому дотику пером і так гарантує,
-//     що перо не гортає й не зумить сторінку; більше нічого чіпати не
-//     треба, а зайві обмеження touch-action, судячи з усього, і були
-//     причиною затримки між буквами.
-//   • НІЯКОЇ JS-компенсації позиції/розміру кнопки й панелі під час
-//     pinch-zoom. Вони — звичайний CSS position:fixed. Раніше спроби
-//     "виправити" це власним кодом лише ламали те, що й так працювало.
-//   • Малювання — просте, пряме, растрове (як у прикладі), без черг і
-//     буферизації.
-// Єдине, що збережено понад приклад: чорнило кожної вкладки зберігається
-// окремо (бо в цьому уроці, на відміну від прикладу, є кілька вкладок) —
-// через ті самі getDrawingSnapshot/setDrawingSnapshot, які вже викликає
-// зовнішній скрипт при перемиканні вкладок.
+// Без втручання в touch-action, без JS-компенсації зуму, пряме растрове
+// малювання. Чорнило кожної вкладки зберігається окремо через
+// getDrawingSnapshot / setDrawingSnapshot.
 // ======================================================================
 (function(){
   const canvas = document.getElementById('drawCanvas');
@@ -715,11 +525,7 @@ renderContent();
   window.isDrawingActive = function(){ return drawingActive; };
 
   function currentDocHeight(){
-    return Math.max(
-      document.documentElement.scrollHeight,
-      document.body.scrollHeight,
-      window.innerHeight
-    );
+    return Math.max(document.documentElement.scrollHeight, document.body.scrollHeight, window.innerHeight);
   }
 
   function resizeCanvas(){
@@ -757,9 +563,6 @@ renderContent();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   };
 
-  // сумісний з рештою сторінки API: чорнило кожної вкладки зберігається й
-  // відновлюється окремо при перемиканні вкладок (викликається з
-  // зовнішнього скрипту через saveCurrentDrawing()/restoreCurrentDrawing())
   window.getDrawingSnapshot = function(){
     try{
       return (canvas.width && canvas.height) ? canvas.toDataURL('image/png') : null;
@@ -808,38 +611,30 @@ renderContent();
     });
   });
 
-  if(xthinBtn){
-    xthinBtn.addEventListener('click', ()=>{
-      currentWidth = 2;
-      [xthinBtn,thinBtn,thickBtn].forEach(b=>b.classList.remove('selected'));
-      xthinBtn.classList.add('selected');
-    });
-  }
+  xthinBtn.addEventListener('click', ()=>{
+    currentWidth = 2;
+    [xthinBtn,thinBtn,thickBtn].forEach(b=>b.classList.remove('selected'));
+    xthinBtn.classList.add('selected');
+  });
   thinBtn.addEventListener('click', ()=>{
-    currentWidth = xthinBtn ? 5 : 4;
-    [xthinBtn,thinBtn,thickBtn].forEach(b=>b&&b.classList.remove('selected'));
+    currentWidth = 5;
+    [xthinBtn,thinBtn,thickBtn].forEach(b=>b.classList.remove('selected'));
     thinBtn.classList.add('selected');
   });
   thickBtn.addEventListener('click', ()=>{
-    currentWidth = xthinBtn ? 11 : 12;
-    [xthinBtn,thinBtn,thickBtn].forEach(b=>b&&b.classList.remove('selected'));
+    currentWidth = 11;
+    [xthinBtn,thinBtn,thickBtn].forEach(b=>b.classList.remove('selected'));
     thickBtn.classList.add('selected');
   });
   eraserBtn.addEventListener('click', ()=>{
     eraserMode = !eraserMode;
     eraserBtn.classList.toggle('selected', eraserMode);
   });
-  clearBtn.addEventListener('click', ()=>{
-    window.clearDrawing();
-  });
+  clearBtn.addEventListener('click', ()=>{ window.clearDrawing(); });
 
   function pointerPos(e){
     const rect = canvas.getBoundingClientRect();
-    return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-      pressure: e.pressure || 0.5,
-    };
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top, pressure: e.pressure || 0.5 };
   }
 
   function isOnControls(e){
@@ -850,7 +645,6 @@ renderContent();
     if(!drawingActive) return;
     if(e.pointerType !== 'pen') return;
     if(isOnControls(e)) return;
-
     e.preventDefault();
     isDrawing = true;
     activePointerId = e.pointerId;
@@ -861,7 +655,6 @@ renderContent();
   document.addEventListener('pointermove', (e)=>{
     if(!drawingActive || !isDrawing) return;
     if(e.pointerId !== activePointerId) return;
-
     e.preventDefault();
     const p = pointerPos(e);
     ctx.globalCompositeOperation = eraserMode ? 'destination-out' : 'source-over';
