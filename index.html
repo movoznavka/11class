@@ -404,6 +404,11 @@
    замість зеленої "📝 Загальний тест"). Додай блоку matchTest
    (той самий формат: {status, href}).
 
+   Загальні тести (generalTest / matchTest) відкриваються учню АВТОМАТИЧНО,
+   коли йому відкрито всі готові уроки свого розділу/підрозділу (див. AUTO_REQUIRES).
+   Також їх можна відкрити вручну в боті ("🔓 Теми") — ключ доступу це href тесту —
+   а задане по ньому ДЗ теж відкриває тест.
+
    Щоб додати розділ — скопіюй { name: "...", subgroups: [...] } у BLOCKS.
    ============================================================ */
 
@@ -732,6 +737,68 @@ renderBlocks_();
 const HOMEWORK_API_URL = "https://script.google.com/macros/s/AKfycbzDs5WkG3yAOIFbj4BEvTczkCynEAkhIja0ThB3LGtpXerg2pUdtcX1AzDTisH_v36k/exec";
 
 let _lastHomeworkMap = null;
+let _allowed = null;   // повний список відкритих учню уроків/тестів (ставиться при вході)
+
+// ------------------------------------------------------------
+// АВТОМАТИЧНЕ ВІДКРИТТЯ ЗАГАЛЬНИХ ТЕСТІВ
+// Загальний тест відкривається учню сам, щойно йому відкрито ВСІ
+// (готові) уроки тієї теми, яку він охоплює:
+//   • загальний тест розділу / тест на відповідність — усі уроки розділу
+//     (Орфографія → усі теми орфографії, Морфологія → усі теми морфології...);
+//   • загальний тест підрозділу — усі уроки підрозділу
+//     (Складні слова → складні іменники + прикметники + прислівник).
+// Окрім того, тест відкритий, якщо ви відкрили його вручну в боті
+// або задали по ньому ДЗ.
+// ------------------------------------------------------------
+const AUTO_REQUIRES = {};
+BLOCKS.forEach(function(b){
+  const all = [];
+  b.subgroups.forEach(function(sg){
+    const hs = sg.items.filter(function(i){ return i.status === 'ready'; }).map(function(i){ return i.href; });
+    hs.forEach(function(h){ all.push(h); });
+    if (sg.generalTest && sg.generalTest.href) AUTO_REQUIRES[sg.generalTest.href] = hs;
+  });
+  if (b.generalTest && b.generalTest.href) AUTO_REQUIRES[b.generalTest.href] = all;
+  if (b.matchTest && b.matchTest.href) AUTO_REQUIRES[b.matchTest.href] = all;
+});
+
+function testOpen_(key){
+  if (!_allowed) return false;
+  if (_allowed.indexOf(key) !== -1) return true;                       // відкрито вручну
+  if (_lastHomeworkMap && _lastHomeworkMap[key]) return true;          // задано ДЗ
+  const req = AUTO_REQUIRES[key];
+  return !!(req && req.length && req.every(function(h){ return _allowed.indexOf(h) !== -1; }));
+}
+
+function isShown_(el){ return el && el.style.display !== 'none'; }
+
+function hasAnyOpen_(){
+  if (document.querySelector('.card-wrap')) return true;
+  return Array.prototype.some.call(document.querySelectorAll('.block-test-pill, .subgroup-test-pill'), isShown_);
+}
+
+function refreshVisibility_(){
+  if (!_allowed) return;
+  document.querySelectorAll('.block-test-pill, .subgroup-test-pill').forEach(function(a){
+    a.style.display = testOpen_(a.getAttribute('data-testkey')) ? '' : 'none';
+  });
+  document.querySelectorAll('.subgroup-header').forEach(function(h){
+    const hasTitle = !!h.querySelector('.subgroup-title');
+    const hasPill = Array.prototype.some.call(h.querySelectorAll('.subgroup-test-pill'), isShown_);
+    h.style.display = (hasTitle || hasPill) ? '' : 'none';
+  });
+  document.querySelectorAll('.subgroup').forEach(function(sg){
+    const hasPill = Array.prototype.some.call(sg.querySelectorAll('.subgroup-test-pill'), isShown_);
+    sg.style.display = (sg.querySelector('.card') || hasPill) ? '' : 'none';
+  });
+  document.querySelectorAll('.block').forEach(function(b){
+    const hasPill = Array.prototype.some.call(b.querySelectorAll('.block-test-pill, .subgroup-test-pill'), isShown_);
+    b.style.display = (b.querySelector('.card') || hasPill) ? '' : 'none';
+  });
+  if (hasAnyOpen_()){
+    const m = document.getElementById('noTopicsMsg'); if (m) m.remove();
+  }
+}
 function applyHomework(map){
   map = map || {};
   _lastHomeworkMap = map;
@@ -750,6 +817,7 @@ function applyHomework(map){
       el.setAttribute('href', el.getAttribute('href') + sep + 'hw=' + encodeURIComponent(hw.number));
     }
   });
+  refreshVisibility_();   // тест із ДЗ має бути доступний учню
 }
 
 function loadHomework(studentCode){
@@ -768,6 +836,8 @@ function loadHomework(studentCode){
 //
 // Кожен код відкриває СПИСОК ТЕМ (масив href уроків, як і раніше) —
 // а урок і тест до нього показуються/ховаються РАЗОМ, як одна тема.
+// Загальні тести відкриваються так само — додайте їхній href у список
+// (напр. "orfografiya-zagalnyi.html") або відкрийте через бота.
 //
 // ВАЖЛИВО: якщо учня немає в цьому списку — посилання НЕ спрацює,
 // портал покаже "Це посилання недійсне".
@@ -841,20 +911,17 @@ function applyAccessAndRender_(studentCode, allowed, displayName){
     }
   });
 
-  // Загальні тести розділу / підрозділу і тест на відповідність —
-  // теж мають отримати ?student=, інакше сторінка питає ім'я вручну.
+  // Загальні тести / тест на відповідність: усім пілюлям даємо ?student=,
+  // а показуємо лише ті, що відкриті (вручну, через ДЗ або автоматично
+  // після всіх уроків своєї теми — див. AUTO_REQUIRES).
+  _allowed = allowed;
   document.querySelectorAll('.block-test-pill, .subgroup-test-pill').forEach(function(a){
     const h = a.getAttribute('href');
     if (h && h !== '#' && h.indexOf('student=') === -1) {
       a.setAttribute('href', appendStudentParam_(h, displayName));
     }
   });
-  document.querySelectorAll('.subgroup').forEach(function(sg){
-    if (!sg.querySelector('.card')) sg.remove();
-  });
-  document.querySelectorAll('.block').forEach(function(b){
-    if (!b.querySelector('.card')) b.remove();
-  });
+  refreshVisibility_();
 
   document.querySelectorAll('#switchWho').forEach(function(el){ el.closest('p').remove(); });
   if (GROUP_MEMBERS[studentCode]) {
@@ -892,7 +959,7 @@ function finishStudentView_(studentCode, allowedStatic, displayName){
   // очікується від бота) — не лишаємо порожню сторінку, а пишемо, що йде
   // завантаження, поки чекаємо відповідь.
   let loadingEl = null;
-  if (stillWaiting && !document.querySelector('.card-wrap')) {
+  if (stillWaiting && !hasAnyOpen_()) {
     loadingEl = document.createElement('p');
     loadingEl.className = 'sub';
     loadingEl.id = 'accessLoading';
@@ -919,8 +986,9 @@ function finishStudentView_(studentCode, allowedStatic, displayName){
     const loader = document.getElementById('accessLoading');
     if (loader) loader.remove();
 
-    if (!document.querySelector('.card-wrap')) {
+    if (!hasAnyOpen_()) {
       const msg = document.createElement('p');
+      msg.id = 'noTopicsMsg';
       msg.className = 'sub';
       msg.textContent = 'Поки для вас не відкрито жодної теми. Зверніться до вчительки.';
       document.querySelector('.wrap').insertBefore(msg, blocksEl);
@@ -999,6 +1067,13 @@ function showNamePicker_(studentCode, allowed, members){
     }
 
     renderOpenBadges_({});
+
+    // У режимі вчителя всі посилання ведуть у тести з ?vchytel=1
+    // (відповідь одразу після кожного завдання, результат у Telegram не надсилається).
+    document.querySelectorAll('.card, .test-pill, .block-test-pill, .subgroup-test-pill').forEach(function(a){
+      const h = a.getAttribute('href');
+      if (h && h !== '#') a.setAttribute('href', h + (h.indexOf('?') > -1 ? '&' : '?') + 'vchytel=1');
+    });
 
     if (HOMEWORK_API_URL && HOMEWORK_API_URL.indexOf('ВСТАВТЕ') !== 0) {
       window.applyAllAccess = renderOpenBadges_;
