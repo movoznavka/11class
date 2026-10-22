@@ -134,13 +134,17 @@
   .clockwrap{display:flex;flex-direction:column;align-items:center;gap:16px;padding:24px 0 8px;}
   .clockface{width:240px;height:240px;filter:drop-shadow(0 12px 26px rgba(19,33,59,0.18));touch-action:none;cursor:grab;}
   .clocktick{stroke:#fff;stroke-width:3;stroke-linecap:round;opacity:.85;}
-  .clocknum{fill:#fff;font-family:'Manrope',sans-serif;font-weight:800;font-size:22px;text-anchor:middle;}
+  .clocknum{fill:#fff;font-family:'Manrope',sans-serif;font-weight:800;font-size:18px;text-anchor:middle;}
   .hand{stroke-linecap:round;transform-origin:110px 110px;}
   .hand.hour{stroke:#fff;stroke-width:7;}
   .hand.minute{stroke:#fff;stroke-width:5;}
   .clock-answer-wrap{width:100%;max-width:340px;}
   .clock-answer{padding:14px 20px;border-radius:16px;background:var(--bg-soft);font-family:'Manrope',sans-serif;font-weight:800;font-size:16px;color:var(--ink);text-align:center;cursor:pointer;user-select:none;filter:blur(9px);transition:filter .25s ease;}
   .clock-answer.revealed{filter:blur(0);}
+  .clock-answer{text-align:left;font-size:15px;line-height:1.35;}
+  .ans-line{margin-bottom:8px;}
+  .ans-line:last-child{margin-bottom:0;}
+  .ans-label{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--c1-b);opacity:.85;margin-bottom:1px;}
   .clock-hint{font-size:11.5px;font-weight:600;color:var(--ink-soft);opacity:.75;}
 
   /* exceptions chips */
@@ -218,17 +222,12 @@
   footer{text-align:center;margin-top:22px;font-size:12.5px;color:var(--ink-soft);font-weight:500;}
 
   /* ===================== DRAWING / TEACHER MODE ===================== */
-  /* Canvas is positioned over the whole DOCUMENT (not just the viewport),
-     so ink scrolls together with the page content instead of staying
-     glued to the screen. Its size is recalculated after every content
-     change (see resizeCanvas() below). */
   #drawCanvas{
     position:absolute;
     top:0;
     left:0;
     z-index:9998;
-    pointer-events:none; /* drawing is handled via window-level listeners so
-                             taps/clicks on real UI underneath always pass through */
+    pointer-events:none;
   }
 
   #drawDebug{
@@ -317,7 +316,6 @@
     opacity:1;
     pointer-events:auto;
   }
-  /* панель згорнута, але малювання лишається увімкненим */
   #drawToolbar.mini{
     transform:translateX(-50%) translateY(130%) scale(0.94);
     opacity:0;
@@ -482,13 +480,6 @@
 /* ============================================================
    ЯК ДОДАТИ ЧИ ЗМІНИТИ МАТЕРІАЛ
    Весь контент живе в об'єкті TOPICS нижче.
-   Структура: TOPICS.suffix / TOPICS.noun / ... → subs [ ... ].
-   Кожен розділ — один об'єкт { ... }.
-   Щоб додати картку/слово/питання — скопіюй існуючий блок
-   { ... } всередині потрібного масиву (cards / words / questions)
-   і зміни текст між лапками.
-   Щоб додати новий підрозділ (вкладку) — скопіюй один об'єкт
-   зі списку subs цілком і зміни tab / title / вміст.
    ============================================================ */
 
 const TOPICS = {
@@ -511,7 +502,8 @@ const TOPICS = {
         rows: [
           {write: "НА", say: "+ наступна год.", example: "п'ятнадцять НА одинадцяту", ipa: "10:15 → скільки хвилин минуло + «на» + наступна година (знахідний відмінок)"},
           {write: "ПО", say: "+ поточна год.", example: "п'ятнадцять ПО десятій", ipa: "10:15 → скільки хвилин минуло + «по» + поточна година (місцевий відмінок)"}
-        ]
+        ],
+        warn: "<b>З часом не вживаємо «після».</b> Не можна казати «п'ятнадцять після десятої». Кажи правильно: <b>п'ятнадцять по десятій</b> або <b>п'ятнадцять на одинадцяту</b>."
       },
       {
         id: "t-za-do", tab: "«За» і «до» (після :30)", dot: "3", type: "table",
@@ -521,7 +513,7 @@ const TOPICS = {
           {write: "ЗА", say: "+ наступна год.", example: "ЗА п'ятнадцять (чверть) одинадцята", ipa: "10:45 → скільки хвилин залишилось + «за» + наступна година (називний відмінок)"},
           {write: "ДО", say: "+ наступна год.", example: "п'ятнадцять (чверть) ДО одинадцятої", ipa: "10:45 → скільки хвилин залишилось + «до» + наступна година (родовий відмінок)"}
         ],
-        warn: "<b>Так казати не можна:</b> «без п'ятнадцяти одинадцята» — це поширена помилка (калька з російської «без пятнадцати»). Кажи правильно: <b>за п'ятнадцять одинадцята</b> або <b>п'ятнадцять до одинадцятої</b>."
+        warn: "<b>З часом не вживаємо «без» і «після».</b> Не можна казати «без п'ятнадцяти одинадцята» чи «п'ятнадцять після десятої». Кажи правильно: <b>за п'ятнадцять одинадцята</b> або <b>п'ятнадцять до одинадцятої</b>; <b>п'ятнадцять на одинадцяту</b> або <b>п'ятнадцять по десятій</b>."
       },
       {
         id: "t-clock", tab: "Годинник", dot: "4", type: "clock",
@@ -558,9 +550,7 @@ function currentSection(){
   return sub;
 }
 
-// ---- per-tab drawing storage: намальоване на кожній вкладці (і на кожному
-// питанні тесту) зберігається окремо, тож перехід на іншу вкладку й назад
-// не стирає написане, а показує саме те, що було на ній ----
+// ---- per-tab drawing storage ----
 const drawStore = {};
 function sectionKey(){
   const sec = currentSection();
@@ -678,6 +668,13 @@ function renderContent(){
 
   if(s.type === "clock"){
     const ticks = Array.from({length:12}, (_,i)=>`<line class="clocktick" x1="110" y1="16" x2="110" y2="30" transform="rotate(${i*30} 110 110)"/>`).join('');
+    const nums = Array.from({length:12}, (_,i)=>{
+      const n = i === 0 ? 12 : i;
+      const a = i * 30 * Math.PI / 180;
+      const x = 110 + 68 * Math.sin(a);
+      const y = 110 - 68 * Math.cos(a) + 6.5;
+      return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" class="clocknum">${n}</text>`;
+    }).join('');
     html += `
       <div class="clockwrap">
         <svg viewBox="0 0 220 220" class="clockface">
@@ -689,10 +686,7 @@ function renderContent(){
           </defs>
           <circle cx="110" cy="110" r="100" fill="url(#halfGrad)" stroke="#fff" stroke-width="5"/>
           ${ticks}
-          <text x="110" y="38" class="clocknum">12</text>
-          <text x="182" y="116" class="clocknum">3</text>
-          <text x="110" y="194" class="clocknum">6</text>
-          <text x="38" y="116" class="clocknum">9</text>
+          ${nums}
           <line id="hourHand" class="hand hour" x1="110" y1="110" x2="110" y2="68"/>
           <line id="minuteHand" class="hand minute" x1="110" y1="110" x2="110" y2="42"/>
           <circle cx="110" cy="110" r="6" fill="#fff" stroke="var(--c1-b)" stroke-width="2"/>
@@ -725,12 +719,35 @@ function renderContent(){
 const HOUR_WORDS_FEM = ["дванадцята","перша","друга","третя","четверта","п'ята","шоста","сьома","восьма","дев'ята","десята","одинадцята"];
 const MINUTE_WORDS = {0:"",5:"п'ять",10:"десять",15:"п'ятнадцять",20:"двадцять",25:"двадцять п'ять",30:"тридцять",35:"тридцять п'ять",40:"сорок",45:"сорок п'ять",50:"п'ятдесят",55:"п'ятдесят п'ять"};
 
+const HOUR_ACC = ["дванадцяту","першу","другу","третю","четверту","п'яту","шосту","сьому","восьму","дев'яту","десяту","одинадцяту"];
+const HOUR_LOC = ["дванадцятій","першій","другій","третій","четвертій","п'ятій","шостій","сьомій","восьмій","дев'ятій","десятій","одинадцятій"];
+const HOUR_GEN = ["дванадцятої","першої","другої","третьої","четвертої","п'ятої","шостої","сьомої","восьмої","дев'ятої","десятої","одинадцятої"];
+
+function minuteLabel(m){
+  const w = MINUTE_WORDS[m];
+  return (m === 15 || m === 45) ? `${w} (чверть)` : w;
+}
+
 function formatClockAnswer(hour, minute){
-  const wordIdx = hour % 12;
-  const hourWord = HOUR_WORDS_FEM[wordIdx];
+  const cur = hour % 12;
+  const next = (cur + 1) % 12;
   const digital = `${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`;
-  if(minute === 0) return `${digital} — рівно ${hourWord}`;
-  return `${digital} — ${hourWord} ${MINUTE_WORDS[minute]}`;
+  const line = (label, text) => `<div class="ans-line"><span class="ans-label">${label}</span>${text}</div>`;
+
+  if(minute === 0){
+    return line('Цифрами', `${digital} — рівно ${HOUR_WORDS_FEM[cur]}`);
+  }
+  if(minute <= 30){
+    const mw = minuteLabel(minute);
+    return line('Цифрами', `${digital} — ${HOUR_WORDS_FEM[cur]} ${MINUTE_WORDS[minute]}`)
+      + line('«На»', `${mw} на ${HOUR_ACC[next]}`)
+      + line('«По»', `${mw} по ${HOUR_LOC[cur]}`);
+  }
+  const left = 60 - minute;
+  const lw = minuteLabel(left);
+  return line('Цифрами', `${digital} — ${HOUR_WORDS_FEM[cur]} ${MINUTE_WORDS[minute]}`)
+    + line('«За»', `за ${lw} ${HOUR_WORDS_FEM[next]}`)
+    + line('«До»', `${lw} до ${HOUR_GEN[next]}`);
 }
 
 function setupDraggableClock(){
@@ -774,7 +791,7 @@ function setupDraggableClock(){
   function render(){
     hourHand.style.transform = `rotate(${(hour % 12) * 30}deg)`;
     minuteHand.style.transform = `rotate(${(minute / 5) * 30}deg)`;
-    answer.textContent = formatClockAnswer(hour, minute);
+    answer.innerHTML = formatClockAnswer(hour, minute);
     answer.classList.remove('revealed');
   }
 
@@ -815,8 +832,6 @@ function setupDraggableClock(){
 }
 
 function syncCanvasAfterRender(){
-  // дає верстці "осісти", а тоді підганяє розмір канвасу малювання під нову висоту сторінки,
-  // і відновлює те, що було намальоване саме на цій вкладці (якщо було)
   if(window.resizeDrawCanvas){
     requestAnimationFrame(()=> requestAnimationFrame(()=>{
       window.resizeDrawCanvas();
@@ -904,24 +919,6 @@ renderAll();
 
 // ======================================================================
 // МАЛЮВАННЯ ПОВЕРХ ЕКРАНА (режим "учитель")
-//
-// Ця версія навмисно побудована один в один за робочим прикладом, який
-// підтвердив, що пише без затримок і що кнопка з панеллю не зникають і не
-// роздуваються під час зуму. Різниця з попередніми спробами:
-//   • НІЯКОГО втручання в touch-action — воно завжди 'auto', як типово
-//     в браузері. preventDefault() на самому дотику пером і так гарантує,
-//     що перо не гортає й не зумить сторінку; більше нічого чіпати не
-//     треба, а зайві обмеження touch-action, судячи з усього, і були
-//     причиною затримки між буквами.
-//   • НІЯКОЇ JS-компенсації позиції/розміру кнопки й панелі під час
-//     pinch-zoom. Вони — звичайний CSS position:fixed. Раніше спроби
-//     "виправити" це власним кодом лише ламали те, що й так працювало.
-//   • Малювання — просте, пряме, растрове (як у прикладі), без черг і
-//     буферизації.
-// Єдине, що збережено понад приклад: чорнило кожної вкладки зберігається
-// окремо (бо в цьому уроці, на відміну від прикладу, є кілька вкладок) —
-// через ті самі getDrawingSnapshot/setDrawingSnapshot, які вже викликає
-// зовнішній скрипт при перемиканні вкладок.
 // ======================================================================
 (function(){
   const canvas = document.getElementById('drawCanvas');
@@ -990,9 +987,6 @@ renderAll();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   };
 
-  // сумісний з рештою сторінки API: чорнило кожної вкладки зберігається й
-  // відновлюється окремо при перемиканні вкладок (викликається з
-  // зовнішнього скрипту через saveCurrentDrawing()/restoreCurrentDrawing())
   window.getDrawingSnapshot = function(){
     try{
       return (canvas.width && canvas.height) ? canvas.toDataURL('image/png') : null;
