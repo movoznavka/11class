@@ -119,6 +119,13 @@
   .flip-face{position:absolute;inset:0;border-radius:20px;padding:16px 18px;backface-visibility:hidden;display:flex;flex-direction:column;justify-content:center;}
   .flip-front{background:var(--bg-soft);}
   .flip-back{background:linear-gradient(155deg,var(--c1-a),var(--c1-b));color:#fff;transform:rotateY(180deg);align-items:center;text-align:center;}
+  /* зворот не лишається видимим після перевертання (Safari + запасне приховування) */
+  .flip-inner{-webkit-transform-style:preserve-3d;}
+  .flip-face{-webkit-backface-visibility:hidden;}
+  .flip-front{visibility:visible;transition:visibility 0s linear .25s;}
+  .flip-back{visibility:hidden;transition:visibility 0s linear .25s;}
+  .flip.open .flip-front{visibility:hidden;}
+  .flip.open .flip-back{visibility:visible;}
   .flip-tag{font-family:'Manrope',sans-serif;font-weight:800;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;opacity:.55;margin-bottom:7px;}
   .flip-back .flip-tag{opacity:.75;}
   .flip-rule{font-family:'Manrope',sans-serif;font-weight:800;font-size:15px;line-height:1.32;}
@@ -1055,10 +1062,13 @@ renderAll();
 
     e.preventDefault();
     const p = pointerPos(e);
-    ctx.globalCompositeOperation = eraserMode ? 'destination-out' : 'source-over';
+    // кнопка на пері (barrel, buttons&2) або «гумка» на кінці пера (buttons&32) → стирає
+    const penErase = (e.buttons & 2) === 2 || (e.buttons & 32) === 32;
+    const erasing = eraserMode || penErase;
+    ctx.globalCompositeOperation = erasing ? 'destination-out' : 'source-over';
     ctx.strokeStyle = currentColor;
     const pressureFactor = 0.6 + (p.pressure || 0.5) * 0.8;
-    ctx.lineWidth = (eraserMode ? currentWidth * 3 : currentWidth) * pressureFactor;
+    ctx.lineWidth = (erasing ? currentWidth * 3 : currentWidth) * pressureFactor;
     ctx.beginPath();
     ctx.moveTo(lastX, lastY);
     ctx.lineTo(p.x, p.y);
@@ -1073,6 +1083,11 @@ renderAll();
   }
   document.addEventListener('pointerup', stopDrawing);
   document.addEventListener('pointercancel', stopDrawing);
+
+  // щоб затискання кнопки на пері не відкривало контекстне меню
+  document.addEventListener('contextmenu', function(e){
+    if(drawingActive) e.preventDefault();
+  });
 
   document.addEventListener('touchmove', function(e){
     if(drawingActive && e.touches && e.touches[0] && e.touches[0].touchType === 'stylus'){
