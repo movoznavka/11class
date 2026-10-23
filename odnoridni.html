@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Однорідні члени · Тренажер</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#D0E9FC;
+    --bg-soft:#E4F2FC;
+    --card:#FFFFFF;
+    --ink:#13213B;
+    --ink-soft:#6478A0;
+    --line: rgba(19,33,59,0.08);
+
+    --c1-a:#6C8CFF; --c1-b:#3355EE; --c1-sh: rgba(51,85,238,0.45);
+    --c3-a:#5FE0A8; --c3-b:#17A863; --c3-sh: rgba(23,168,99,0.4);
+    --c2-b:#E5484D;
+
+    --correct-bg:#E6F8EE;
+    --correct-ink:#128A54;
+    --wrong-bg:#FDECEC;
+    --wrong-ink:#D8393E;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    padding:28px 16px 64px;
+    position:relative;
+  }
+  .wrap{max-width:720px;margin:0 auto;}
+
+  .topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding-bottom:16px;
+    margin-bottom:22px;
+    border-bottom:1.5px solid rgba(19,33,59,0.14);
+  }
+  .kicker{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:12.5px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--ink);
+    opacity:.55;
+  }
+  .kicker.tag{opacity:.4;}
+
+  .review-banner{
+    display:none;
+    align-items:center;
+    gap:8px;
+    background:#FFF4E0;
+    color:#8A5A00;
+    font-family:'Manrope',sans-serif;
+    font-weight:700;
+    font-size:13px;
+    padding:10px 16px;
+    border-radius:14px;
+    margin-bottom:16px;
+  }
+  .review-banner.show{display:flex;}
+
+  h1{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:clamp(26px,6vw,38px);
+    line-height:1.05;
+    letter-spacing:-0.01em;
+    margin:0 0 8px;
+    text-transform:uppercase;
+  }
+  h1 .hl{color:var(--c1-b);}
+  .sub{color:var(--ink-soft);font-size:15px;max-width:50ch;margin:0 0 22px;font-weight:500;}
+
+  .card{
+    background:var(--card);
+    border-radius:28px;
+    padding:30px 26px;
+    box-shadow: 0 20px 44px -28px rgba(19,33,59,0.35);
+  }
+
+  .progress-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:16px;
+  }
+  .qnum{
+    font-family:'Manrope',sans-serif;
+    font-weight:700;
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+  .score{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:12.5px;
+    color:var(--c3-b);
+    background:var(--correct-bg);
+    padding:6px 13px;
+    border-radius:999px;
+  }
+
+  .segbar{display:flex;gap:3px;margin-bottom:22px;flex-wrap:wrap;}
+  .seg{
+    flex:1;
+    min-width:6px;
+    height:6px;
+    border-radius:999px;
+    background:var(--bg-soft);
+    cursor:pointer;
+  }
+  .seg.current{background:var(--c1-b);}
+  .seg.done-correct{background:var(--c3-b);}
+  .seg.done-wrong{background:var(--c2-b);}
+
+  .qtext{
+    font-family:'Manrope',sans-serif;
+    font-size:19px;
+    font-weight:700;
+    line-height:1.4;
+    margin:0 0 20px;
+    letter-spacing:-0.005em;
+  }
+  .qtext u{ text-decoration-thickness:2px; text-underline-offset:2px; }
+  .qtext i{ font-weight:500; color:var(--ink-soft); }
+
+  .options{display:flex;flex-direction:column;gap:10px;}
+  .opt{
+    display:flex;
+    align-items:center;
+    gap:13px;
+    text-align:left;
+    width:100%;
+    padding:9px 14px 9px 9px;
+    border-radius:18px;
+    border:none;
+    background:var(--bg-soft);
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    font-weight:500;
+    color:var(--ink);
+    transition:transform .12s ease, background .15s ease;
+  }
+  .opt:hover{transform:translateY(-1px);}
+  .opt[disabled]{cursor:default;}
+  .opt[disabled]:hover{transform:none;}
+  .opt u{ text-decoration-thickness:2px; text-underline-offset:2px; }
+
+  .tile{
+    position:relative;
+    width:32px;height:32px;min-width:32px;
+    border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:13.5px;
+    color:var(--c1-b);
+    background: linear-gradient(150deg, rgba(255,255,255,0.75), rgba(108,140,255,0.22));
+    backdrop-filter: blur(6px) saturate(160%);
+    -webkit-backdrop-filter: blur(6px) saturate(160%);
+    border:1px solid rgba(255,255,255,0.7);
+    box-shadow: 0 4px 12px -7px var(--c1-sh), inset 0 1px 1px rgba(255,255,255,0.8);
+    overflow:visible;
+  }
+  .tile > span{position:relative;z-index:1;}
+
+  .badge{
+    position:absolute;
+    top:-5px;right:-5px;
+    width:16px;height:16px;
+    border-radius:50%;
+    border:2px solid var(--card);
+    display:flex;align-items:center;justify-content:center;
+    font-size:9.5px;
+    font-weight:800;
+    color:#fff;
+    z-index:2;
+  }
+  .badge.ok{background:var(--c3-b);}
+  .badge.no{background:var(--c2-b);}
+
+  .opt.correct{background:var(--correct-bg);}
+  .opt.wrong{background:var(--wrong-bg);}
+  .opt.dim{opacity:.5;}
+
+  .feedback{
+    margin-top:16px;
+    padding:13px 16px;
+    border-radius:16px;
+    font-size:14.5px;
+    font-weight:600;
+    display:none;
+    align-items:center;
+    gap:9px;
+  }
+  .feedback.show{display:flex;}
+  .feedback.ok{background:var(--correct-bg);color:var(--correct-ink);}
+  .feedback.bad{background:var(--wrong-bg);color:var(--wrong-ink);}
+  .feedback b{font-family:'Manrope',sans-serif;}
+
+  .nav-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:24px;
+  }
+  .btn{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:13px;
+    padding:12px 22px;
+    border-radius:999px;
+    border:none;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .btn.primary{
+    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));
+    color:#fff;
+    box-shadow:0 10px 20px -8px var(--c1-sh);
+  }
+  .btn.ghost{background:transparent;color:var(--ink-soft);}
+  .btn:disabled{opacity:.3;cursor:default;box-shadow:none;}
+  .btn.small{
+    font-size:12px;
+    padding:8px 4px;
+    opacity:.55;
+    text-decoration:underline;
+    text-underline-offset:2px;
+  }
+  .btn.small:hover{opacity:.85;}
+  .reset-row{
+    text-align:center;
+    margin-top:6px;
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+
+  .done-screen{text-align:center;padding:16px 0;}
+  .done-screen .ring{
+    width:120px;height:120px;
+    margin:0 auto 18px;
+    border-radius:50%;
+    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));
+    box-shadow:0 16px 30px -12px var(--c1-sh);
+    display:flex;align-items:center;justify-content:center;
+    position:relative;
+  }
+  .done-screen .ring::before{
+    content:'';
+    position:absolute;
+    top:6px;left:10px;right:10px;
+    height:46%;
+    border-radius:50% 50% 60% 60%;
+    background:linear-gradient(to bottom, rgba(255,255,255,0.5), rgba(255,255,255,0));
+  }
+  .done-screen .big{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:30px;
+    color:#fff;
+    position:relative;
+    z-index:1;
+  }
+  .done-screen .send-status{
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin-top:10px;
+    min-height:18px;
+  }
+  .done-screen .send-status.ok{color:var(--correct-ink);}
+  .done-screen .send-status.bad{color:var(--wrong-ink);}
+
+  .name-screen{padding:6px 0;}
+  .name-screen label{
+    display:block;
+    font-family:'Manrope',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    margin-bottom:10px;
+    color:var(--ink);
+  }
+  .name-screen input{
+    width:100%;
+    padding:14px 16px;
+    border-radius:16px;
+    border:1.5px solid var(--line);
+    background:var(--bg-soft);
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    font-weight:500;
+    color:var(--ink);
+    outline:none;
+    margin-bottom:18px;
+  }
+  .name-screen input:focus{border-color:var(--c1-b);}
+
+  footer{
+    text-align:center;
+    margin-top:22px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-weight:500;
+  }
+
+  /* ===================== DRAWING / TEACHER MODE ===================== */
+  #drawCanvas{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    z-index:9998;
+    pointer-events:none;
+  }
+
+  #drawToggleBtn{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    width:58px;height:58px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,0.5);
+    background:
+      linear-gradient(150deg, rgba(255,255,255,0.35), rgba(255,255,255,0) 60%),
+      linear-gradient(155deg,var(--c1-a),var(--c1-b));
+    backdrop-filter: blur(10px) saturate(160%);
+    -webkit-backdrop-filter: blur(10px) saturate(160%);
+    box-shadow:
+      0 14px 28px -10px var(--c1-sh),
+      inset 0 1px 1px rgba(255,255,255,0.6),
+      inset 0 -6px 10px -4px rgba(0,0,0,0.15);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    z-index:9999;
+    transition:transform .18s cubic-bezier(.34,1.56,.64,1), background .2s ease, box-shadow .2s ease;
+  }
+  #drawToggleBtn svg{
+    width:24px;height:24px;
+    display:block;
+    transition:transform .25s ease, opacity .15s ease;
+  }
+  #drawToggleBtn:active{transform:scale(0.90);}
+  #drawToggleBtn.on{
+    background:
+      linear-gradient(150deg, rgba(255,255,255,0.35), rgba(255,255,255,0) 60%),
+      linear-gradient(155deg,#FF8A65,var(--c2-b));
+    box-shadow:
+      0 14px 28px -10px rgba(229,72,77,0.55),
+      inset 0 1px 1px rgba(255,255,255,0.6),
+      inset 0 -6px 10px -4px rgba(0,0,0,0.15);
+  }
+  #drawToggleBtn.on svg{ transform:rotate(90deg); }
+
+  #drawToolbar{
+    position:fixed;
+    left:50%;
+    bottom:22px;
+    transform:translateX(-50%) translateY(130%) scale(0.94);
+    opacity:0;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:
+      linear-gradient(150deg, rgba(255,255,255,0.6), rgba(255,255,255,0.15));
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border:1px solid rgba(255,255,255,0.7);
+    padding:9px 16px;
+    border-radius:999px;
+    box-shadow:
+      0 24px 48px -20px rgba(19,33,59,0.45),
+      inset 0 1px 1px rgba(255,255,255,0.9);
+    z-index:9999;
+    transition:transform .25s cubic-bezier(.34,1.56,.64,1), opacity .2s ease;
+    pointer-events:none;
+  }
+  #drawToolbar.show{
+    transform:translateX(-50%) translateY(0) scale(1);
+    opacity:1;
+    pointer-events:auto;
+  }
+  .swatch{
+    position:relative;
+    width:25px;height:25px;
+    border-radius:50%;
+    border:none;
+    box-shadow:
+      0 3px 8px -2px rgba(19,33,59,0.35),
+      inset 0 1px 1px rgba(255,255,255,0.5);
+    cursor:pointer;
+    padding:0;
+    transition:transform .15s cubic-bezier(.34,1.56,.64,1);
+  }
+  .swatch::after{
+    content:'';
+    position:absolute;
+    inset:-4px;
+    border-radius:50%;
+    border:2px solid var(--ink);
+    opacity:0;
+    transform:scale(0.7);
+    transition:opacity .15s ease, transform .15s cubic-bezier(.34,1.56,.64,1);
+  }
+  .swatch.selected{ transform:scale(1.08); }
+  .swatch.selected::after{ opacity:1; transform:scale(1); }
+  .tool-btn{
+    width:34px;height:34px;
+    border-radius:50%;
+    border:none;
+    background:rgba(255,255,255,0.5);
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease, transform .15s cubic-bezier(.34,1.56,.64,1);
+  }
+  .tool-btn svg{ width:16px; height:16px; }
+  .tool-btn .dot{
+    border-radius:50%;
+    background:currentColor;
+  }
+  #thinBtn .dot{ width:6px; height:6px; }
+  #thickBtn .dot{ width:12px; height:12px; }
+  .tool-btn.selected{
+    background:var(--c1-b);
+    color:#fff;
+    transform:scale(1.06);
+  }
+  .tool-sep{
+    width:1px;
+    height:22px;
+    background:rgba(19,33,59,0.14);
+  }
+
+  @media (max-width:480px){
+    #drawToolbar{
+      max-width:94vw;
+      overflow-x:auto;
+      padding:8px 13px;
+      gap:9px;
+    }
+    .swatch{width:21px;height:21px;}
+    .tool-btn{width:30px;height:30px;}
+    .tool-btn svg{width:14px;height:14px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="kicker">Синтаксис і пунктуація</div>
+    <div class="kicker tag" id="totalTag">45 завдань</div>
+  </div>
+
+  <div class="review-banner" id="reviewBanner">👀 Режим перегляду відповідей учня</div>
+
+  <h1>Тренажер <span class="hl">однорідних членів</span></h1>
+  <p class="sub">Формат НМТ — обери правильний варіант, перевір відповідь одразу.</p>
+
+  <div class="card">
+    <div id="quizArea"></div>
+  </div>
+
+  <footer>@movoznavka</footer>
+</div>
+
+<!-- ==== Малювання поверх екрана (для вчителя) ==== -->
+<canvas id="drawCanvas"></canvas>
+<button id="drawToggleBtn" title="Малювати">
+  <svg id="drawIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4 20L4.6 16.6C4.7 15.9 5.03 15.26 5.55 14.79L15.3 5.7C16.09 4.96 17.34 4.99 18.09 5.78L18.34 6.04C19.08 6.83 19.04 8.08 18.25 8.81L8.5 17.9C8 18.37 7.37 18.66 6.7 18.75L4 20Z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/>
+    <path d="M13.5 7.5L16.5 10.3" stroke="white" stroke-width="1.7" stroke-linecap="round"/>
+  </svg>
+</button>
+<div id="drawToolbar">
+  <button class="swatch selected" style="background:#E5484D" data-color="#E5484D"></button>
+  <button class="swatch" style="background:#3355EE" data-color="#3355EE"></button>
+  <button class="swatch" style="background:#17A863" data-color="#17A863"></button>
+  <button class="swatch" style="background:#13213B" data-color="#13213B"></button>
+  <div class="tool-sep"></div>
+  <button class="tool-btn selected" id="thinBtn" title="Тонка лінія"><span class="dot"></span></button>
+  <button class="tool-btn" id="thickBtn" title="Товста лінія"><span class="dot"></span></button>
+  <div class="tool-sep"></div>
+  <button class="tool-btn" id="eraserBtn" title="Ластик">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M18.5 13.5L10.5 21.5H5.5L2.5 18.5C2.11 18.11 2.11 17.48 2.5 17.09L13.5 6.09C13.89 5.7 14.52 5.7 14.91 6.09L18.5 9.68C19.5 10.68 19.5 12.5 18.5 13.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M9 13.5L15 19.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <button class="tool-btn" id="clearBtn" title="Очистити все">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M5 7H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M9.5 7V4.8C9.5 4.36 9.86 4 10.3 4H13.7C14.14 4 14.5 4.36 14.5 4.8V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M7 7L7.7 18.6C7.75 19.42 8.42 20 9.24 20H14.76C15.58 20 16.25 19.42 16.3 18.6L17 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M10.3 10.5V16.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M13.7 10.5V16.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  </button>
+</div>
+
+<script>
+// Слово в подвійних квадратних дужках, напр. [[а]] всередині опції, підкреслюється автоматично.
+const ALL_QUESTIONS = [
+  {q:"Однорідними підметами ускладнено речення", opts:[
+    "Полонила мене ти косою русою, напоїла мене на біду спокусою.",
+    "Очима карими, п'янкими чарами приворожив мене юнак.",
+    "Живою казкою, теплом і ласкою у полі цвів багряний мак.",
+    "Часто сниться біленька хустина, наші зустрічі й перша любов."], a:3},
+
+  {q:"Однорідними означеннями ускладнено речення", opts:[
+    "Пісня любові й дитинства в серці бринить, як струна.",
+    "Зникає поїзд в синяві дощу, колесами вистукує об крицю.",
+    "Темна ніч розкидала шовки на поля і чарівні садки.",
+    "Літа на зиму повернули, пливуть в осінній хмурості."], a:0},
+
+  {q:"Правильно розставлено розділові знаки в реченні", opts:[
+    "Розділю я порівну з тобою радощі, і болі, й сподівання.",
+    "Дерева зараз обважніли, посіпішали, й розтікалися сірим туманом по низині.",
+    "Голоси зяблика і вівсянки, і зеленушки, і навіть одуда заглушали куванням зозулі.",
+    "Класична пластика і контур строгий, і логіки залізна течія — це справжньої поезії дороги."], a:0},
+
+  {q:"Пунктуаційну помилку допущено в реченні", opts:[
+    "Силуети гір то випливали, то ховалися за сіткою весняного дощу.",
+    "Тягнуться до сонця і квіти, і трави, віти кучеряві, гори голубі.",
+    "Я знав міста, ліси, і гори, і в морі бачив кораблі.",
+    "Дихнуло з північі і півдня, із заходу і сходу."], a:2},
+
+  {q:"Кому перед сполучником <i>та</i> пропущено в реченні", opts:[
+    "Я в пісні молодість знайду та довго-довго буду з нею.",
+    "Згори видно скошені жита та залитий водою луг.",
+    "На розпутті кобзар сидить та на кобзі грає.",
+    "Тече вода в синє море та не витікає."], a:3},
+
+  {q:"Кому треба поставити на місці крапок у реченні", opts:[
+    "Я на згадку серцю подарую не журбину ... первоцвіт кохання.",
+    "Не вітер ... буря над землею в замети клала білий сніг.",
+    "Не пише ... не телефонує моє щастя з-за океану.",
+    "Вітер в гаї не гуляє ... вночі спочиває."], a:2},
+
+  {q:"Правильно поставлено розділові знаки в реченні", opts:[
+    "У моїй душі бриніли людські голоси, і співи птахів, і шум дерев, і ні вдень, ні вночі не давали спокою.",
+    "У моїй душі бриніли людські голоси і співи птахів, і шум дерев, і ні вдень, ні вночі не давали спокою.",
+    "У моїй душі бриніли людські голоси, і співи птахів, і шум дерев, і ні вдень ні вночі не давали спокою.",
+    "У моїй душі бриніли людські голоси, і співи птахів, і шум дерев і ні вдень ні вночі не давали спокою."], a:3},
+
+  {q:"Правильно поставлено розділові знаки в реченні", opts:[
+    "Тема матері завжди була, є і вічно залишатиметься актуальною, як у фольклорі, так і в авторській творчості.",
+    "Тема матері завжди була є і вічно залишатиметься актуальною, як у фольклорі, так і в авторській творчості.",
+    "Тема матері завжди була, є і вічно залишатиметься актуальною як у фольклорі, так і в авторській творчості.",
+    "Тема матері завжди була, є, і вічно залишатиметься актуальною як у фольклорі, так і в авторській творчості."], a:2},
+
+  {q:"Тире при однорідних членах треба поставити в реченні <i>(розділові знаки пропущено)</i>", opts:[
+    "Усюди німа тиша на річці у лісі на полі.",
+    "І все поволі зникає море скелі земля.",
+    "Усе в чеканні спілі краплі рос земля і місяць вишні і тополі.",
+    "Кожен кущик горбок долина стежечка усе це йому знайоме."], a:3},
+
+  {q:"Двокрапку при однорідних членах треба поставити в реченні <i>(розділові знаки пропущено)</i>", opts:[
+    "На все осінь щедра на кавуни і на дощі і на холодні роси.",
+    "Море й озеро синій берег і широкий степ усе залите гарячим сонцем.",
+    "Проміння ламалося у хвилі блищало миготіло рябіло наче хто сипонув на воду блискучими іскрами.",
+    "Бажання дізнатися про далеких предків пошуки сімейних реліквій розмови з рідними усе це прокладає незримі ниточки духовності між людьми різних поколінь."], a:0},
+
+  {q:"Перед однорідними членами треба поставити двокрапку, а після них тире в реченні <i>(розділові знаки пропущено)</i>", opts:[
+    "На вершечку стрілецької гори у лісах і долинах скрізь панувала тиша.",
+    "Ранок зачинався тихий усе навколо і трави і дерева і кущі неначе завмерло.",
+    "Летиш і милуєшся всім і сріблястою нехворощю і лісосмугами і білою дівочою косинкою.",
+    "Усе в думках ожива і луги в зеленних отавах і гніздо ластовине під дахом старого хлівця і дупласта верба..."], a:1},
+
+  {q:"З'ясуйте кількість пропущених ком у реченні.<br><i>Долини здалека ніби дихають тобі в лице холодком лісовою вогкістю манять у тінь густого старого лісу.</i>", opts:[
+    "1","2","3","4"], a:1},
+
+  {q:"Двокрапку при однорідних членах треба поставити в реченні <i>(розділові знаки пропущено)</i>", opts:[
+    "Шевченкові були підвладні різні літературні роди поезія проза драматургія.",
+    "Козацтво було озброєне мушкетами пістолями рушницею мечами луками й іншими видами зброї.",
+    "Для походу ми приготували рюкзаки намети пакети для сміття консерви теплий одяг.",
+    "Деякі пернаті навчилися імітувати окремі штучні звуки пісні інших видів птахів і навіть звуки людської мови."], a:0},
+
+  {q:"Прочитайте речення <i>(риска в дужках позначає пропущений розділовий знак)</i>.<br><i>Усе (_) і штормове море, і голубе небо (_) і далекі, ледь окреслені хмари (_) пройняте легеньким серпанком.</i><br>Правильним є варіант послідовного заповнення пропусків у рядку", opts:[
+    "тире, двокрапка, кома",
+    "двокрапка, кома, тире",
+    "тире, кома, двокрапка",
+    "двокрапка, тире, кома"], a:1},
+
+  {q:"Однорідними підметами ускладнено речення", opts:["Треба полити гарбузи, кавуни, огірки й помідори.", "А від тата знову пахло хмарами, небом і трохи втомою.", "Нутро дерева відгонило гіркуватим пилом, вощиною та живим яблуком.", "До нас на подвір'я прилітають такі гарні снігурі й синички, а деколи навіть дятел."], a:3},
+  {q:"Однорідними підметами ускладнено речення", opts:["Увечері мамка клала мене на ладу й обмивала руки, лице, ноги.", "Люди, що працюють на землі, у лісі, на будові, здебільшого міцні до старості.", "Через секунду з кухні почувся шум води з-під крану, стукіт дверцят холодильника, дзвін посуду й спів Соньки, яка готувала гостину.", "Рідна планета швидко зменшувалася, губилася в космосі, стала подібна до зеленуватої блискучої вишні."], a:2},
+  {q:"Однорідними присудками ускладнено речення", opts:["Чисте небо не боїться ні блискавки, ні грому.", "Пахнув дід теплою землею й трохи млином.", "Жінка була доволі огрядна, висока, русява.", "Любив дід гарну бесіду й добре слово."], a:2},
+  {q:"Однорідними присудками ускладнено речення", opts:["Там катастрофа, там теракт, там вибух метану.", "Узимку та влітку люди по-різному бачать кольори.", "Скрізь по світу конфлікти, сутички, протистояння.", "Вода при березі починала каламутитись і жовкнути."], a:3},
+  {q:"Однорідними додатками ускладнено речення", opts:["Ніяке м'ясо, ніякі страви не дають нам таку здорову поживу, як трави й коріння.", "На трав'яних напарах я помалу віджививав, виходив з потьмарення, але руками й ногами не владав.", "Уважно слідкував хлопець за ходом думки гостя, услухався в заплутані фрази, але нічого не міг збагнути.", "Жовтень зривав листя з дерев, укривав розцяцькованою ковдрою втомлену землю, готував її до зимового сну."], a:1},
+  {q:"Однорідними додатками ускладнено речення", opts:["І трава, й людина скоряються рухові великого безміру.", "Баба вгадувала всі мої заміри, звідкись знала про всі мої денні гріхи.", "Квітка наблизилася, охопила Славка теплим вогнем, щезла.", "Трава має розум, має слух і пам'ять."], a:3},
+  {q:"Однорідними обставинами ускладнено речення", opts:["Було дуже образливо, боляче, гірко.", "Аж ось Катря підняла вгору голову й крикнула радісно та голосно.", "Птиці й комашня покажуть знатнику грибні та ягідні місця.", "Холод притлумлював біль струдженого, побитого тіла."], a:1},
+  {q:"Однорідними обставинами ускладнено речення", opts:["Усе дихає, плине, відчуває, зливається з навколишніми явищами, речами, істотами.", "Страус зупинився біля краю води, знову погрозливо вигнув шию, а тоді почав поважно походжати вздовж берега туди-сюди.", "Було весело й гірко, скрутно матеріально та привільно морально без батьківського контролю.", "Ми їздимо на природу, у Гідропарк, за місто, але я нікуди не можу поїхати від себе."], a:3},
+  {q:"Однорідними означеннями ускладнено речення", opts:["Я стаю легкий, сипкий і сам для себе непереконливий.", "Настанови мами й тата пам'ятай усе життя.", "Сад темний, густий, бур'янами зарослий.", "Сила та розум — краса людини."], a:1},
+  {q:"Перед виділеним сполучником треба поставити кому в реченні", opts:["Уся вулиця співала <i>та</i> пританцьовувала.", "Полетіла б я до тебе <i>та</i> крилець не маю.", "Треба підкреслити підмети <i>та</i> присудки.", "У лісі пахло листям, грибами <i>та</i> оживою."], a:1},
+  {q:"Перед виділеним сполучником треба поставити кому в реченні", opts:["Теплі слова <i>та</i> лагідний погляд дарую тобі.", "Молодий місяць <i>та</i> зорі освічують дорогу.", "Ти пам'ятаєш мене <i>та</i> чекаєш у снах.", "Тече вода в синє море <i>та</i> не витікає."], a:3},
+  {q:"Правильно поставлено розділові знаки в реченні", opts:["Далеко внизу Поділ і Дніпро, і низьке лівобережжя, що ген-ген до крайнеба простяглося.", "Книжки лежали на підвіконнях і на табуретах, і на спеціальних полицях, і просто на підлозі.", "Ранок все відчарував: сині квіти поміж трав, і метелика, і бджілку, і в цвіту вишневу гілку...", "Скільки в очах Надії сховано світла і радощів, і смутку водночас."], a:2},
+  {q:"<b>НЕПРАВИЛЬНО</b> поставлено розділові знаки в реченні", opts:["Минає рік, і два, і п'ять років...", "Батько і мати, і дід з бабою нагадували мені святих.", "Шумить, і шепче, і тривожить зрадливий дощ із-за кутка.", "Любіть травинку, і тваринку, і сонце завтрашнього дня..."], a:1},
+  {q:"Між однорідними членами треба поставити тире в реченні <i>(розділові знаки пропущено)</i>", opts:["Стрілоподібний пуп'янок квітки захитався в повітрі розкрився.", "Струни сумно скрикують кричать разом з дорослими.", "Наречена не пішла побігла до свого щастя в краватці.", "Мозаїка світу мерехтить сяє обсипається."], a:2},
+  {q:"Перед виділеним словом <b>НЕ ТРЕБА</b> ставити кому в реченні <i>(розділові знаки пропущено)</i>", opts:["Коли вогонь розгориться <i>то</i> спалює і мокре <i>і</i> сухе.", "Без розуму <i>ні</i> сокирою рубати <i>ні</i> личака в'язати.", "І так <i>і</i> сяк намагався відкрити скриньку але зась!", "Ні під столом <i>ні</i> біля ліжка Тома не було."], a:2},
+  {q:"Перед виділеним словом <b>НЕ ТРЕБА</b> ставити кому в реченні <i>(розділові знаки пропущено)</i>", opts:["Тепер від реготу заходилися сльозами не тільки глядачі <i>але</i> й артисти.", "Мокра газета не стільки розгорталася <i>скільки</i> відпадала м'якими клаптями.", "М'ячі не стільки в повітрі літають <i>скільки</i> по піску качаються.", "На несподіваний гуркіт літака притихли <i>як</i> дорослі так і діти."], a:3},
+  {q:"Пунктуаційну помилку допущено в реченні", opts:["Вишні й черешні, абрикоси і сливи — чого тільки не росло в саду бабусі.", "Від застуди і кашлю варіть і пийте чаї з гілочок, листя, і квіток яблуні.", "У швидких, уважних очах сіклися то скалки льоду, то білі бритви.", "Ліс вабить барвами навесні й восени, улітку й навіть узимку."], a:1},
+  {q:"Пунктуаційну помилку допущено в реченні", opts:["На столику біля дзеркала красувалося ще чимало флакончиків, коробочок і різних футлярчиків.", "Осінь сумовитим пензлем малювала на кущах, на деревах пишні пурпурно-золоті шати.", "Славко Беркута підвівся з-за парти, мовчки натягнув пальто й мовчки пішов із класу.", "Не побачиш вітра в полі ні тополю на роздоллі, ні метелика, ні бджілку, ні в цвіту вишневу гілку..."], a:3},
+  {q:"Пунктуаційну помилку допущено в реченні", opts:["Живеш, переймаєшся, на все реагуєш, а згодом озирнешся — уже й не згадаєш, що коли було й чи взагалі було?", "Уранці ні світ, ні зоря я прибігла з гуртожитку на автобусну зупинку й цілих пів години чекала на перший автобус.", "У хаті не тільки дід з бабою, а й гостей повно: племінник з дружиною і двоє дрібних діточок.", "Тато великий, сильний, мужній, найсильніший у світі — з ним нічого не може трапитися..."], a:1},
+  {q:"Після однорідних членів треба поставити тире в реченні <i>(розділові знаки пропущено)</i>", opts:["Куди не повернешся скрізь земля і згори і знизу і праворуч і ліворуч.", "Ми садили ліс у полі і дубочки і тополі і осику і ліщину і червону горобину.", "Дерева трави квіти усе жило в очікуванні весняних сонячних дотиків.", "І заспівало все у цім краю Карпатські гори ріки і смереки."], a:2},
+  {q:"Перед однорідними членами треба поставити двокрапку в реченні <i>(розділові знаки пропущено)</i>", opts:["Небо було глибоке бездонне залите густою темінню усипане міріадами мерехтливих зірок.", "Люблю я осінні квіти прощальну красу вечорів і сині оголені віти й від вітру холодний спів.", "Сонька перебувала під пильним наглядом чотирьох дорослих тата баби з дідом і медсестри.", "Луки і ліси під пензлем осені барвисто немов шедеври пейзажиста горять на виставці краси."], a:2},
+  {q:"Перед однорідними членами треба поставити двокрапку в реченні <i>(розділові знаки пропущено)</i>", opts:["Ніколи не думав що буває стільки різних кактусів і маленькі і великі і круглі і стовбуристі.", "Вишні черешні груші сливки-угорки терноліс терен і дерен усе росло густими купами.", "Скресли ріки і крижини безладно громадились і шурхотіли в течії повноводдя.", "На греблі знов у два рядки видивляються у воді старі товсті дуплинасті верби."], a:0},
+  {q:"Перед однорідними членами треба поставити двокрапку в реченні <i>(розділові знаки пропущено)</i>", opts:["Бачу що всі кругом сміються і Людмила Василівна і режисер й оператор.", "Сонце ліси поля води повітря все це святиня яку маємо берегти.", "Люблю твій шум і шепіт серед поля і серцем чую силу наливну.", "Ні спека дня ні бурі ні морози ніщо не вб'є любов мою живу."], a:0},
+  {q:"Після однорідних членів треба поставити тире в реченні <i>(розділові знаки пропущено)</i>", opts:["У нашому саду була розкішна флора жоржини й кропива любисток і ревень.", "Усі весну щиро люблять і люди і пташки і дерева і комашки і ніжна травиця.", "Усе докупи злилося материна любов піклування батькове дитячі забавки радощі й горе.", "Столиці міста й містечка велетенські та зовсім крихітні країни усе це тепер випало Іванові Силі побачити на власні очі."], a:3},
+  {q:"Перед однорідними членами треба поставити двокрапку в реченні <i>(розділові знаки пропущено)</i>", opts:["Осінній смерк і хрест й зів'ялі квіти ось відповідь на всі твої питання.", "І ліс і фіолетові тіні і зоряна ніч усе було урочисто прекрасним і близьким.", "На вершечку стрілецької гори на горах і видолинках скрізь уже панувала тиша.", "І подумав Стефко що вже ніхто його не любить ні теля ані сонце ані співуча липа..."], a:3},
+  {q:"Перед однорідними членами треба поставити двокрапку, а після них — тире в реченні <i>(розділові знаки пропущено)</i>", opts:["І це повітря і покручені лози і зів'яла трава усе це мимохіть нагадувало щасливі хвилини життя.", "Усюди і на вулицях і круг стадіону і обабіч дороги до заводу росли молоді осокори клени й каштани.", "Ті пісні мене найперше вчили поважати труд людський і піт шанувать Вітчизну мою милу бо вона одна на цілий світ.", "І квіт і зорі спалахи півонії космічний гул і мовчазний туман усе довкруг в довершеній гармонії звучить урочим ладом як орган."], a:1},
+  {q:"Перед однорідними членами треба поставити двокрапку, а після них — тире в реченні <i>(розділові знаки пропущено)</i>", opts:["Ніщо не мертве в вирі світовому ні курява планет ні сталагміт ні мумії прадавніх пірамід ні літери спліснявілого тому.", "Тонкі брови русяві дрібні кучері на голові тонкий ніс рум'яні губи все дихало молодою парубочою красою.", "На синіх долонях вечора темним смутком горбатився старий вітряк і в благанні простягали замерзлі руки чи до неба чи до людей.", "В очі полізло різне зілля копитник і ракова шийка материнка й чорнобиль горицвіт і звіробій деревій і ромен усе це росло на землі по болотах і на воді."], a:3},
+  {q:"Перед однорідними членами треба поставити двокрапку, а після них — тире в реченні <i>(розділові знаки пропущено)</i>", opts:["Усе навколо дерева птахи люди сповнене весняної пружної нестримної сили.", "Наближення зими в усьому серце чує я в шелесті трав і у вітрі і в стежках.", "У селі в бабусі все мені цікаве квіти берег річки і зелені трави.", "У мудрості своїй закони є і цвіт і злет і несходимі пущі."], a:0},
+  {q:"Лише один ряд однорідних членів має речення", opts:["У щастя людського два рівних є крила: троянди й виноград, красиве і корисне.", "Завернув до нас якось один панок, скаржився на серце, на задишку, на кволість.", "Бабай опустив долі вологі очі й уперше в житті невміло, але щиро й лагідно обняв Чу.", "З тих перших звуків я прочитував настрій лісу, угадував поведінку звіра, риби, комашні."], a:0},
+  {q:"Лише один ряд однорідних членів має речення", opts:["Часу Богдан не гаяв: скинув куртку, черевики, шкарпетки, засукав рукави сорочки й мавпою видерся по трубі до четвертого поверху.", "Простір захаращений і перекритий — теплицями, щитами, білбордами, павучками висаджених дерев.", "У дворі був невеличкий дитячий майданчик з пісочницею, металевою горкою, однією поламаною гойдалкою у вигляді дерев'яного, фарбованого в зелене крокодила.", "Полюють зайців в основному трьома способами: з підйомом, з-під собак-гончаків і на засідах."], a:3},
+  {q:"Лише один ряд однорідних членів має речення", opts:["З середини прекрасної лілеї вихопилися пружні щупальця, оповили руки й ноги дівчинки міцними обіймами.", "З кукурудзяного бадилля зв'язав плотик, поклав на нього одежу й торбу з книжками, дочекався першої звізди й відштовхнувся від берега.", "Я навчився видіти довкола все живе й тішитися йому — травині, дереву, грибові, птиці, звіру, землі, небу.", "Усяке птаство, як-от: деркачів, перепілок, куликів, курок — можна було використати косою в траві."], a:3}
+];
+
+// ============================================================
+// ДЗ: підтримує і "одне число" (?hw=5 — почати з №5 і до кінця),
+// і "список/діапазон" (?hw=2-4,8-10 — показати ЛИШЕ ці завдання).
+// ============================================================
+function parseHwSpec_(raw){
+  if(!raw) return null;
+  raw = raw.trim()
+    .replace(/[\u2010-\u2015\u2212]/g, '-')
+    .replace(/[\u00A0\u202F]/g, ' ');
+  if(/^\d+$/.test(raw)){
+    return { type: 'from', start: parseInt(raw, 10) };
+  }
+  const set = new Set();
+  raw.split(',').forEach(function(part){
+    part = part.trim();
+    if(!part) return;
+    const m = part.match(/^(\d+)\s*-\s*(\d+)$/);
+    if(m){
+      let a = parseInt(m[1],10), b = parseInt(m[2],10);
+      if(a > b){ const t=a; a=b; b=t; }
+      for(let n=a; n<=b; n++) set.add(n);
+    } else {
+      const n = parseInt(part,10);
+      if(!isNaN(n)) set.add(n);
+    }
+  });
+  return set.size ? { type: 'subset', numbers: Array.from(set).sort(function(a,b){return a-b;}) } : null;
+}
+
+const _hwParam = new URLSearchParams(location.search).get('hw');
+const _hwSpec = parseHwSpec_(_hwParam);
+
+let QUESTIONS = ALL_QUESTIONS;
+let _hwStartIdx = 0;
+if(_hwSpec){
+  if(_hwSpec.type === 'subset'){
+    const filtered = _hwSpec.numbers
+      .map(function(n){ return ALL_QUESTIONS[n-1] ? Object.assign({origIndex: n-1}, ALL_QUESTIONS[n-1]) : null; })
+      .filter(Boolean);
+    if(filtered.length) QUESTIONS = filtered;
+  } else if(_hwSpec.type === 'from'){
+    if(_hwSpec.start >= 1 && _hwSpec.start <= ALL_QUESTIONS.length){
+      _hwStartIdx = _hwSpec.start - 1;
+    }
+  }
+}
+
+const LETTERS = ["А","Б","В","Г","Д"];
+
+// --- Telegram reporting config ---
+const LOG_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyDGcDVtwD0L8WW0zDIsXwYwwf6zp4XzmofzdI0wU-AhhfZIXbH2lOHquNSHI8cKRc7/exec";
+
+function logToSheet(payload){
+  try{
+    return fetch(LOG_WEBAPP_URL, {
+      method: 'POST',
+      headers: {'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    }).then(resp => resp.ok).catch(()=>false);
+  }catch(e){
+    return Promise.resolve(false);
+  }
+}
+
+let qIdx = 0;
+let answers = {};
+let flags = {};
+let studentName = "";
+let started = false;
+let reportSent = false;
+let finished = false;
+let reviewMode = false;
+
+function progressKey_(){
+  return 'quizProgress::' + location.pathname + '::' + studentName;
+}
+function saveProgress_(){
+  try{
+    localStorage.setItem(progressKey_(), JSON.stringify({
+      answers, flags, qIdx, finished, hwParam: _hwParam || '', ts: Date.now()
+    }));
+  }catch(e){}
+}
+function loadProgress_(){
+  try{
+    const raw = localStorage.getItem(progressKey_());
+    if(!raw) return null;
+    const data = JSON.parse(raw);
+    if((data.hwParam || '') !== (_hwParam || '')) return null;
+    return data;
+  }catch(e){ return null; }
+}
+function clearProgress_(){
+  try{ localStorage.removeItem(progressKey_()); }catch(e){}
+}
+
+const quizArea = document.getElementById('quizArea');
+document.getElementById('totalTag').textContent = QUESTIONS.length + " завдань";
+
+function renderOpt(o){
+  return o.replace(/\[\[([^\]]+)\]\]/g, '<u>$1</u>');
+}
+
+function scoreOverall(){
+  let correct = 0, answered = 0;
+  QUESTIONS.forEach((_,i)=>{
+    const rec = answers[i];
+    if(rec){ answered++; if(rec.correct) correct++; }
+  });
+  return {correct, answered, total: QUESTIONS.length};
+}
+
+async function getStoredName(){
+  try{
+    const result = await window.storage.get('student_name');
+    return result ? result.value : null;
+  }catch(e){
+    return null;
+  }
+}
+
+async function setStoredName(name){
+  try{
+    await window.storage.set('student_name', name);
+  }catch(e){}
+}
+
+async function clearStoredName(){
+  try{
+    await window.storage.delete('student_name');
+  }catch(e){}
+}
+
+function buildReviewLink(){
+  const pairs = [];
+  QUESTIONS.forEach((_,i)=>{
+    const rec = answers[i];
+    if(rec) pairs.push(i + '-' + rec.picked);
+  });
+  const ansStr = pairs.join(',');
+  const flagStr = Object.keys(flags).filter(i=>flags[i]).join(',');
+  const base = location.origin + location.pathname;
+  let url = `${base}?review=1&name=${encodeURIComponent(studentName)}&ans=${ansStr}`;
+  if(flagStr) url += `&flags=${flagStr}`;
+  if(_hwParam) url += `&hw=${encodeURIComponent(_hwParam)}`;
+  return url;
+}
+
+function parseReviewParam(){
+  const params = new URLSearchParams(location.search);
+  if(params.get('review') !== '1') return false;
+  const name = params.get('name');
+  const ansParam = params.get('ans');
+  if(!ansParam) return false;
+
+  studentName = name || 'Учень';
+  answers = {};
+  ansParam.split(',').forEach(pair=>{
+    const [idxStr, valStr] = pair.split('-');
+    const i = Number(idxStr);
+    const picked = Number(valStr);
+    if(!Number.isNaN(i) && !Number.isNaN(picked) && i >= 0 && i < QUESTIONS.length){
+      answers[i] = {picked, correct: picked === QUESTIONS[i].a};
+    }
+  });
+
+  flags = {};
+  const flagsParam = params.get('flags');
+  if(flagsParam){
+    flagsParam.split(',').forEach(s=>{
+      const i = Number(s);
+      if(!Number.isNaN(i)) flags[i] = true;
+    });
+  }
+
+  started = true;
+  reviewMode = true;
+  qIdx = 0;
+  return true;
+}
+
+function renderNameScreen(prefill){
+  quizArea.innerHTML = `
+    <div class="name-screen">
+      <label for="nameInput">Як тебе звати?</label>
+      <input type="text" id="nameInput" placeholder="Ім'я" autocomplete="off" value="${prefill ? prefill.replace(/"/g,'&quot;') : ''}">
+      <button class="btn primary" id="startBtn" style="width:100%;justify-content:center;">Почати тест</button>
+    </div>
+  `;
+  const input = document.getElementById('nameInput');
+  const startBtn = document.getElementById('startBtn');
+  input.focus();
+  const go = async ()=>{
+    const val = input.value.trim();
+    studentName = val || "Без імені";
+    await setStoredName(studentName);
+    started = true;
+    qIdx = 0;
+    renderQuiz();
+  };
+  startBtn.onclick = go;
+  input.addEventListener('keydown', (e)=>{ if(e.key==='Enter') go(); });
+}
+
+async function sendTelegramReport(){
+  const {correct, total, answered} = scoreOverall();
+  const wrongList = [];
+  const flaggedList = [];
+  QUESTIONS.forEach((_,i)=>{
+    const rec = answers[i];
+    const num = (QUESTIONS[i].origIndex !== undefined ? QUESTIONS[i].origIndex : i) + 1;
+    if(rec && !rec.correct) wrongList.push(num);
+    if(flags[i]) flaggedList.push(num);
+  });
+
+  const reviewLink = buildReviewLink();
+  const statusEl = document.getElementById('sendStatus');
+
+  const ok = await logToSheet({
+    type: "quiz_result",
+    student: studentName,
+    testName: "Однорідні члени",
+    correct, answered, total,
+    wrongList,
+    flaggedList,
+    reviewLink
+  });
+
+  if(ok){
+    reportSent = true;
+    clearProgress_();
+    if(statusEl){ statusEl.textContent = 'Результат надіслано вчителю ✓'; statusEl.className = 'send-status ok'; }
+  } else if(statusEl){
+    statusEl.innerHTML = 'Не вдалося надіслати результат (перевірте інтернет). Прогрес збережено, спробуйте ще раз.<br><button class="btn ghost small" id="retrySendBtn" style="margin-top:8px;">Спробувати ще раз</button>';
+    statusEl.className = 'send-status bad';
+    const retryBtn = document.getElementById('retrySendBtn');
+    if(retryBtn) retryBtn.onclick = ()=>{
+      statusEl.textContent = 'Надсилаємо результат...';
+      statusEl.className = 'send-status';
+      sendTelegramReport();
+    };
+  }
+}
+
+function renderQuiz(){
+  document.getElementById('reviewBanner').classList.toggle('show', reviewMode);
+
+  if(!started){ renderNameScreen(); return; }
+
+  const total = QUESTIONS.length;
+
+  if(qIdx >= total || finished){
+    const {correct, answered} = scoreOverall();
+    quizArea.innerHTML = `
+      <div class="done-screen">
+        <div class="ring"><div class="big">${correct}/${answered}</div></div>
+        <p class="sub" style="margin:0 auto 4px;">${studentName} · Однорідні члени · відповідано ${answered} з ${total}</p>
+        ${reviewMode ? '' : `<div class="send-status" id="sendStatus">Надсилаємо результат...</div>
+        <button class="btn primary" id="restartBtn" style="margin-top:14px;">Пройти ще раз</button>`}
+      </div>`;
+    if(!reviewMode){
+      document.getElementById('restartBtn').onclick = ()=>{
+        answers = {}; flags = {};
+        qIdx = 0; reportSent = false; finished = false;
+        clearProgress_();
+        renderQuiz();
+      };
+      saveProgress_();
+      if(!reportSent){
+        sendTelegramReport();
+      }
+    }
+    return;
+  }
+
+  const q = QUESTIONS[qIdx];
+  const rec = answers[qIdx];
+  const {correct, answered} = scoreOverall();
+  const isFlagged = !!flags[qIdx];
+
+  let segs = '';
+  QUESTIONS.forEach((_,i)=>{
+    const r = answers[i];
+    let cls = i===qIdx ? 'current' : (r ? (r.correct?'done-correct':'done-wrong') : '');
+    segs += `<div class="seg ${cls}" data-i="${i}"></div>`;
+  });
+
+  const canGoNext = rec || reviewMode;
+
+  quizArea.innerHTML = `
+    <div class="progress-row">
+      <div class="qnum">${studentName} · Питання ${qIdx+1} з ${total}</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        ${!reviewMode ? `<button id="flagBtn" type="button" title="Позначити, якщо незрозуміло" style="background:${isFlagged?'#FFE27A':'none'};border:none;cursor:pointer;font-size:13px;line-height:1;padding:4px 7px;border-radius:8px;opacity:${isFlagged?'1':'0.3'};">❓</button>` : ''}
+        <div class="score">${correct}/${answered||0}</div>
+      </div>
+    </div>
+    ${reviewMode && isFlagged ? `<p class="sub" style="color:#B8860B;font-weight:700;margin:0 0 6px;">❓ Учень позначив це питання як незрозуміле</p>` : ''}
+    <div class="segbar">${segs}</div>
+    <p class="qtext">${q.q}</p>
+    <div class="options">
+      ${q.opts.map((o,i)=>`
+        <button class="opt" data-i="${i}" ${(rec||reviewMode)?'disabled':''}>
+          <span class="tile"><span>${LETTERS[i]}</span></span><span>${renderOpt(o)}</span>
+        </button>`).join('')}
+    </div>
+    <div class="feedback ${rec ? 'show '+(rec.correct?'ok':'bad') : (reviewMode ? 'show bad' : '')}" id="fb">
+      ${rec
+        ? (rec.correct ? `<span><b>Правильно.</b> Відповідь — ${LETTERS[q.a]}.</span>` : `<span>Правильна відповідь — ${LETTERS[q.a]}.</span>`)
+        : (reviewMode ? `<span>Учень не відповів. Правильна відповідь — ${LETTERS[q.a]}.</span>` : '')}
+    </div>
+    <div class="nav-row">
+      <button class="btn ghost" id="prevBtn" ${qIdx===0?'disabled':''}>← Назад</button>
+      <button class="btn primary" id="nextBtn" ${canGoNext?'':'disabled'}>${qIdx===total-1?'До результату':'Далі →'}</button>
+    </div>
+    ${reviewMode ? '' : `
+    <div class="reset-row">
+      <button class="btn ghost small" id="finishBtn">Завершити і надіслати результат</button>
+      <button class="btn ghost small" id="changeNameBtn">Змінити ім'я</button>
+    </div>`}
+  `;
+
+  if(rec){
+    quizArea.querySelectorAll('.opt').forEach((btn,i)=>{
+      const tile = btn.querySelector('.tile');
+      if(i===q.a){
+        btn.classList.add('correct');
+        tile.insertAdjacentHTML('beforeend', '<span class="badge ok">✓</span>');
+      } else if(i===rec.picked){
+        btn.classList.add('wrong');
+        tile.insertAdjacentHTML('beforeend', '<span class="badge no">✕</span>');
+      } else {
+        btn.classList.add('dim');
+      }
+    });
+  } else if(reviewMode){
+    quizArea.querySelectorAll('.opt').forEach((btn,i)=>{
+      const tile = btn.querySelector('.tile');
+      if(i===q.a){
+        btn.classList.add('correct');
+        tile.insertAdjacentHTML('beforeend', '<span class="badge ok">✓</span>');
+      } else {
+        btn.classList.add('dim');
+      }
+    });
+  }
+
+  quizArea.querySelectorAll('.opt').forEach(btn=>{
+    btn.onclick = ()=>{
+      if(reviewMode) return;
+      if(answers[qIdx]) return;
+      const picked = +btn.dataset.i;
+      answers[qIdx] = {picked, correct: picked===q.a};
+      saveProgress_();
+      renderQuiz();
+    };
+  });
+  document.getElementById('prevBtn').onclick = ()=>{ qIdx--; saveProgress_(); renderQuiz(); };
+  document.getElementById('nextBtn').onclick = ()=>{ qIdx++; saveProgress_(); renderQuiz(); };
+  if(!reviewMode){
+    const flagBtn = document.getElementById('flagBtn');
+    if(flagBtn) flagBtn.onclick = ()=>{
+      flags[qIdx] = !flags[qIdx];
+      saveProgress_();
+      renderQuiz();
+    };
+    document.getElementById('finishBtn').onclick = ()=>{
+      const {answered} = scoreOverall();
+      const msg = answered===0
+        ? 'Ти ще не відповів на жодне питання. Завершити тест зараз?'
+        : `Завершити тест зараз і надіслати результат (відповідено на ${answered} із ${total})?`;
+      if(confirm(msg)){
+        finished = true;
+        saveProgress_();
+        renderQuiz();
+      }
+    };
+    document.getElementById('changeNameBtn').onclick = async ()=>{
+      await clearStoredName();
+      started = false;
+      renderNameScreen(studentName);
+    };
+  }
+  quizArea.querySelectorAll('.seg').forEach(d=>{
+    d.onclick = ()=>{ qIdx = +d.dataset.i; saveProgress_(); renderQuiz(); };
+  });
+}
+
+async function init(){
+  if(parseReviewParam()){
+    renderQuiz();
+    return;
+  }
+  const urlParams = new URLSearchParams(location.search);
+  const fromUrl = urlParams.get('student');
+  if(fromUrl){
+    studentName = fromUrl;
+    started = true;
+    const saved = loadProgress_();
+    if(saved){
+      answers = saved.answers || {};
+      flags = saved.flags || {};
+      qIdx = typeof saved.qIdx === 'number' ? saved.qIdx : _hwStartIdx;
+      finished = !!saved.finished;
+    } else {
+      qIdx = _hwStartIdx;
+    }
+    renderQuiz();
+    return;
+  }
+  const saved = await getStoredName();
+  if(saved){
+    studentName = saved;
+    started = true;
+  }
+  renderQuiz();
+}
+init();
+
+// ======================================================================
+// МАЛЮВАННЯ ПОВЕРХ ЕКРАНА (режим "учитель")
+// ======================================================================
+(function(){
+  const canvas = document.getElementById('drawCanvas');
+  const ctx = canvas.getContext('2d');
+  const toggleBtn = document.getElementById('drawToggleBtn');
+  const toolbar = document.getElementById('drawToolbar');
+  const thinBtn = document.getElementById('thinBtn');
+  const thickBtn = document.getElementById('thickBtn');
+  const eraserBtn = document.getElementById('eraserBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const swatches = document.querySelectorAll('.swatch');
+
+  let drawingActive = false;
+  let isDrawing = false;
+  let currentColor = "#E5484D";
+  let currentWidth = 4;
+  let eraserMode = false;
+  let lastX = 0, lastY = 0;
+  let activePointerId = null;
+
+  function currentDocHeight(){
+    return Math.max(
+      document.documentElement.scrollHeight,
+      document.body.scrollHeight,
+      window.innerHeight
+    );
+  }
+
+  function resizeCanvas(){
+    const docWidth = document.documentElement.clientWidth;
+    const docHeight = currentDocHeight();
+
+    const prev = document.createElement('canvas');
+    prev.width = canvas.width;
+    prev.height = canvas.height;
+    if(canvas.width && canvas.height){
+      prev.getContext('2d').drawImage(canvas, 0, 0);
+    }
+
+    canvas.width = docWidth * devicePixelRatio;
+    canvas.height = docHeight * devicePixelRatio;
+    canvas.style.width = docWidth + 'px';
+    canvas.style.height = docHeight + 'px';
+    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    if(prev.width && prev.height){
+      ctx.drawImage(prev, 0, 0, prev.width / devicePixelRatio, prev.height / devicePixelRatio);
+    }
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+  window.addEventListener('orientationchange', resizeCanvas);
+  if(window.ResizeObserver){
+    new ResizeObserver(()=> resizeCanvas()).observe(document.body);
+  }
+
+  window.clearDrawing = function(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  };
+
+  function setActive(on){
+    drawingActive = on;
+    toolbar.classList.toggle('show', on);
+    toggleBtn.classList.toggle('on', on);
+    toggleBtn.title = on ? 'Вимкнути малювання' : 'Малювати';
+  }
+
+  toggleBtn.addEventListener('click', ()=> setActive(!drawingActive));
+
+  swatches.forEach(sw=>{
+    sw.addEventListener('click', ()=>{
+      swatches.forEach(s=>s.classList.remove('selected'));
+      sw.classList.add('selected');
+      currentColor = sw.dataset.color;
+      eraserMode = false;
+      eraserBtn.classList.remove('selected');
+    });
+  });
+
+  thinBtn.addEventListener('click', ()=>{
+    currentWidth = 4;
+    thinBtn.classList.add('selected');
+    thickBtn.classList.remove('selected');
+  });
+  thickBtn.addEventListener('click', ()=>{
+    currentWidth = 12;
+    thickBtn.classList.add('selected');
+    thinBtn.classList.remove('selected');
+  });
+  eraserBtn.addEventListener('click', ()=>{
+    eraserMode = !eraserMode;
+    eraserBtn.classList.toggle('selected', eraserMode);
+  });
+  clearBtn.addEventListener('click', ()=>{
+    window.clearDrawing();
+  });
+
+  function pointerPos(e){
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+      pressure: e.pressure || 0.5,
+    };
+  }
+
+  function isOnControls(e){
+    return !!(e.target.closest && e.target.closest('#drawToolbar, #drawToggleBtn'));
+  }
+
+  document.addEventListener('pointerdown', (e)=>{
+    if(!drawingActive) return;
+    if(e.pointerType !== 'pen') return;
+    if(isOnControls(e)) return;
+
+    e.preventDefault();
+    isDrawing = true;
+    activePointerId = e.pointerId;
+    const p = pointerPos(e);
+    lastX = p.x; lastY = p.y;
+  }, { passive: false });
+
+  document.addEventListener('pointermove', (e)=>{
+    if(!drawingActive || !isDrawing) return;
+    if(e.pointerId !== activePointerId) return;
+
+    e.preventDefault();
+    const p = pointerPos(e);
+    ctx.globalCompositeOperation = eraserMode ? 'destination-out' : 'source-over';
+    ctx.strokeStyle = currentColor;
+    const pressureFactor = 0.6 + (p.pressure || 0.5) * 0.8;
+    ctx.lineWidth = (eraserMode ? currentWidth * 3 : currentWidth) * pressureFactor;
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+    lastX = p.x; lastY = p.y;
+  }, { passive: false });
+
+  function stopDrawing(e){
+    if(e && e.pointerId !== undefined && e.pointerId !== activePointerId) return;
+    isDrawing = false;
+    activePointerId = null;
+  }
+  document.addEventListener('pointerup', stopDrawing);
+  document.addEventListener('pointercancel', stopDrawing);
+
+  document.addEventListener('touchmove', function(e){
+    if(drawingActive && e.touches && e.touches[0] && e.touches[0].touchType === 'stylus'){
+      e.preventDefault();
+    }
+  }, { passive: false });
+})();
+</script>
+</body>
+</html>
