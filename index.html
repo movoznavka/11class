@@ -221,6 +221,31 @@
     pointer-events:none;
   }
 
+  /* --- «Повторити»: фіолетова рамка + значок на куточку картки --- */
+  .card.repeat{
+    box-shadow: 0 0 0 2px rgba(139,92,246,0.55), 0 14px 30px -24px rgba(19,33,59,0.35);
+  }
+  .card.repeat.ready:hover{
+    box-shadow: 0 0 0 2px rgba(139,92,246,0.7), 0 18px 34px -18px rgba(19,33,59,0.4);
+  }
+  .repeat-badge{
+    position:absolute;
+    top:-10px;
+    right:14px;
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:11px;
+    letter-spacing:.03em;
+    text-transform:uppercase;
+    padding:5px 11px;
+    border-radius:999px;
+    color:#fff;
+    background:linear-gradient(135deg,#8B5CF6,#5B3FE0);
+    box-shadow:0 8px 16px -8px rgba(91,63,224,0.7);
+    pointer-events:none;
+    white-space:nowrap;
+  }
+
   .card-top{
     display:flex;
     align-items:flex-start;
@@ -738,6 +763,41 @@ const HOMEWORK_API_URL = "https://script.google.com/macros/s/AKfycbzDs5WkG3yAOIF
 
 let _lastHomeworkMap = null;
 let _allowed = null;   // повний список відкритих учню уроків/тестів (ставиться при вході)
+let _repeatList = [];  // теми, на яких учень бачить значок «🔁 Повторити»
+
+// ------------------------------------------------------------
+// ПОВТОРЕННЯ: значок «🔁 Повторити» на куточку картки теми.
+// Вмикається вчителькою в боті (кнопка «🔁 Повторити»), а тут
+// лише зчитується для цього учня і малюється на його картках.
+// ------------------------------------------------------------
+function markRepeat_(){
+  document.querySelectorAll('.card').forEach(function(card){
+    const on = _repeatList.indexOf(card.getAttribute('data-key')) !== -1;
+    card.classList.toggle('repeat', on);
+    let badge = card.querySelector('.repeat-badge');
+    if (on && !badge) {
+      badge = document.createElement('span');
+      badge.className = 'repeat-badge';
+      badge.textContent = '🔁 Повторити';
+      card.appendChild(badge);
+    }
+    if (!on && badge) badge.remove();
+  });
+}
+
+window.applyRepeat = function(list){
+  _repeatList = list || [];
+  markRepeat_();
+};
+
+function loadRepeat(studentCode){
+  if(!HOMEWORK_API_URL || HOMEWORK_API_URL.indexOf('ВСТАВТЕ') === 0) return;
+  if(!studentCode) return;
+  const sep = HOMEWORK_API_URL.indexOf('?') > -1 ? '&' : '?';
+  const s = document.createElement('script');
+  s.src = HOMEWORK_API_URL + sep + 'mode=repeat&callback=applyRepeat&student=' + encodeURIComponent(studentCode);
+  document.body.appendChild(s);
+}
 
 // ------------------------------------------------------------
 // АВТОМАТИЧНЕ ВІДКРИТТЯ ЗАГАЛЬНИХ ТЕСТІВ
@@ -924,6 +984,7 @@ function applyAccessAndRender_(studentCode, allowed, displayName){
     }
   });
   refreshVisibility_();
+  markRepeat_();   // значки «Повторити» на картках, що лишились
 
   document.querySelectorAll('#switchWho').forEach(function(el){ el.closest('p').remove(); });
   if (GROUP_MEMBERS[studentCode]) {
@@ -952,6 +1013,7 @@ const HW_SPLIT_GROUPS = ["марина світлана"];
 function finishStudentView_(studentCode, allowedStatic, displayName){
   const hwLookupCode = HW_SPLIT_GROUPS.indexOf(studentCode) !== -1 ? displayName : studentCode;
   loadHomework(hwLookupCode);
+  loadRepeat(studentCode);   // «Повторити» — спільне для всього коду (пари теж)
   applyAccessAndRender_(studentCode, allowedStatic, displayName);
 
   const stillWaiting = HOMEWORK_API_URL && HOMEWORK_API_URL.indexOf('ВСТАВТЕ') !== 0;
@@ -981,8 +1043,9 @@ function finishStudentView_(studentCode, allowedStatic, displayName){
       renderBlocks_();
       applyAccessAndRender_(studentCode, allowedStatic.concat(extra), displayName);
       // Перемальовування вище стирає картки разом з уже застосованими
-      // позначками ДЗ — застосовуємо їх ще раз на нових картках.
+      // позначками ДЗ і «Повторити» — застосовуємо їх ще раз на нових картках.
       if (_lastHomeworkMap) applyHomework(_lastHomeworkMap);
+      markRepeat_();
     }
 
     const loader = document.getElementById('accessLoading');
