@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Звертання · Урок</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#E4DAFB;--soft:#F0EAFE;--card:#fff;--ink:#1D1538;--ink2:#7664A3;
+--a:#A78BFA;--b:#6D3FE0;--sh:rgba(109,63,224,.45);--g:#17A863;--o1:#FFB86C;--o2:#F5820D;--red:#E5484D}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;min-height:100vh;padding:28px 16px 64px;position:relative}
+.wrap{max-width:760px;margin:0 auto}
+.topbar{padding-bottom:16px;margin-bottom:22px;border-bottom:1.5px solid rgba(29,21,56,.14)}
+.kicker{font-family:'Manrope',sans-serif;font-weight:800;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;opacity:.55}
+h1{font-family:'Manrope',sans-serif;font-weight:800;font-size:clamp(24px,5.6vw,36px);line-height:1.08;margin:0 0 22px;text-transform:uppercase}
+h1 .hl{color:var(--b)}
+.topictoggle{display:flex;gap:10px;margin-bottom:14px}
+.topictoggle button{flex:1;padding:15px;border-radius:20px;border:none;background:var(--card);font-family:'Manrope',sans-serif;font-weight:800;font-size:14.5px;color:var(--ink2);cursor:pointer;box-shadow:0 8px 18px -14px rgba(29,21,56,.3)}
+.tabbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.tab{padding:10px 15px 10px 10px;border-radius:999px;border:none;background:var(--card);color:var(--ink2);font-family:'Manrope',sans-serif;font-weight:800;font-size:12.5px;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 8px 18px -14px rgba(29,21,56,.3)}
+.tab .dot{width:22px;height:22px;border-radius:8px;background:rgba(109,63,224,.1);color:var(--b);display:flex;align-items:center;justify-content:center;font-size:11px}
+.topictoggle button.active,.tab.active{background:linear-gradient(155deg,var(--a),var(--b));color:#fff;box-shadow:0 10px 20px -10px var(--sh)}
+.tab.active .dot{background:rgba(255,255,255,.25);color:#fff}
+.card{background:var(--card);border-radius:28px;padding:28px 24px;box-shadow:0 20px 44px -28px rgba(29,21,56,.35)}
+.section-title{font-family:'Manrope',sans-serif;font-weight:800;font-size:20px;margin:0 0 8px}
+.section-intro{color:var(--ink2);font-size:14.5px;line-height:1.6;margin:0 0 18px}
+.section-intro b{color:var(--ink)}
+.cardgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:560px){.cardgrid{grid-template-columns:1fr}}
+.flip{perspective:1200px;height:158px;cursor:pointer;position:relative}
+.flip-inner{position:relative;width:100%;height:100%;transition:transform .5s cubic-bezier(.4,.2,.2,1);transform-style:preserve-3d;-webkit-transform-style:preserve-3d}
+.flip.open .flip-inner{transform:rotateY(180deg)}
+.flip-face{position:absolute;inset:0;border-radius:20px;padding:16px 18px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;justify-content:center}
+.flip-front{background:var(--soft);visibility:visible;transition:visibility 0s linear .25s}
+.flip-back{background:linear-gradient(155deg,var(--a),var(--b));color:#fff;transform:rotateY(180deg);align-items:center;text-align:center;visibility:hidden;transition:visibility 0s linear .25s}
+.flip.open .flip-front{visibility:hidden}.flip.open .flip-back{visibility:visible}
+.flip-rule{font-family:'Manrope',sans-serif;font-weight:800;font-size:15px;line-height:1.32}
+.flip-desc{font-size:12.5px;margin-top:7px;opacity:.8;line-height:1.4}
+.flip-example{font-size:15px;font-weight:700;margin-bottom:4px}
+.flip-note{font-size:11.5px;opacity:.75;font-weight:500}
+.flip-hint{position:absolute;bottom:9px;right:14px;font-size:10px;font-weight:700;opacity:.4}
+.combo-table{display:flex;flex-direction:column;gap:8px}
+.combo-row{display:flex;align-items:center;gap:12px;background:var(--soft);border-radius:16px;padding:12px 16px;cursor:pointer;flex-wrap:wrap}
+.combo-write{font-family:'Manrope',sans-serif;font-weight:800;font-size:14px;color:var(--b);min-width:70px}
+.combo-say{font-family:'Manrope',sans-serif;font-weight:800;font-size:13px;color:var(--ink2);min-width:64px}
+.combo-example{flex:1;font-size:14px;font-weight:600;min-width:130px}
+.combo-ipa{font-size:13px;font-weight:700;color:var(--g);opacity:0;transition:opacity .2s}
+.combo-row.open .combo-ipa{opacity:1}
+footer{text-align:center;margin-top:22px;font-size:12.5px;color:var(--ink2);font-weight:500}
+
+/* малювання */
+#drawCanvas{position:absolute;top:0;left:0;z-index:9998;pointer-events:none}
+#drawToggleBtn{position:fixed;right:20px;bottom:20px;width:58px;height:58px;border-radius:50%;border:1px solid rgba(255,255,255,.5);background:linear-gradient(150deg,rgba(255,255,255,.35),rgba(255,255,255,0) 60%),linear-gradient(155deg,var(--a),var(--b));box-shadow:0 14px 28px -10px var(--sh),inset 0 1px 1px rgba(255,255,255,.6);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:9999;transition:transform .18s}
+#drawToggleBtn svg{width:24px;height:24px}
+#drawToggleBtn:active{transform:scale(.9)}
+#drawToggleBtn.on{background:linear-gradient(155deg,#FF8A65,var(--red))}
+#drawToolbar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(130%);opacity:0;display:flex;align-items:center;gap:12px;background:linear-gradient(150deg,rgba(255,255,255,.7),rgba(255,255,255,.3));backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border:1px solid rgba(255,255,255,.7);padding:9px 16px;border-radius:999px;box-shadow:0 24px 48px -20px rgba(29,21,56,.45);z-index:9999;transition:transform .25s cubic-bezier(.34,1.56,.64,1),opacity .2s;pointer-events:none}
+#drawToolbar.show{transform:translateX(-50%);opacity:1;pointer-events:auto}
+.swatch{position:relative;width:25px;height:25px;border-radius:50%;border:none;padding:0;cursor:pointer;box-shadow:0 3px 8px -2px rgba(29,21,56,.35)}
+.swatch.selected{outline:2px solid var(--ink);outline-offset:3px}
+.tool-btn{width:34px;height:34px;border-radius:50%;border:none;background:rgba(255,255,255,.5);color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.tool-btn svg{width:16px;height:16px}
+.tool-btn i{display:block;border-radius:50%;background:currentColor}
+.tool-btn.selected{background:var(--b);color:#fff}
+.tool-sep{width:1px;height:22px;background:rgba(29,21,56,.14)}
+@media(max-width:480px){#drawToolbar{max-width:94vw;overflow-x:auto;padding:8px 13px;gap:9px}.swatch{width:21px;height:21px}.tool-btn{width:30px;height:30px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><div class="kicker">Синтаксис · Урок</div></div>
+  <h1>Звер<span class="hl">тання</span></h1>
+  <div class="topictoggle" id="topictoggle"></div>
+  <div class="tabbar" id="subtabbar"></div>
+  <div class="card" id="lessonArea"></div>
+  <footer>@movoznavka</footer>
+</div>
+
+<canvas id="drawCanvas"></canvas>
+<button id="drawToggleBtn" title="Малювати">
+  <svg viewBox="0 0 24 24" fill="none"><path d="M4 20L4.6 16.6C4.7 15.9 5.03 15.26 5.55 14.79L15.3 5.7C16.09 4.96 17.34 4.99 18.09 5.78L18.34 6.04C19.08 6.83 19.04 8.08 18.25 8.81L8.5 17.9C8 18.37 7.37 18.66 6.7 18.75L4 20Z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/><path d="M13.5 7.5L16.5 10.3" stroke="white" stroke-width="1.7" stroke-linecap="round"/></svg>
+</button>
+<div id="drawToolbar">
+  <button class="swatch selected" style="background:#F5304A" data-color="#F5304A"></button>
+  <button class="swatch" style="background:#6D3FE0" data-color="#6D3FE0"></button>
+  <button class="swatch" style="background:#17A863" data-color="#17A863"></button>
+  <button class="swatch" style="background:#1D1538" data-color="#1D1538"></button>
+  <div class="tool-sep"></div>
+  <button class="tool-btn selected" data-w="2" title="Дуже тонка"><i style="width:3.5px;height:3.5px"></i></button>
+  <button class="tool-btn" data-w="5" title="Тонка"><i style="width:7px;height:7px"></i></button>
+  <button class="tool-btn" data-w="11" title="Товста"><i style="width:12.5px;height:12.5px"></i></button>
+  <div class="tool-sep"></div>
+  <button class="tool-btn" id="eraserBtn" title="Ластик"><svg viewBox="0 0 24 24" fill="none"><path d="M18.5 13.5L10.5 21.5H5.5L2.5 18.5C2.11 18.11 2.11 17.48 2.5 17.09L13.5 6.09C13.89 5.7 14.52 5.7 14.91 6.09L18.5 9.68C19.5 10.68 19.5 12.5 18.5 13.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 13.5L15 19.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+  <button class="tool-btn" id="clearBtn" title="Очистити все"><svg viewBox="0 0 24 24" fill="none"><path d="M5 7H19M9.5 7V4.8C9.5 4.4 9.9 4 10.3 4H13.7C14.1 4 14.5 4.4 14.5 4.8V7M7 7L7.6 19.2C7.63 19.9 8.2 20.5 8.9 20.5H15.1C15.8 20.5 16.37 19.9 16.4 19.2L17 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+</div>
+
+<script>
+/* Увесь матеріал — в TOPICS. Щоб додати картку чи рядок, скопіюй існуючий
+   блок { ... } у масиві cards / rows, постав кому й зміни текст. */
+const TOPICS = {
+  basics: {
+    label: "Що таке звертання",
+    subs: [
+      {tab:"Ознаки", dot:"1", type:"cards", title:"Звертання",
+       intro:"Звертання — слово чи сполука слів, що <b>називає адресата</b> мовлення.",
+       cards:[
+        {rule:"Називає того, до кого звертаються", desc:"в мовленні", examples:[{word:"Мамо, прочитай мені казку."}]},
+        {rule:"Не є членом речення", desc:"не пов’язане з іншими словами підрядним зв’язком", examples:[{word:"Друже, зачекай на мене."}]}
+       ]},
+      {tab:"Види", dot:"2", type:"cards", title:"Непоширені та поширені",
+       intro:"За складом звертання бувають непоширені й поширені. Тисни на картку, щоб побачити приклад.",
+       cards:[
+        {rule:"Непоширені", desc:"одне слово", examples:[{word:"Сестро, іди сюди."}]},
+        {rule:"Поширені", desc:"слово з залежними словами", examples:[{word:"Мій любий друже, іди сюди."}]}
+       ]},
+      {tab:"Форма", dot:"3", type:"cards", title:"У якому відмінку",
+       intro:"Звертання вживаються в <b>кличному відмінку</b> (Кл. в.).",
+       cards:[
+        {rule:"Кличний відмінок", desc:"основна форма звертання", examples:[{word:"Олено, добрий день!"}, {word:"Тарасе, ходи сюди."}]},
+        {rule:"Називний відмінок", desc:"допускається в художньому стилі", examples:[{word:"Ти, зоря, не гасни."}]}
+       ]}
+    ]
+  },
+  punct: {
+    label: "Розділові знаки",
+    subs: [
+      {tab:"Позиція", dot:"1", type:"table", title:"Де стоїть звертання",
+       intro:"Від місця звертання в реченні залежать коми. Тисни на рядок, щоб перевірити себе.",
+       rows:[
+        {write:"Зв, ….", say:"початок", example:"Друже, ходімо разом.", ipa:"кома після звертання"},
+        {write:"…, зв, …", say:"середина", example:"Ходімо, друже, разом.", ipa:"коми з обох боків"},
+        {write:"…., зв.", say:"кінець", example:"Ходімо разом, друже.", ipa:"кома перед звертанням"}
+       ]},
+      {tab:"Особливі випадки", dot:"2", type:"cards", title:"Винятки та особливості",
+       intro:"Є два випадки, коли пунктуація змінюється.",
+       cards:[
+        {rule:"О, ой + звертання", desc:"кома між ними не потрібна", examples:[{word:"О краю мій! На тебе не надивлюся я ніяк."}, {word:"Ой мамо, допоможи!"}]},
+        {rule:"Зв! — велика літера", desc:"після окличного звертання наступне слово пишемо з великої", examples:[{word:"Друже! Ходімо разом."}]}
+       ]}
+    ]
+  }
+};
+const ORDER = ["basics","punct"];
+let topic = "basics", sub = 0;
+const $ = id => document.getElementById(id);
+const area = $('lessonArea');
+
+// ---- збереження малюнка для кожної вкладки ----
+const store = {};
+const key = () => topic + '_' + sub;
+const saveDraw = () => { if(window.getSnap) store[key()] = window.getSnap(); };
+
+function tap(el, fn){
+  let sx=0, sy=0, pen=false, on=false;
+  el.addEventListener('pointerdown', e=>{on=true; sx=e.clientX; sy=e.clientY; pen=e.pointerType==='pen';}, {passive:true});
+  el.addEventListener('pointerup', e=>{
+    if(!on) return; on=false;
+    if(pen && window.isDrawing_ && window.isDrawing_()) return;
+    if(Math.hypot(e.clientX-sx, e.clientY-sy) > 10) return;
+    fn(e);
+  });
+}
+
+function renderNav(){
+  $('topictoggle').innerHTML = ORDER.map(k=>`<button class="${k===topic?'active':''}" data-k="${k}">${TOPICS[k].label}</button>`).join('');
+  $('topictoggle').querySelectorAll('button').forEach(b=>tap(b, ()=>{saveDraw(); topic=b.dataset.k; sub=0; renderAll();}));
+  $('subtabbar').innerHTML = TOPICS[topic].subs.map((s,i)=>`<button class="tab ${i===sub?'active':''}" data-i="${i}"><span class="dot">${s.dot}</span>${s.tab}</button>`).join('');
+  $('subtabbar').querySelectorAll('.tab').forEach(b=>tap(b, ()=>{saveDraw(); sub=+b.dataset.i; renderAll();}));
+}
+
+function renderContent(){
+  const s = TOPICS[topic].subs[sub];
+  let h = `<p class="section-title">${s.title}</p><p class="section-intro">${s.intro}</p>`;
+  if(s.type==="cards"){
+    h += `<div class="cardgrid">${s.cards.map(c=>`
+      <div class="flip" data-t="1"><div class="flip-inner">
+        <div class="flip-face flip-front"><div class="flip-rule">${c.rule}</div><div class="flip-desc">${c.desc||''}</div><div class="flip-hint">натисни →</div></div>
+        <div class="flip-face flip-back">${c.examples.map(e=>`<div class="flip-example">${e.word}</div>${e.note?`<div class="flip-note">${e.note}</div>`:''}`).join('')}</div>
+      </div></div>`).join('')}</div>`;
+  } else {
+    h += `<div class="combo-table">${s.rows.map(r=>`
+      <div class="combo-row" data-t="1"><span class="combo-write">${r.write}</span><span class="combo-say">${r.say}</span><span class="combo-example">${r.example}</span><span class="combo-ipa">${r.ipa}</span></div>`).join('')}</div>`;
+  }
+  area.innerHTML = h;
+  area.querySelectorAll('[data-t]').forEach(el=>tap(el, ()=>el.classList.toggle('open')));
+  if(window.resizeDraw) requestAnimationFrame(()=>requestAnimationFrame(()=>{window.resizeDraw(); window.setSnap(store[key()]||null);}));
+}
+function renderAll(){ renderNav(); renderContent(); }
+renderAll();
+
+// ---- малювання пером поверх екрана ----
+(function(){
+  const cv = $('drawCanvas'), ctx = cv.getContext('2d');
+  const toggle = $('drawToggleBtn'), bar = $('drawToolbar'), eraserBtn = $('eraserBtn');
+  let active=false, drawing=false, color="#F5304A", width=2, eraser=false, lx=0, ly=0, pid=null;
+  window.isDrawing_ = ()=>active;
+
+  function resize(){
+    const w = document.documentElement.clientWidth;
+    const h = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight, innerHeight);
+    const prev = document.createElement('canvas'); prev.width = cv.width; prev.height = cv.height;
+    if(cv.width && cv.height) prev.getContext('2d').drawImage(cv,0,0);
+    cv.width = w*devicePixelRatio; cv.height = h*devicePixelRatio;
+    cv.style.width = w+'px'; cv.style.height = h+'px';
+    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+    ctx.lineCap = ctx.lineJoin = 'round';
+    if(prev.width && prev.height) ctx.drawImage(prev,0,0,prev.width/devicePixelRatio,prev.height/devicePixelRatio);
+  }
+  window.resizeDraw = resize;
+  resize();
+  addEventListener('resize', resize);
+  if(window.ResizeObserver) new ResizeObserver(resize).observe(document.body);
+
+  window.getSnap = ()=>{ try{ return cv.width ? cv.toDataURL('image/png') : null; }catch(e){ return null; } };
+  window.setSnap = d=>{
+    ctx.clearRect(0,0,cv.width,cv.height);
+    if(!d) return;
+    const img = new Image();
+    img.onload = ()=>ctx.drawImage(img,0,0,cv.width/devicePixelRatio,cv.height/devicePixelRatio);
+    img.src = d;
+  };
+
+  toggle.addEventListener('click', ()=>{
+    active = !active;
+    bar.classList.toggle('show', active);
+    toggle.classList.toggle('on', active);
+  });
+  document.querySelectorAll('.swatch').forEach(sw=>sw.addEventListener('click', ()=>{
+    document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('selected'));
+    sw.classList.add('selected'); color = sw.dataset.color; eraser = false; eraserBtn.classList.remove('selected');
+  }));
+  document.querySelectorAll('[data-w]').forEach(b=>b.addEventListener('click', ()=>{
+    document.querySelectorAll('[data-w]').forEach(x=>x.classList.remove('selected'));
+    b.classList.add('selected'); width = +b.dataset.w;
+  }));
+  eraserBtn.addEventListener('click', ()=>{ eraser = !eraser; eraserBtn.classList.toggle('selected', eraser); });
+  $('clearBtn').addEventListener('click', ()=>ctx.clearRect(0,0,cv.width,cv.height));
+
+  const pos = e=>{ const r = cv.getBoundingClientRect(); return {x:e.clientX-r.left, y:e.clientY-r.top, p:e.pressure||.5}; };
+  const onControls = e=>e.target.closest && e.target.closest('#drawToolbar,#drawToggleBtn');
+
+  document.addEventListener('pointerdown', e=>{
+    if(!active || e.pointerType!=='pen' || onControls(e)) return;
+    e.preventDefault(); drawing = true; pid = e.pointerId;
+    const p = pos(e); lx = p.x; ly = p.y;
+  }, {passive:false});
+  document.addEventListener('pointermove', e=>{
+    if(!active || !drawing || e.pointerId!==pid) return;
+    e.preventDefault();
+    const p = pos(e);
+    const er = eraser || (e.buttons&2)===2 || (e.buttons&32)===32;
+    ctx.globalCompositeOperation = er ? 'destination-out' : 'source-over';
+    ctx.strokeStyle = color;
+    ctx.lineWidth = (er ? width*3 : width) * (0.6 + p.p*0.8);
+    ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(p.x,p.y); ctx.stroke();
+    lx = p.x; ly = p.y;
+  }, {passive:false});
+  const stop = e=>{ if(e && e.pointerId!==undefined && e.pointerId!==pid) return; drawing=false; pid=null; };
+  document.addEventListener('pointerup', stop);
+  document.addEventListener('pointercancel', stop);
+  document.addEventListener('contextmenu', e=>{ if(active) e.preventDefault(); });
+  document.addEventListener('touchmove', e=>{
+    if(active && e.touches[0] && e.touches[0].touchType==='stylus') e.preventDefault();
+  }, {passive:false});
+})();
+</script>
+</body>
+</html>
