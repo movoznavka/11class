@@ -8,18 +8,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#D7F3E1;
-    --bg-soft:#EBFAF1;
+    --bg:#F5DABF;
+    --bg-soft:#FBEBDA;
     --card:#FFFFFF;
-    --ink:#0E2C1B;
-    --ink-soft:#4C8567;
-    --line: rgba(14,44,27,0.08);
+    --ink:#0F3D3A;
+    --ink-soft:#4F7A74;
+    --line: rgba(15,61,58,0.08);
 
-    /* головний акцент — фіолетовий */
-    --c1-a:#58DF8C; --c1-b:#16A34A; --c1-sh: rgba(22,163,74,0.42);
+    /* палітра: бордо · зелений · крем */
+    --c1-a:#A8404C; --c1-b:#6C151E; --c1-sh: rgba(108,21,30,0.45);
     --c3-a:#5FE0A8; --c3-b:#17A863; --c3-sh: rgba(23,168,99,0.4);
     --c2-b:#E5484D;
-    --c4-a:#FFD166; --c4-b:#F59E0B;
+    --c4-a:#3F8F86; --c4-b:#0F3D3A;
 
     --correct-bg:#E6F8EE;
     --correct-ink:#128A54;
@@ -36,7 +36,7 @@
 
   .topbar{
     display:flex;justify-content:space-between;align-items:center;
-    padding-bottom:16px;margin-bottom:22px;border-bottom:1.5px solid rgba(14,44,27,0.14);
+    padding-bottom:16px;margin-bottom:22px;border-bottom:1.5px solid rgba(15,61,58,0.14);
   }
   .kicker{font-family:'Manrope',sans-serif;font-weight:800;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);opacity:.55;}
   .kicker.tag{opacity:.4;}
@@ -52,7 +52,7 @@
   .topictoggle button{
     flex:1 1 calc(50% - 5px);min-width:140px;padding:15px;border-radius:20px;border:none;background:var(--card);
     font-family:'Manrope',sans-serif;font-weight:800;font-size:13.5px;color:var(--ink-soft);
-    cursor:pointer;box-shadow:0 8px 18px -14px rgba(14,44,27,.3);
+    cursor:pointer;box-shadow:0 8px 18px -14px rgba(15,61,58,.3);
     display:flex;align-items:center;justify-content:center;gap:8px;
   }
   .topictoggle button.active{background:linear-gradient(155deg,var(--c1-a),var(--c1-b));color:#fff;box-shadow:0 10px 20px -10px var(--c1-sh);}
@@ -62,16 +62,16 @@
   .tab{
     padding:10px 15px 10px 10px;border-radius:999px;border:none;background:var(--card);
     color:var(--ink-soft);font-family:'Manrope',sans-serif;font-weight:800;font-size:12.5px;
-    cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 8px 18px -14px rgba(14,44,27,0.3);
+    cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 8px 18px -14px rgba(15,61,58,0.3);
   }
   .tabbar.nested .tab{background:var(--bg-soft);box-shadow:none;}
-  .tab .dot{width:22px;height:22px;border-radius:8px;background:rgba(22,163,74,.13);color:var(--c1-b);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;}
+  .tab .dot{width:22px;height:22px;border-radius:8px;background:rgba(108,21,30,.13);color:var(--c1-b);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;}
   .tab.active{background:linear-gradient(155deg,var(--c1-a),var(--c1-b));color:#fff;box-shadow:0 10px 20px -10px var(--c1-sh);}
   .tab.active .dot{background:rgba(255,255,255,.25);color:#fff;}
-  .tabbar.nested .tab.active{background:#fff;color:var(--c1-b);box-shadow:0 6px 16px -10px rgba(14,44,27,.3);}
+  .tabbar.nested .tab.active{background:#fff;color:var(--c1-b);box-shadow:0 6px 16px -10px rgba(15,61,58,.3);}
   .tabbar.nested .tab.active .dot{background:var(--c1-b);color:#fff;}
 
-  .card{background:var(--card);border-radius:28px;padding:28px 24px;box-shadow:0 20px 44px -28px rgba(14,44,27,0.35);}
+  .card{background:var(--card);border-radius:28px;padding:28px 24px;box-shadow:0 20px 44px -28px rgba(15,61,58,0.35);}
 
   .section-title{font-family:'Manrope',sans-serif;font-weight:800;font-size:20px;letter-spacing:-0.005em;margin:0 0 8px;}
   .section-intro{color:var(--ink-soft);font-size:14.5px;line-height:1.6;margin:0 0 18px;}
@@ -89,6 +89,13 @@
   .flip-face{position:absolute;inset:0;border-radius:20px;padding:16px 18px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;justify-content:center;overflow:hidden;}
   .flip-front{background:var(--bg-soft);}
   .flip-back{background:linear-gradient(155deg,var(--c1-a),var(--c1-b));color:#fff;transform:rotateY(180deg);align-items:center;text-align:center;}
+  .flip-inner{-webkit-transform-style:preserve-3d;}
+  .flip-face{-webkit-backface-visibility:hidden;}
+  .flip-front{visibility:visible;transition:visibility 0s linear .25s;}
+  .flip-back{visibility:hidden;transition:visibility 0s linear .25s;}
+  .flip.open .flip-front{visibility:hidden;}
+  .flip.open .flip-back{visibility:visible;}
+  .flip-tag{font-family:'Manrope',sans-serif;font-weight:800;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;opacity:.55;margin-bottom:7px;}
   .flip-rule{font-family:'Manrope',sans-serif;font-weight:800;font-size:15px;line-height:1.32;}
   .flip-desc{font-size:12.5px;margin-top:7px;opacity:.8;line-height:1.4;}
   .flip-example{font-size:13.5px;font-weight:700;margin-bottom:5px;line-height:1.35;}
@@ -108,7 +115,7 @@
   .arrsent .common::after{content:'';position:absolute;left:50%;top:100%;width:2px;height:17px;margin-left:-1px;background:#fff;border-radius:1px;}
   .arrsent .common::before{content:'';position:absolute;left:50%;top:calc(100% + 11px);margin-left:-4px;width:7px;height:7px;border-right:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(45deg);}
   .hl-w{background:var(--c1-b);color:#fff;border-radius:7px;padding:1px 7px;font-weight:800;}
-  .hl-o{background:rgba(245,158,11,.28);border-radius:7px;padding:1px 6px;font-weight:800;}
+  .hl-o{background:rgba(15,61,58,.16);border-radius:7px;padding:1px 6px;font-weight:800;}
   .flip-hint{position:absolute;bottom:9px;right:14px;font-size:10px;font-weight:700;opacity:.4;}
 
   /* chips */
@@ -141,73 +148,201 @@
   footer{text-align:center;margin-top:22px;font-size:12.5px;color:var(--ink-soft);font-weight:500;}
 
   /* ===================== DRAWING / TEACHER MODE ===================== */
-  #drawCanvas{position:absolute;top:0;left:0;z-index:9998;pointer-events:none;}
+  /* Canvas is positioned over the whole DOCUMENT (not just the viewport),
+     so ink scrolls together with the page content instead of staying
+     glued to the screen. Its size is recalculated after every content
+     change (see resizeCanvas() below). */
+  #drawCanvas{
+    position:absolute;
+    top:0;
+    left:0;
+    z-index:9998;
+    pointer-events:none; /* drawing is handled via window-level listeners so
+                             taps/clicks on real UI underneath always pass through */
+  }
+
+  #drawDebug{
+    position:fixed;
+    top:8px;
+    left:8px;
+    z-index:10000;
+    background:rgba(15,61,58,0.82);
+    color:#fff;
+    font-family:'Manrope',monospace;
+    font-size:12px;
+    font-weight:700;
+    padding:5px 10px;
+    border-radius:10px;
+    pointer-events:none;
+    display:none;
+  }
+  #drawDebug.show{display:block;}
 
   #drawToggleBtn{
-    position:fixed;right:20px;bottom:20px;width:58px;height:58px;border-radius:50%;
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    width:58px;height:58px;
+    border-radius:50%;
     border:1px solid rgba(255,255,255,0.5);
-    background:linear-gradient(150deg, rgba(255,255,255,0.35), rgba(255,255,255,0) 60%),linear-gradient(155deg,var(--c1-a),var(--c1-b));
-    backdrop-filter:blur(10px) saturate(160%);-webkit-backdrop-filter:blur(10px) saturate(160%);
-    box-shadow:0 14px 28px -10px var(--c1-sh),inset 0 1px 1px rgba(255,255,255,0.6),inset 0 -6px 10px -4px rgba(0,0,0,0.15);
-    color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:9999;
+    background:
+      linear-gradient(150deg, rgba(255,255,255,0.35), rgba(255,255,255,0) 60%),
+      linear-gradient(155deg,var(--c1-a),var(--c1-b));
+    backdrop-filter: blur(10px) saturate(160%);
+    -webkit-backdrop-filter: blur(10px) saturate(160%);
+    box-shadow:
+      0 14px 28px -10px var(--c1-sh),
+      inset 0 1px 1px rgba(255,255,255,0.6),
+      inset 0 -6px 10px -4px rgba(0,0,0,0.15);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    z-index:9999;
     transition:transform .18s cubic-bezier(.34,1.56,.64,1), background .2s ease, box-shadow .2s ease;
   }
-  #drawToggleBtn svg{width:24px;height:24px;display:block;transition:transform .25s ease, opacity .15s ease;}
+  #drawToggleBtn svg{
+    width:24px;height:24px;
+    display:block;
+    transition:transform .25s ease, opacity .15s ease;
+  }
   #drawToggleBtn:active{transform:scale(0.90);}
   #drawToggleBtn.on{
-    background:linear-gradient(150deg, rgba(255,255,255,0.35), rgba(255,255,255,0) 60%),linear-gradient(155deg,#FF8A65,var(--c2-b));
-    box-shadow:0 14px 28px -10px rgba(229,72,77,0.55),inset 0 1px 1px rgba(255,255,255,0.6),inset 0 -6px 10px -4px rgba(0,0,0,0.15);
+    background:
+      linear-gradient(150deg, rgba(255,255,255,0.35), rgba(255,255,255,0) 60%),
+      linear-gradient(155deg,#FF8A65,var(--c2-b));
+    box-shadow:
+      0 14px 28px -10px rgba(229,72,77,0.55),
+      inset 0 1px 1px rgba(255,255,255,0.6),
+      inset 0 -6px 10px -4px rgba(0,0,0,0.15);
   }
-  #drawToggleBtn.on svg{transform:rotate(90deg);}
+  #drawToggleBtn.on svg{ transform:rotate(90deg); }
 
   #drawToolbar{
-    position:fixed;left:50%;bottom:22px;
-    transform:translateX(-50%) translateY(130%) scale(0.94);opacity:0;
-    display:flex;align-items:center;gap:12px;
-    background:linear-gradient(150deg, rgba(255,255,255,0.6), rgba(255,255,255,0.15));
-    backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);
-    border:1px solid rgba(255,255,255,0.7);padding:9px 16px;border-radius:999px;
-    box-shadow:0 24px 48px -20px rgba(14,44,27,0.45),inset 0 1px 1px rgba(255,255,255,0.9);
-    z-index:9999;transition:transform .25s cubic-bezier(.34,1.56,.64,1), opacity .2s ease;pointer-events:none;
+    position:fixed;
+    left:50%;
+    bottom:22px;
+    transform:translateX(-50%) translateY(130%) scale(0.94);
+    opacity:0;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:
+      linear-gradient(150deg, rgba(255,255,255,0.6), rgba(255,255,255,0.15));
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border:1px solid rgba(255,255,255,0.7);
+    padding:9px 16px;
+    border-radius:999px;
+    box-shadow:
+      0 24px 48px -20px rgba(15,61,58,0.45),
+      inset 0 1px 1px rgba(255,255,255,0.9);
+    z-index:9999;
+    transition:transform .25s cubic-bezier(.34,1.56,.64,1), opacity .2s ease;
+    pointer-events:none;
   }
-  #drawToolbar.show{transform:translateX(-50%) translateY(0) scale(1);opacity:1;pointer-events:auto;}
-  #drawToolbar.mini{transform:translateX(-50%) translateY(130%) scale(0.94);opacity:0;pointer-events:none;}
+  #drawToolbar.show{
+    transform:translateX(-50%) translateY(0) scale(1);
+    opacity:1;
+    pointer-events:auto;
+  }
+  /* панель згорнута, але малювання лишається увімкненим */
+  #drawToolbar.mini{
+    transform:translateX(-50%) translateY(130%) scale(0.94);
+    opacity:0;
+    pointer-events:none;
+  }
   #drawToolbarMini{
-    position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(130%) scale(0.9);opacity:0;
-    width:40px;height:26px;border-radius:14px;border:1px solid rgba(255,255,255,0.5);
-    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));box-shadow:0 10px 20px -10px var(--c1-sh);
-    display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:9999;
-    transition:transform .25s cubic-bezier(.34,1.56,.64,1), opacity .2s ease;pointer-events:none;
+    position:fixed;
+    left:50%;
+    bottom:20px;
+    transform:translateX(-50%) translateY(130%) scale(0.9);
+    opacity:0;
+    width:40px;height:26px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,0.5);
+    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));
+    box-shadow:0 10px 20px -10px var(--c1-sh);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    z-index:9999;
+    transition:transform .25s cubic-bezier(.34,1.56,.64,1), opacity .2s ease;
+    pointer-events:none;
   }
   #drawToolbarMini svg{width:18px;height:18px;}
-  #drawToolbarMini.show{transform:translateX(-50%) translateY(0) scale(1);opacity:1;pointer-events:auto;}
-  .swatch{
-    position:relative;width:25px;height:25px;border-radius:50%;border:none;
-    box-shadow:0 3px 8px -2px rgba(14,44,27,0.35),inset 0 1px 1px rgba(255,255,255,0.5);
-    cursor:pointer;padding:0;transition:transform .15s cubic-bezier(.34,1.56,.64,1);
+  #drawToolbarMini.show{
+    transform:translateX(-50%) translateY(0) scale(1);
+    opacity:1;
+    pointer-events:auto;
   }
-  .swatch::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--ink);opacity:0;transform:scale(0.7);transition:opacity .15s ease, transform .15s cubic-bezier(.34,1.56,.64,1);}
-  .swatch.selected{transform:scale(1.08);}
-  .swatch.selected::after{opacity:1;transform:scale(1);}
+  .swatch{
+    position:relative;
+    width:25px;height:25px;
+    border-radius:50%;
+    border:none;
+    box-shadow:
+      0 3px 8px -2px rgba(15,61,58,0.35),
+      inset 0 1px 1px rgba(255,255,255,0.5);
+    cursor:pointer;
+    padding:0;
+    transition:transform .15s cubic-bezier(.34,1.56,.64,1);
+  }
+  .swatch::after{
+    content:'';
+    position:absolute;
+    inset:-4px;
+    border-radius:50%;
+    border:2px solid var(--ink);
+    opacity:0;
+    transform:scale(0.7);
+    transition:opacity .15s ease, transform .15s cubic-bezier(.34,1.56,.64,1);
+  }
+  .swatch.selected{ transform:scale(1.08); }
+  .swatch.selected::after{ opacity:1; transform:scale(1); }
   .tool-btn{
-    width:34px;height:34px;border-radius:50%;border:none;background:rgba(255,255,255,0.5);color:var(--ink);
-    display:flex;align-items:center;justify-content:center;cursor:pointer;
+    width:34px;height:34px;
+    border-radius:50%;
+    border:none;
+    background:rgba(255,255,255,0.5);
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
     transition:background .15s ease, color .15s ease, transform .15s cubic-bezier(.34,1.56,.64,1);
   }
-  .tool-btn svg{width:16px;height:16px;}
-  .tool-btn .dot{border-radius:50%;background:currentColor;}
-  #xthinBtn .dot{width:3.5px;height:3.5px;}
-  #thinBtn .dot{width:7px;height:7px;}
-  #thickBtn .dot{width:12.5px;height:12.5px;}
-  .tool-btn.selected{background:var(--c1-b);color:#fff;transform:scale(1.06);}
-  .tool-sep{width:1px;height:22px;background:rgba(14,44,27,0.14);}
+  .tool-btn svg{ width:16px; height:16px; }
+  .tool-btn .dot{
+    border-radius:50%;
+    background:currentColor;
+  }
+  #xthinBtn .dot{ width:3.5px; height:3.5px; }
+  #thinBtn .dot{ width:7px; height:7px; }
+  #thickBtn .dot{ width:12.5px; height:12.5px; }
+  .tool-btn.selected{
+    background:var(--c1-b);
+    color:#fff;
+    transform:scale(1.06);
+  }
+  .tool-sep{
+    width:1px;
+    height:22px;
+    background:rgba(15,61,58,0.14);
+  }
 
   @media (max-width:480px){
-    #drawToolbar{max-width:94vw;overflow-x:auto;padding:8px 13px;gap:9px;}
+    #drawToolbar{
+      max-width:94vw;
+      overflow-x:auto;
+      padding:8px 13px;
+      gap:9px;
+    }
     .swatch{width:21px;height:21px;}
     .tool-btn{width:30px;height:30px;}
     .tool-btn svg{width:14px;height:14px;}
   }
+  .flip{position:relative;}
 </style>
 </head>
 <body>
@@ -230,6 +365,8 @@
 
 <!-- ==== Малювання поверх екрана (для вчителя) ==== -->
 <canvas id="drawCanvas"></canvas>
+<div id="drawDebug"></div>
+
 <button id="drawToggleBtn" title="Малювати">
   <svg id="drawIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M4 20L4.6 16.6C4.7 15.9 5.03 15.26 5.55 14.79L15.3 5.7C16.09 4.96 17.34 4.99 18.09 5.78L18.34 6.04C19.08 6.83 19.04 8.08 18.25 8.81L8.5 17.9C8 18.37 7.37 18.66 6.7 18.75L4 20Z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/>
@@ -237,10 +374,10 @@
   </svg>
 </button>
 <div id="drawToolbar">
-  <button class="swatch selected" style="background:#E5484D" data-color="#E5484D"></button>
-  <button class="swatch" style="background:#3355EE" data-color="#3355EE"></button>
+  <button class="swatch selected" style="background:#F5304A" data-color="#F5304A"></button>
+  <button class="swatch" style="background:#6C151E" data-color="#6C151E"></button>
   <button class="swatch" style="background:#17A863" data-color="#17A863"></button>
-  <button class="swatch" style="background:#13213B" data-color="#13213B"></button>
+  <button class="swatch" style="background:#0F3D3A" data-color="#0F3D3A"></button>
   <div class="tool-sep"></div>
   <button class="tool-btn selected" id="xthinBtn" title="Дуже тонка лінія"><span class="dot"></span></button>
   <button class="tool-btn" id="thinBtn" title="Тонка лінія"><span class="dot"></span></button>
@@ -283,8 +420,24 @@
    ============================================================ */
 
 const TOPICS = {
+  osnovy: {
+    label: "Що таке сурядне речення",
+    subs: [
+      {
+        id: "o-def", tab: "Означення", dot: "1", type: "cards",
+        title: "Що таке складносурядне речення",
+        intro: "Складне речення, прості частини якого <b>рівноправні</b> і поєднані <b>сурядним зв'язком</b> — за допомогою сурядних сполучників та інтонації.",
+        cards: [
+          {rule: "Складне речення", desc: "має кілька граматичних основ", examples: [{word: "Дмухнув вітер понад ставом, і сліду не стало.", note: "дві основи: вітер дмухнув — сліду не стало"}]},
+          {rule: "Рівноправні частини", desc: "жодна не залежить від іншої", examples: [{word: "Море голубіє під стінами скель, і сонце світить ласкаво.", note: "від однієї частини до іншої питання не поставиш"}]},
+          {rule: "Сурядний зв'язок", desc: "поєднує частини сполучник та інтонація", examples: [{word: "і, й, та, а, але, проте, зате, однак, або, чи, то…то"}]},
+          {rule: "Не плутай зі складнопідрядним", desc: "там частини нерівноправні: головна й залежна", examples: [{word: "Я знаю, що настала весна.", note: "від головної частини до залежної питання ставимо: знаю (що?)"}]}
+        ]
+      }
+    ]
+  },
   vydy: {
-    label: "Види",
+    label: "Види сполучників",
     subs: [
       {
         id: "v-yed", tab: "Єднальні", dot: "1", type: "demo",
@@ -357,9 +510,9 @@ const TOPICS = {
   }
 };
 
-const TOPIC_ORDER = ["vydy","znaky"];
+const TOPIC_ORDER = ["osnovy","vydy","znaky"];
 
-let activeTopic = "vydy";
+let activeTopic = "osnovy";
 let activeSub = 0;
 let activeSubsub = 0;
 
@@ -524,6 +677,7 @@ function attachTapToggle(el, handler){
 }
 window.attachTapToggle = attachTapToggle;
 
+
 function renderAll(){
   renderTopics();
   renderSubs();
@@ -534,7 +688,25 @@ function renderAll(){
 renderAll();
 
 // ======================================================================
-// МАЛЮВАННЯ ПОВЕРХ ЕКРАНА (режим "учитель") — без змін відносно еталона
+// МАЛЮВАННЯ ПОВЕРХ ЕКРАНА (режим "учитель")
+//
+// Ця версія навмисно побудована один в один за робочим прикладом, який
+// підтвердив, що пише без затримок і що кнопка з панеллю не зникають і не
+// роздуваються під час зуму. Різниця з попередніми спробами:
+//   • НІЯКОГО втручання в touch-action — воно завжди 'auto', як типово
+//     в браузері. preventDefault() на самому дотику пером і так гарантує,
+//     що перо не гортає й не зумить сторінку; більше нічого чіпати не
+//     треба, а зайві обмеження touch-action, судячи з усього, і були
+//     причиною затримки між буквами.
+//   • НІЯКОЇ JS-компенсації позиції/розміру кнопки й панелі під час
+//     pinch-zoom. Вони — звичайний CSS position:fixed. Раніше спроби
+//     "виправити" це власним кодом лише ламали те, що й так працювало.
+//   • Малювання — просте, пряме, растрове (як у прикладі), без черг і
+//     буферизації.
+// Єдине, що збережено понад приклад: чорнило кожної вкладки зберігається
+// окремо (бо в цьому уроці, на відміну від прикладу, є кілька вкладок) —
+// через ті самі getDrawingSnapshot/setDrawingSnapshot, які вже викликає
+// зовнішній скрипт при перемиканні вкладок.
 // ======================================================================
 (function(){
   const canvas = document.getElementById('drawCanvas');
@@ -552,7 +724,7 @@ renderAll();
 
   let drawingActive = false;
   let isDrawing = false;
-  let currentColor = "#E5484D";
+  let currentColor = "#F5304A";
   let currentWidth = 4;
   let eraserMode = false;
   let lastX = 0, lastY = 0;
@@ -561,11 +733,15 @@ renderAll();
   window.isDrawingActive = function(){ return drawingActive; };
 
   function currentDocHeight(){
-    return Math.max(
+    const prevH = canvas.style.height;
+    canvas.style.height = '0px';
+    const h = Math.max(
       document.documentElement.scrollHeight,
       document.body.scrollHeight,
       window.innerHeight
     );
+    canvas.style.height = prevH;
+    return h;
   }
 
   function resizeCanvas(){
@@ -603,17 +779,24 @@ renderAll();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   };
 
+  // сумісний з рештою сторінки API: чорнило кожної вкладки зберігається й
+  // відновлюється окремо при перемиканні вкладок (викликається з
+  // зовнішнього скрипту через saveCurrentDrawing()/restoreCurrentDrawing())
   window.getDrawingSnapshot = function(){
     try{
       return (canvas.width && canvas.height) ? canvas.toDataURL('image/png') : null;
     }catch(e){ return null; }
   };
+  window.__snapTok = 0;
   window.setDrawingSnapshot = function(dataURL){
+    const tok = ++window.__snapTok;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if(!dataURL) return;
     const img = new Image();
     img.onload = function(){
-      ctx.drawImage(img, 0, 0, canvas.width / devicePixelRatio, canvas.height / devicePixelRatio);
+      if(tok !== window.__snapTok) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, img.width / devicePixelRatio, img.height / devicePixelRatio);
     };
     img.src = dataURL;
   };
@@ -651,30 +834,38 @@ renderAll();
     });
   });
 
-  xthinBtn.addEventListener('click', ()=>{
-    currentWidth = 2;
-    [xthinBtn,thinBtn,thickBtn].forEach(b=>b.classList.remove('selected'));
-    xthinBtn.classList.add('selected');
-  });
+  if(xthinBtn){
+    xthinBtn.addEventListener('click', ()=>{
+      currentWidth = 2;
+      [xthinBtn,thinBtn,thickBtn].forEach(b=>b.classList.remove('selected'));
+      xthinBtn.classList.add('selected');
+    });
+  }
   thinBtn.addEventListener('click', ()=>{
-    currentWidth = 5;
-    [xthinBtn,thinBtn,thickBtn].forEach(b=>b.classList.remove('selected'));
+    currentWidth = xthinBtn ? 5 : 4;
+    [xthinBtn,thinBtn,thickBtn].forEach(b=>b&&b.classList.remove('selected'));
     thinBtn.classList.add('selected');
   });
   thickBtn.addEventListener('click', ()=>{
-    currentWidth = 11;
-    [xthinBtn,thinBtn,thickBtn].forEach(b=>b.classList.remove('selected'));
+    currentWidth = xthinBtn ? 11 : 12;
+    [xthinBtn,thinBtn,thickBtn].forEach(b=>b&&b.classList.remove('selected'));
     thickBtn.classList.add('selected');
   });
   eraserBtn.addEventListener('click', ()=>{
     eraserMode = !eraserMode;
     eraserBtn.classList.toggle('selected', eraserMode);
   });
-  clearBtn.addEventListener('click', ()=>{ window.clearDrawing(); });
+  clearBtn.addEventListener('click', ()=>{
+    window.clearDrawing();
+  });
 
   function pointerPos(e){
     const rect = canvas.getBoundingClientRect();
-    return { x: e.clientX - rect.left, y: e.clientY - rect.top, pressure: e.pressure || 0.5 };
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+      pressure: e.pressure || 0.5,
+    };
   }
 
   function isOnControls(e){
@@ -685,6 +876,7 @@ renderAll();
     if(!drawingActive) return;
     if(e.pointerType !== 'pen') return;
     if(isOnControls(e)) return;
+
     e.preventDefault();
     isDrawing = true;
     activePointerId = e.pointerId;
@@ -695,12 +887,16 @@ renderAll();
   document.addEventListener('pointermove', (e)=>{
     if(!drawingActive || !isDrawing) return;
     if(e.pointerId !== activePointerId) return;
+
     e.preventDefault();
     const p = pointerPos(e);
-    ctx.globalCompositeOperation = eraserMode ? 'destination-out' : 'source-over';
+    // кнопка на пері (barrel, buttons&2) або «гумка» на кінці пера (buttons&32) → стирає
+    const penErase = (e.buttons & 2) === 2 || (e.buttons & 32) === 32;
+    const erasing = eraserMode || penErase;
+    ctx.globalCompositeOperation = erasing ? 'destination-out' : 'source-over';
     ctx.strokeStyle = currentColor;
     const pressureFactor = 0.6 + (p.pressure || 0.5) * 0.8;
-    ctx.lineWidth = (eraserMode ? currentWidth * 3 : currentWidth) * pressureFactor;
+    ctx.lineWidth = (erasing ? currentWidth * 3 : currentWidth) * pressureFactor;
     ctx.beginPath();
     ctx.moveTo(lastX, lastY);
     ctx.lineTo(p.x, p.y);
@@ -715,6 +911,11 @@ renderAll();
   }
   document.addEventListener('pointerup', stopDrawing);
   document.addEventListener('pointercancel', stopDrawing);
+
+  // щоб затискання кнопки на пері не відкривало контекстне меню
+  document.addEventListener('contextmenu', function(e){
+    if(drawingActive) e.preventDefault();
+  });
 
   document.addEventListener('touchmove', function(e){
     if(drawingActive && e.touches && e.touches[0] && e.touches[0].touchType === 'stylus'){
