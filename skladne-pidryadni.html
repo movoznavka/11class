@@ -1,0 +1,2128 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Складнопідрядне речення · Загальний тест</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+  :root{
+    --bg:#D0E9FC;
+    --bg-soft:#E4F2FC;
+    --card:#FFFFFF;
+    --ink:#13213B;
+    --ink-soft:#6478A0;
+    --line: rgba(19,33,59,0.08);
+
+    --c1-a:#4DA3FF; --c1-b:#007AFF; --c1-sh: rgba(0,122,255,0.38);
+    --c3-a:#5FE0A8; --c3-b:#17A863; --c3-sh: rgba(23,168,99,0.4);
+    --c2-b:#E5484D;
+
+    --correct-bg:#E6F8EE;
+    --correct-ink:#128A54;
+    --wrong-bg:#FDECEC;
+    --wrong-ink:#D8393E;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    padding:28px 16px 64px;
+    position:relative;
+  }
+  .wrap{max-width:720px;margin:0 auto;}
+
+  .topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding-bottom:16px;
+    margin-bottom:22px;
+    border-bottom:1.5px solid rgba(19,33,59,0.14);
+  }
+  .kicker{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:12.5px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--ink);
+    opacity:.55;
+  }
+  .kicker.tag{opacity:.4;}
+
+  .review-banner{
+    display:none;
+    align-items:center;
+    gap:8px;
+    background:#FFF4E0;
+    color:#8A5A00;
+    font-family:'Manrope',sans-serif;
+    font-weight:700;
+    font-size:13px;
+    padding:10px 16px;
+    border-radius:14px;
+    margin-bottom:16px;
+  }
+  .review-banner.show{display:flex;}
+
+  h1{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:clamp(26px,6vw,38px);
+    line-height:1.05;
+    letter-spacing:-0.01em;
+    margin:0 0 8px;
+    text-transform:uppercase;
+  }
+  h1 .hl{color:var(--c1-b);}
+  .sub{color:var(--ink-soft);font-size:15px;max-width:50ch;margin:0 0 22px;font-weight:500;}
+
+  .card{
+    background:var(--card);
+    border-radius:28px;
+    padding:30px 26px;
+    box-shadow: 0 20px 44px -28px rgba(19,33,59,0.35);
+  }
+
+  .progress-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:16px;
+  }
+  .qnum{
+    font-family:'Manrope',sans-serif;
+    font-weight:700;
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+  .score{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:12.5px;
+    color:var(--c3-b);
+    background:var(--correct-bg);
+    padding:6px 13px;
+    border-radius:999px;
+  }
+
+  .segbar{display:flex;gap:3px;margin-bottom:22px;flex-wrap:wrap;}
+  .seg{
+    flex:1;
+    min-width:6px;
+    height:6px;
+    border-radius:999px;
+    background:var(--bg-soft);
+    cursor:pointer;
+  }
+  .seg.current{background:var(--c1-b);}
+  .seg.done-correct{background:var(--c3-b);}
+  .seg.done-wrong{background:var(--c2-b);}
+
+  .qtext{
+    font-family:'Manrope',sans-serif;
+    font-size:19px;
+    font-weight:700;
+    line-height:1.5;
+    margin:0 0 20px;
+    letter-spacing:-0.005em;
+  }
+  .qtext u{ text-decoration-thickness:2px; text-underline-offset:2px; }
+
+  .options{display:flex;flex-direction:column;gap:10px;}
+  .opt{
+    display:flex;
+    align-items:center;
+    gap:13px;
+    text-align:left;
+    width:100%;
+    padding:9px 14px 9px 9px;
+    border-radius:18px;
+    border:none;
+    background:var(--bg-soft);
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    font-weight:500;
+    color:var(--ink);
+    transition:transform .12s ease, background .15s ease;
+  }
+  .opt:hover{transform:translateY(-1px);}
+  .opt[disabled]{cursor:default;}
+  .opt[disabled]:hover{transform:none;}
+  .opt u{ text-decoration-thickness:2px; text-underline-offset:2px; }
+
+  /* --- glass letter tile: uniform accent color, translucent, blurred, like iOS icons --- */
+  .tile{
+    position:relative;
+    width:32px;height:32px;min-width:32px;
+    border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:13.5px;
+    color:var(--c1-b);
+    background: linear-gradient(150deg, rgba(255,255,255,0.75), rgba(77,163,255,0.22));
+    backdrop-filter: blur(6px) saturate(160%);
+    -webkit-backdrop-filter: blur(6px) saturate(160%);
+    border:1px solid rgba(255,255,255,0.7);
+    box-shadow: 0 4px 12px -7px var(--c1-sh), inset 0 1px 1px rgba(255,255,255,0.8);
+    overflow:visible;
+  }
+  .tile > span{position:relative;z-index:1;}
+
+  .badge{
+    position:absolute;
+    top:-5px;right:-5px;
+    width:16px;height:16px;
+    border-radius:50%;
+    border:2px solid var(--card);
+    display:flex;align-items:center;justify-content:center;
+    font-size:9.5px;
+    font-weight:800;
+    color:#fff;
+    z-index:2;
+  }
+  .badge.ok{background:var(--c3-b);}
+  .badge.no{background:var(--c2-b);}
+
+  .opt.correct{background:var(--correct-bg);}
+  .opt.wrong{background:var(--wrong-bg);}
+  .opt.dim{opacity:.5;}
+
+  .feedback{
+    margin-top:16px;
+    padding:13px 16px;
+    border-radius:16px;
+    font-size:14.5px;
+    font-weight:600;
+    display:none;
+    align-items:center;
+    gap:9px;
+  }
+  .feedback.show{display:flex;}
+  .feedback.ok{background:var(--correct-bg);color:var(--correct-ink);}
+  .feedback.bad{background:var(--wrong-bg);color:var(--wrong-ink);}
+  .feedback b{font-family:'Manrope',sans-serif;}
+
+  .nav-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:24px;
+  }
+  .btn{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:13px;
+    padding:12px 22px;
+    border-radius:999px;
+    border:none;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .btn.primary{
+    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));
+    color:#fff;
+    box-shadow:0 10px 20px -8px var(--c1-sh);
+  }
+  .btn.ghost{background:transparent;color:var(--ink-soft);}
+  .btn:disabled{opacity:.3;cursor:default;box-shadow:none;}
+  .btn.small{
+    font-size:12px;
+    padding:8px 4px;
+    opacity:.55;
+    text-decoration:underline;
+    text-underline-offset:2px;
+  }
+  .btn.small:hover{opacity:.85;}
+  .reset-row{
+    text-align:center;
+    margin-top:6px;
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+
+  .done-screen{text-align:center;padding:16px 0;}
+  .done-screen .ring{
+    width:120px;height:120px;
+    margin:0 auto 18px;
+    border-radius:50%;
+    background:linear-gradient(155deg,var(--c1-a),var(--c1-b));
+    box-shadow:0 16px 30px -12px var(--c1-sh);
+    display:flex;align-items:center;justify-content:center;
+    position:relative;
+  }
+  .done-screen .ring::before{
+    content:'';
+    position:absolute;
+    top:6px;left:10px;right:10px;
+    height:46%;
+    border-radius:50% 50% 60% 60%;
+    background:linear-gradient(to bottom, rgba(255,255,255,0.5), rgba(255,255,255,0));
+  }
+  .done-screen .big{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:30px;
+    color:#fff;
+    position:relative;
+    z-index:1;
+  }
+  .done-screen .send-status{
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin-top:10px;
+    min-height:18px;
+  }
+  .done-screen .send-status.ok{color:var(--correct-ink);}
+  .done-screen .send-status.bad{color:var(--wrong-ink);}
+
+  .name-screen{padding:6px 0;}
+  .name-screen label{
+    display:block;
+    font-family:'Manrope',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    margin-bottom:10px;
+    color:var(--ink);
+  }
+  .name-screen input{
+    width:100%;
+    padding:14px 16px;
+    border-radius:16px;
+    border:1.5px solid var(--line);
+    background:var(--bg-soft);
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    font-weight:500;
+    color:var(--ink);
+    outline:none;
+    margin-bottom:18px;
+  }
+  .name-screen input:focus{border-color:var(--c1-b);}
+
+  footer{
+    text-align:center;
+    margin-top:22px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-weight:500;
+  }
+
+  /* --- формат як у тесті зі службових частин мови --- */
+  .match-grid{display:flex;gap:18px;align-items:flex-start;background:var(--bg-soft);border-radius:20px;padding:16px;margin-bottom:18px;}
+  .match-col{flex:1;display:flex;flex-direction:column;gap:10px;min-width:0;}
+  .match-word-row{display:flex;align-items:center;gap:8px;}
+  .match-word-card{flex:1;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:11px 14px;font-family:'Manrope',sans-serif;font-weight:700;font-size:14px;color:var(--ink);min-width:0;}
+  .match-word-card b{color:var(--c1-b);margin-right:4px;}
+  .match-arrow{color:var(--ink-soft);font-size:16px;flex-shrink:0;}
+  .ans-box{flex:1;min-height:44px;border:1.5px dashed var(--c1-a);border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;font-weight:800;font-size:13px;cursor:pointer;background:#fff;color:var(--c1-b);padding:6px 8px;text-align:center;}
+  .ans-box.filled{border-style:solid;background:#E1EEFF;}
+  .ans-box.correct{border-color:var(--correct-ink);background:var(--correct-bg);color:var(--correct-ink);cursor:default;}
+  .ans-box.wrong{border-color:var(--wrong-ink);background:var(--wrong-bg);color:var(--wrong-ink);cursor:default;}
+  .opt-card{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;font-family:'Manrope',sans-serif;font-weight:700;font-size:14px;cursor:pointer;color:var(--ink);}
+  .opt-card.active{border-color:var(--c1-b);background:#E1EEFF;box-shadow:0 0 0 3px rgba(0,122,255,0.16);}
+  .opt-card.used{opacity:.45;}
+  .opt-card.disabled{cursor:default;}
+  @media (max-width:560px){ .match-grid{flex-direction:column;} .match-word-card,.opt-card{font-size:13px;} }
+
+  
+  .qtext b{font-weight:800;}
+  .qtext .num{font-weight:800;}
+  .qtext .num1{color:var(--c1-b);} .qtext .num2{color:#13213B;} .qtext .num3{color:#AF52DE;} .qtext .num4{color:#FF9500;}
+  .quote{ display:block; font-weight:500; font-style:italic; line-height:1.55; margin:10px 0 12px; }
+  .opt.sel{background:#E1EEFF; box-shadow: inset 0 0 0 2px var(--c1-b);}
+  .seg.done-answered{background:var(--c1-a);}
+  .seg.done-partial{background:#F5A623;}
+  .feedback.mixed{background:#FFF4E0;color:#8A5A00;}
+  .score.neutral{color:var(--c1-b);background:rgba(0,122,255,0.10);}
+  .btn.secondary{background:var(--bg-soft);color:var(--c1-b);}
+  .done-screen .actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px;}
+  .done-list{font-size:14px;font-weight:600;margin:8px 0 0;color:var(--ink-soft);}
+  .done-list.bad{color:var(--wrong-ink);} .done-list.ok{color:var(--correct-ink);}
+  .mhead{font-family:'Manrope',sans-serif;font-weight:800;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 6px;}
+  .stat-row{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px;}
+  .feedback{flex-wrap:wrap;}
+  .done-screen .send-status .btn{margin:8px auto 0;}
+/* ===================== DRAWING / TEACHER MODE ===================== */
+  #drawCanvas{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    z-index:9998;
+    pointer-events:none;
+  }
+
+  #drawToggleBtn{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    width:58px;height:58px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,0.5);
+    background:
+      linear-gradient(150deg, rgba(255,255,255,0.35), rgba(255,255,255,0) 60%),
+      linear-gradient(155deg,var(--c1-a),var(--c1-b));
+    backdrop-filter: blur(10px) saturate(160%);
+    -webkit-backdrop-filter: blur(10px) saturate(160%);
+    box-shadow:
+      0 14px 28px -10px var(--c1-sh),
+      inset 0 1px 1px rgba(255,255,255,0.6),
+      inset 0 -6px 10px -4px rgba(0,0,0,0.15);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    z-index:9999;
+    transition:transform .18s cubic-bezier(.34,1.56,.64,1), background .2s ease, box-shadow .2s ease;
+  }
+  #drawToggleBtn svg{
+    width:24px;height:24px;
+    display:block;
+    transition:transform .25s ease, opacity .15s ease;
+  }
+  #drawToggleBtn:active{transform:scale(0.90);}
+  #drawToggleBtn.on{
+    background:
+      linear-gradient(150deg, rgba(255,255,255,0.35), rgba(255,255,255,0) 60%),
+      linear-gradient(155deg,#FF8A65,var(--c2-b));
+    box-shadow:
+      0 14px 28px -10px rgba(229,72,77,0.55),
+      inset 0 1px 1px rgba(255,255,255,0.6),
+      inset 0 -6px 10px -4px rgba(0,0,0,0.15);
+  }
+  #drawToggleBtn.on svg{ transform:rotate(90deg); }
+
+  #drawToolbar{
+    position:fixed;
+    left:50%;
+    bottom:22px;
+    transform:translateX(-50%) translateY(130%) scale(0.94);
+    opacity:0;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:
+      linear-gradient(150deg, rgba(255,255,255,0.6), rgba(255,255,255,0.15));
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border:1px solid rgba(255,255,255,0.7);
+    padding:9px 16px;
+    border-radius:999px;
+    box-shadow:
+      0 24px 48px -20px rgba(19,33,59,0.45),
+      inset 0 1px 1px rgba(255,255,255,0.9);
+    z-index:9999;
+    transition:transform .25s cubic-bezier(.34,1.56,.64,1), opacity .2s ease;
+    pointer-events:none;
+  }
+  #drawToolbar.show{
+    transform:translateX(-50%) translateY(0) scale(1);
+    opacity:1;
+    pointer-events:auto;
+  }
+  .swatch{
+    position:relative;
+    width:25px;height:25px;
+    border-radius:50%;
+    border:none;
+    box-shadow:
+      0 3px 8px -2px rgba(19,33,59,0.35),
+      inset 0 1px 1px rgba(255,255,255,0.5);
+    cursor:pointer;
+    padding:0;
+    transition:transform .15s cubic-bezier(.34,1.56,.64,1);
+  }
+  .swatch::after{
+    content:'';
+    position:absolute;
+    inset:-4px;
+    border-radius:50%;
+    border:2px solid var(--ink);
+    opacity:0;
+    transform:scale(0.7);
+    transition:opacity .15s ease, transform .15s cubic-bezier(.34,1.56,.64,1);
+  }
+  .swatch.selected{ transform:scale(1.08); }
+  .swatch.selected::after{ opacity:1; transform:scale(1); }
+  .tool-btn{
+    width:34px;height:34px;
+    border-radius:50%;
+    border:none;
+    background:rgba(255,255,255,0.5);
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease, transform .15s cubic-bezier(.34,1.56,.64,1);
+  }
+  .tool-btn svg{ width:16px; height:16px; }
+  .tool-btn .dot{
+    border-radius:50%;
+    background:currentColor;
+  }
+  #thinBtn .dot{ width:6px; height:6px; }
+  #thickBtn .dot{ width:12px; height:12px; }
+  .tool-btn.selected{
+    background:var(--c1-b);
+    color:#fff;
+    transform:scale(1.06);
+  }
+  .tool-sep{
+    width:1px;
+    height:22px;
+    background:rgba(19,33,59,0.14);
+  }
+
+  @media (max-width:480px){
+    #drawToolbar{
+      max-width:94vw;
+      overflow-x:auto;
+      padding:8px 13px;
+      gap:9px;
+    }
+    .swatch{width:21px;height:21px;}
+    .tool-btn{width:30px;height:30px;}
+    .tool-btn svg{width:14px;height:14px;}
+  }
+
+  /* ===================== iOS-СТИЛЬ ===================== */
+  body{ font-family:-apple-system,'SF Pro Text','Inter',sans-serif; }
+  .card{
+    background:rgba(255,255,255,0.78);
+    backdrop-filter:blur(30px) saturate(180%);
+    -webkit-backdrop-filter:blur(30px) saturate(180%);
+    border:1px solid rgba(255,255,255,0.9);
+    border-radius:30px;
+    box-shadow:0 18px 40px -26px rgba(20,60,120,0.35), inset 0 0.5px 0 rgba(255,255,255,1);
+  }
+  .opt, .match-word-card, .opt-card{
+    background:rgba(255,255,255,0.9);
+    border:0.5px solid rgba(60,60,67,0.12);
+    border-radius:16px;
+    box-shadow:0 1px 2px rgba(0,0,0,0.04);
+  }
+  .opt{ background:rgba(236,244,253,0.9); border:none; box-shadow:none; }
+  .ans-box{ background:rgba(255,255,255,0.9); border:1.5px dashed rgba(0,122,255,0.4); border-radius:16px; }
+  .ans-box.filled{ border-style:solid; }
+  .match-grid{ background:rgba(228,241,253,0.75); border-radius:22px; }
+  .seg{ background:rgba(120,140,170,0.18); }
+  .seg.current{ background:var(--c1-b); }
+  .btn{ border-radius:999px; }
+  .btn.primary{
+    background:linear-gradient(180deg,#3F9BFF,#007AFF);
+    box-shadow:0 8px 18px -8px var(--c1-sh), inset 0 1px 0 rgba(255,255,255,0.35);
+  }
+  .btn.secondary{ background:rgba(0,122,255,0.10); color:var(--c1-b); }
+  .done-screen .ring{
+    background:linear-gradient(180deg,#4DA3FF,#007AFF);
+    box-shadow:0 16px 30px -12px var(--c1-sh), inset 0 1px 0 rgba(255,255,255,0.45);
+  }
+  .name-screen input{ background:rgba(118,118,128,0.10); border:none; border-radius:14px; }
+
+  /* ===================== РІДКЕ СКЛО (як iOS 26) ===================== */
+  body{
+    background:
+      radial-gradient(520px 380px at 12% 8%, rgba(255,255,255,0.85), rgba(255,255,255,0) 70%),
+      radial-gradient(480px 420px at 92% 22%, rgba(150,200,255,0.65), rgba(150,200,255,0) 70%),
+      radial-gradient(520px 460px at 78% 92%, rgba(205,180,255,0.45), rgba(205,180,255,0) 70%),
+      radial-gradient(460px 380px at 6% 85%, rgba(140,235,235,0.45), rgba(140,235,235,0) 70%),
+      #D0E9FC;
+    background-attachment:fixed;
+  }
+  .tile, .btn.primary, .btn.secondary, .score, .opt-card, .match-word-card, .ans-box, .opt, .done-screen .ring{
+    backdrop-filter:blur(8px) saturate(200%) brightness(1.08);
+    -webkit-backdrop-filter:blur(8px) saturate(200%) brightness(1.08);
+  }
+  .tile{
+    background:linear-gradient(135deg, rgba(255,255,255,0.55), rgba(255,255,255,0.12) 55%, rgba(255,255,255,0.28));
+    border:1px solid rgba(255,255,255,0.7);
+    color:var(--c1-b);
+    box-shadow:
+      inset 1.5px 1.5px 1px rgba(255,255,255,0.95),
+      inset -1px -1px 2px rgba(255,255,255,0.4),
+      inset 0 0 10px rgba(255,255,255,0.3),
+      0 6px 14px -8px rgba(0,70,160,0.4);
+  }
+  .opt{
+    background:linear-gradient(135deg, rgba(255,255,255,0.5), rgba(255,255,255,0.18));
+    border:1px solid rgba(255,255,255,0.7);
+    box-shadow: inset 1.5px 1.5px 1px rgba(255,255,255,0.9), inset 0 0 14px rgba(255,255,255,0.25), 0 8px 18px -14px rgba(0,70,160,0.4);
+  }
+  .opt.sel{ background:linear-gradient(135deg, rgba(120,190,255,0.5), rgba(0,122,255,0.18)); box-shadow: inset 1.5px 1.5px 1px rgba(255,255,255,0.9), inset 0 0 0 1.5px rgba(0,122,255,0.55); }
+  .match-word-card, .opt-card, .ans-box{
+    background:linear-gradient(135deg, rgba(255,255,255,0.55), rgba(255,255,255,0.18));
+    border:1px solid rgba(255,255,255,0.75);
+    box-shadow: inset 1.5px 1.5px 1px rgba(255,255,255,0.95), inset -1px -1px 2px rgba(255,255,255,0.35), 0 6px 14px -10px rgba(0,70,160,0.35);
+  }
+  .ans-box{ border:1.5px dashed rgba(0,122,255,0.5); }
+  .ans-box.filled{ border:1px solid rgba(255,255,255,0.8); background:linear-gradient(135deg, rgba(120,190,255,0.5), rgba(0,122,255,0.2)); color:#0A4DB0; }
+  .opt-card.active{ background:linear-gradient(135deg, rgba(120,190,255,0.55), rgba(0,122,255,0.2)); }
+  .btn.primary{
+    background:linear-gradient(135deg, rgba(130,195,255,0.75), rgba(0,122,255,0.5) 60%, rgba(60,150,255,0.6));
+    border:1px solid rgba(255,255,255,0.75);
+    color:#fff; text-shadow:0 1px 2px rgba(0,60,140,0.4);
+    box-shadow: inset 1.5px 1.5px 1px rgba(255,255,255,0.9), inset -1px -1px 2px rgba(255,255,255,0.35), inset 0 0 12px rgba(255,255,255,0.25), 0 12px 24px -10px var(--c1-sh);
+  }
+  .btn.secondary{
+    background:linear-gradient(135deg, rgba(255,255,255,0.55), rgba(255,255,255,0.15));
+    border:1px solid rgba(255,255,255,0.75);
+    box-shadow: inset 1.5px 1.5px 1px rgba(255,255,255,0.95), 0 8px 18px -12px rgba(0,70,160,0.4);
+  }
+  .score{
+    background:linear-gradient(135deg, rgba(255,255,255,0.6), rgba(230,248,238,0.3));
+    border:1px solid rgba(255,255,255,0.8);
+    box-shadow: inset 1px 1px 1px rgba(255,255,255,0.95), 0 6px 12px -8px rgba(0,70,160,0.35);
+  }
+  .score.neutral{ background:linear-gradient(135deg, rgba(255,255,255,0.6), rgba(0,122,255,0.12)); }
+  .done-screen .ring{
+    background:linear-gradient(135deg, rgba(130,195,255,0.8), rgba(0,122,255,0.55) 60%, rgba(60,150,255,0.65));
+    border:1px solid rgba(255,255,255,0.8);
+    box-shadow: inset 2px 2px 2px rgba(255,255,255,0.9), inset -2px -2px 4px rgba(255,255,255,0.35), inset 0 0 18px rgba(255,255,255,0.3), 0 18px 34px -14px var(--c1-sh);
+  }
+  #drawToggleBtn{ backdrop-filter:blur(8px) saturate(200%); }
+
+  .qtext .num1,.qtext .num2,.qtext .num3,.qtext .num4{color:inherit;}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="kicker">Складнопідрядне речення · Усі теми</div>
+    <div class="kicker tag" id="totalTag"></div>
+  </div>
+
+  <div class="review-banner" id="reviewBanner"></div>
+
+  <h1>Загальний <span class="hl">тест</span> зі складнопідрядного речення</h1>
+  <p class="sub" id="subText">Види підрядних речень: відповідність і вибір відповіді. Формат НМТ: результат — наприкінці.</p>
+
+  <div class="card">
+    <div id="quizArea"></div>
+  </div>
+
+  <footer>@movoznavka</footer>
+</div>
+
+<!-- ==== Малювання поверх екрана (для вчителя) ==== -->
+<canvas id="drawCanvas"></canvas>
+<button id="drawToggleBtn" title="Малювати">
+  <svg id="drawIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4 20L4.6 16.6C4.7 15.9 5.03 15.26 5.55 14.79L15.3 5.7C16.09 4.96 17.34 4.99 18.09 5.78L18.34 6.04C19.08 6.83 19.04 8.08 18.25 8.81L8.5 17.9C8 18.37 7.37 18.66 6.7 18.75L4 20Z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/>
+    <path d="M13.5 7.5L16.5 10.3" stroke="white" stroke-width="1.7" stroke-linecap="round"/>
+  </svg>
+</button>
+<div id="drawToolbar">
+  <button class="swatch selected" style="background:#E5484D" data-color="#E5484D"></button>
+  <button class="swatch" style="background:#3355EE" data-color="#3355EE"></button>
+  <button class="swatch" style="background:#17A863" data-color="#17A863"></button>
+  <button class="swatch" style="background:#13213B" data-color="#13213B"></button>
+  <div class="tool-sep"></div>
+  <button class="tool-btn selected" id="thinBtn" title="Тонка лінія"><span class="dot"></span></button>
+  <button class="tool-btn" id="thickBtn" title="Товста лінія"><span class="dot"></span></button>
+  <div class="tool-sep"></div>
+  <button class="tool-btn" id="eraserBtn" title="Ластик">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M18.5 13.5L10.5 21.5H5.5L2.5 18.5C2.11 18.11 2.11 17.48 2.5 17.09L13.5 6.09C13.89 5.7 14.52 5.7 14.91 6.09L18.5 9.68C19.5 10.68 19.5 12.5 18.5 13.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M9 13.5L15 19.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <button class="tool-btn" id="clearBtn" title="Очистити все">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M5 7H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M9.5 7V4.8C9.5 4.36 9.86 4 10.3 4H13.7C14.14 4 14.5 4.36 14.5 4.8V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M7 7L7.7 18.6C7.75 19.42 8.42 20 9.24 20H14.76C15.58 20 16.25 19.42 16.3 18.6L17 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M10.3 10.5V16.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M13.7 10.5V16.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  </button>
+</div>
+
+
+
+<script>
+// ======================================================================
+// ЄДИНИЙ РУШІЙ ДЛЯ ВСІХ ЗАГАЛЬНИХ ТЕСТІВ
+//  • два типи завдань: звичайний вибір і «встановити відповідність»
+//    (клітинки «?» + варіанти А–Д, як у тесті на відповідність);
+//  • учень: без підказок під час тесту, результат — наприкінці (як на НМТ);
+//  • вчитель (?vchytel=1): відповідь одразу після кожного завдання;
+//  • прогрес зберігається; нова добірка — ТІЛЬКИ за кнопкою «Нові питання»,
+//    і кожне натискання надсилає вчительці результат поточної спроби;
+//  • результат і «розбір відповідей» приходять у Telegram.
+// ======================================================================
+const CFG = {"testName": "Складнопідрядне речення · Загальний тест", "shortName": "Складнопідрядне речення", "testSize": null};
+
+const BANK = [
+{
+"type": "match",
+"q": "З'ясуйте, який вид підрядного відповідає кожному фрагментові складного речення.<br>Фрагмент речення — Вид підрядного речення.",
+"left": [
+"… зізнаються, якщо …",
+"… зізналися, бо …",
+"… зізнався, що …",
+"… зізналася, дарма що …"
+],
+"opts": [
+"місця",
+"умови",
+"допусту",
+"причини",
+"з’ясувальне"
+],
+"a": [
+1,
+3,
+4,
+2
+],
+"id": "skl.0174e"
+},
+{
+"type": "match",
+"q": "З'ясуйте, який вид підрядного відповідає кожному фрагментові складного речення.<br>Фрагмент речення — Вид підрядного речення.",
+"left": [
+"… знав, незважаючи на те що …",
+"… провалився, так що …",
+"… покидаємо, через те що …",
+"… приїдемо, щоб …"
+],
+"opts": [
+"мети",
+"умови",
+"допусту",
+"причини",
+"наслідку"
+],
+"a": [
+2,
+4,
+3,
+0
+],
+"id": "skl.02c4e"
+},
+{
+"type": "match",
+"q": "З'ясуйте, який вид підрядного відповідає кожному фрагментові складного речення.<br>Фрагмент речення — Вид підрядного речення.",
+"left": [
+"… ударив, що аж …",
+"… відмовилася, оскільки …",
+"… допоміг би, якби …",
+"… будинок, у якому …"
+],
+"opts": [
+"умови",
+"причини",
+"наслідку",
+"означальне",
+"міри і ступеня"
+],
+"a": [
+4,
+1,
+0,
+3
+],
+"id": "skl.0334e"
+},
+{
+"type": "match",
+"q": "З'ясуйте, який вид підрядного відповідає кожному фрагментові складного речення.<br>Фрагмент речення — Вид підрядного речення.",
+"left": [
+"Я твердо переконаний, що …",
+"Настав той день, коли …",
+"… та мати не погодилася.",
+"… то б і горя не знали."
+],
+"opts": [
+"означальне",
+"з’ясувальне",
+"допустове",
+"умови",
+"місця"
+],
+"a": [
+1,
+0,
+2,
+3
+],
+"id": "skl.04e4e"
+},
+{
+"type": "match",
+"q": "З'ясуйте, який вид підрядного відповідає кожному фрагментові складного речення.<br>Фрагмент речення — Вид підрядного речення.",
+"left": [
+"Щоб перемогти, …",
+"Мені наснилося, що …",
+"Пролунав постріл, так що …",
+"Ми залишилися вдома, дарма що …"
+],
+"opts": [
+"міри і ступеня",
+"з’ясувальне",
+"наслідку",
+"допусту",
+"мети"
+],
+"a": [
+4,
+1,
+2,
+3
+],
+"id": "skl.0594e"
+},
+{
+"type": "match",
+"q": "З'ясуйте, який вид підрядного відповідає кожному фрагментові складного речення.<br>Фрагмент речення — Вид підрядного речення.",
+"left": [
+"Ліс, де … , здивував своєю тишею.",
+"Там, де … , сонце рожеве сідає.",
+"Хоч … , але ми виграли кубок.",
+"Що … , то більше знаєш."
+],
+"opts": [
+"місця",
+"допусту",
+"способу дії",
+"означальне",
+"міри і ступеня"
+],
+"a": [
+3,
+0,
+1,
+4
+],
+"id": "skl.06d4e"
+},
+{
+"type": "single",
+"q": "Складне речення з підрядним <b>означальним</b> утвориться, якщо до частини <i>«Ми пішли до річки…»</i> додати",
+"opts": [
+"хоч і почав накрапати дощ.",
+"бо вирішили трохи поплавати.",
+"про яку складено багато легенд.",
+"щоб наловити карасиків на вечерю."
+],
+"a": 2,
+"id": "skl.0714e"
+},
+{
+"type": "single",
+"q": "Складнопідрядним із підрядним <b>означальним</b> є речення",
+"opts": [
+"Для кактуса досить двох крапель води, щоб існувати місяцями під прямим сонцем.",
+"Напровесні, десь надвечір, чуємо, ніби пробують голоси солов’ї.",
+"Бачу за морями золоті дороги, де припав до неба синьоокий степ.",
+"Ми вірили, що своїми руками розіб’ємо скалу, роздробимо граніт."
+],
+"a": 2,
+"id": "skl.08f4e"
+},
+{
+"type": "single",
+"q": "Складне речення з підрядним <b>з’ясувальним</b> утвориться, якщо до частини <i>«Заспіваю вам …»</i> додати",
+"opts": [
+"якщо буде настрій.",
+"бо якось сумно стало.",
+"щоб трохи розважитися.",
+"про що інші не наважуються."
+],
+"a": 3,
+"id": "skl.0954e"
+},
+{
+"type": "single",
+"q": "Складнопідрядним із підрядним <b>з’ясувальним</b> є речення",
+"opts": [
+"Я люблю, як у вечірній час сопілка заспіває переливно.",
+"Моя вічна пісня та, що з дитинства несу через всі літа.",
+"Я виростав серед пісень, що їх співала тихо мати.",
+"І заручини справимо такі, що й земля гудітиме."
+],
+"a": 0,
+"id": "skl.10b4e"
+},
+{
+"type": "single",
+"q": "Складне речення з підрядним <b>способу дії</b> утвориться, якщо до частини <i>«Заміси тісто так …»</i> додати",
+"opts": [
+"як це робила наша бабуся.",
+"бо інакше воно буде глевким.",
+"коли приїдуть онуки на канікули.",
+"якщо на випікання буде мало часу."
+],
+"a": 0,
+"id": "skl.1124e"
+},
+{
+"type": "single",
+"q": "Складнопідрядним із підрядним <b>способу дії</b> є речення",
+"opts": [
+"Уживайте якомога більше слів, які підкреслюють шанобливе ставлення до людей.",
+"Важко переоцінити вплив, що його справив на перебіг історії Богдан Хмельницький.",
+"Старий дзвонар розповідав, як десь дівчата дзвонами привертали парубочі серця.",
+"Буває так, що помилка закріплюється в мові, передається нащадкам і стає нормою."
+],
+"a": 3,
+"id": "skl.12a4e"
+},
+{
+"type": "single",
+"q": "Складне речення з підрядним <b>міри і ступеня</b> утвориться, якщо до частини <i>«Блискавка врізала …»</i> додати",
+"opts": [
+"як бик хвостом хвисьнув.",
+"коли ми виходили з озера.",
+"що аж батько з братом зойкнули.",
+"щоб нагадати світові про свою силу."
+],
+"a": 2,
+"id": "skl.1374e"
+},
+{
+"type": "single",
+"q": "Складнопідрядним із підрядним <b>міри і ступеня</b> є речення",
+"opts": [
+"Лукаш хоче надрізати ножем березу, щоб сточити сік.",
+"Хоч би раз піднятися туди, де й птах ніякий не бував.",
+"Сонце світить так ласкаво, що аж каміння сміється.",
+"Як снасть ламається, чоловік ума набирається."
+],
+"a": 2,
+"id": "skl.14c4e"
+},
+{
+"type": "single",
+"q": "Складне речення з підрядним <b>порівняльним</b> утвориться, якщо до частини <i>«В очах зникає блиск …»</i> додати",
+"opts": [
+"коли чуєш невтішні новини.",
+"хоч для цього й немає причини.",
+"бо роки забирають силу й наснагу.",
+"наче сонце ховається за небокрай."
+],
+"a": 3,
+"id": "skl.1534e"
+},
+{
+"type": "single",
+"q": "Складнопідрядним із підрядним <b>порівняльним</b> є речення",
+"opts": [
+"На плесі вода така темна, ніби вона на чорному камені настояна.",
+"Високо поросло дерево вгору, укриваючи холодком зелену землю, на котрій буяє розкішна рослина.",
+"Щасливий майстер, що з тяжкої брили прекрасну постать висікає вміло на радість людям.",
+"І блідий місяць на ту пору із хмари де-де виглядав, неначе човен в синім морі то виринав, то потопав."
+],
+"a": 3,
+"id": "skl.16e4e"
+},
+{
+"type": "single",
+"q": "Складне речення з підрядним <b>місця</b> утвориться, якщо частину <i>«де ми познайомилися»</i> поставити на місце пропуску в рядку",
+"opts": [
+"Біля озера, … , співають солов’ї.",
+"У парку, … , зацвіли магнолії.",
+"Анно, чекатиму тебе, … .",
+"Будь ласка, нагадай, … ."
+],
+"a": 2,
+"id": "skl.1794e"
+},
+{
+"type": "single",
+"q": "Складнопідрядним із підрядним <b>місця</b> є речення",
+"opts": [
+"Над ставком, з глибини якого визирало зоряне небо, плив білою хмарою туман.",
+"Здавна вулиця була тим місцем, де вирішували важливі для людей справи.",
+"Біжить стежина в сад у зарості малини, яка дозріла вже і запахом п’янить.",
+"Де громи гриміли смертю огняною, зливи прошуміли сивою стіною."
+],
+"a": 3,
+"id": "skl.18d4e"
+},
+{
+"type": "single",
+"q": "Складне речення з підрядним <b>часу</b> утвориться, якщо частину <i>«коли закінчиться фільм»</i> поставити на місце пропуску в рядку",
+"opts": [
+"Чи знаєте ви, … ?",
+"Запитай про це тоді, … .",
+"Тобі відомо, … ?",
+"Нам не кажуть, … ."
+],
+"a": 1,
+"id": "skl.1914e"
+},
+{
+"type": "single",
+"q": "Складнопідрядним із підрядним <b>часу</b> є речення",
+"opts": [
+"Мені примарилася повінь, котру я запам’ятав ще змалечку.",
+"Батько й мати щодня сумували за мною до болю, задобряючи долю, щоб зло оминало мене.",
+"Стояла та досвітня пора, коли небо ховає в обіймах гори й ще спить на вершинах, мов у колисці.",
+"Тріумфальна хода кави по світу починається відтоді, як кілька зерен привіз до Венеції лікар із Єгипту."
+],
+"a": 3,
+"id": "skl.20f4e"
+},
+{
+"type": "single",
+"q": "Складне речення з підрядним <b>причини</b> утвориться, якщо частину <i>«я не піду на компроміси із совістю»</i> поставити на місце пропуску в рядку",
+"opts": [
+"Якщо мене навіть дуже попросять, … .",
+"… , адже хочу жити із чистим серцем.",
+"… , дарма що наполягають друзі.",
+"Щоб догодити начальству, … ."
+],
+"a": 1,
+"id": "skl.2154e"
+},
+{
+"type": "single",
+"q": "Складнопідрядним із підрядним <b>причини</b> є речення",
+"opts": [
+"Як іде біда до кого в гості, то із собою і злидні бере.",
+"Пише рідня, що навколо хати наш садок вишневий забілів.",
+"Ніхто з нас не куштував абрикосів, бо ні в кого в селі вони не ростуть.",
+"Завітай навесні, коли синя фіалка в чисте небо погляне здивованим оком."
+],
+"a": 2,
+"id": "skl.22b4e"
+},
+{
+"type": "single",
+"q": "Складне речення з підрядним <b>мети</b> утвориться, якщо до частини <i>«Сьогодні ми провели збори трудового колективу …»</i> додати",
+"opts": [
+"аби затвердити склад виборчої комісії.",
+"незважаючи на те що була пізня година.",
+"так що всі питання щодо виборів вирішено.",
+"до якого входять всі підрозділи фабрики."
+],
+"a": 0,
+"id": "skl.2324e"
+},
+{
+"type": "single",
+"q": "Складнопідрядним із підрядним <b>мети</b> є речення",
+"opts": [
+"Людині треба, щоб її робота залишалася після неї жити.",
+"На світі так ведеться, що вбогий перед багатим гнеться.",
+"Треба нахилитися, щоб із криниці води напитися.",
+"І без слів я все зрозумію, що сказати маєш мені."
+],
+"a": 2,
+"id": "skl.24a4e"
+},
+{
+"type": "single",
+"q": "Складне речення з підрядним <b>умови</b> утвориться, якщо до частини <i>«Їм смажені страви …»</i> додати",
+"opts": [
+"хоча вони й дуже шкідливі для здоров’я.",
+"які готує моя найкраща подруга.",
+"бо вони смачно пахнуть.",
+"коли немає іншої їжі."
+],
+"a": 3,
+"id": "skl.2574e"
+},
+{
+"type": "single",
+"q": "Складнопідрядним із підрядним <b>умови</b> є речення",
+"opts": [
+"І миті жодної не можна повернути, щоб заново по-іншому прожить.",
+"Коли хочеш ти добро зробити, поспішай його робити швидше.",
+"Нам не можна прожити без того, щоб не мріяти і не творить.",
+"Треба замолоду кості гризти, аби на старість м’ясо їсти."
+],
+"a": 1,
+"id": "skl.26c4e"
+},
+{
+"type": "single",
+"q": "Складне речення з підрядним <b>наслідку</b> утвориться, якщо до частини <i>«Дорогу перегородило сухе дерево …»</i> додати",
+"opts": [
+"що впало внаслідок учорашнього буревію.",
+"так що доведеться об’їжджати цю місцину.",
+"коли ми під’їжджали до супермаркету.",
+"яке мали спиляти ще минулого року."
+],
+"a": 1,
+"id": "skl.2734e"
+},
+{
+"type": "single",
+"q": "Складнопідрядним із підрядним <b>наслідку</b> є речення",
+"opts": [
+"І тут заревіло так, що весь попередній шум здався дитячим вереском.",
+"Джерела додають нам чистоти такої, що наміри одразу злі зникають.",
+"Хлопці стали гуртом і заколядували, так що луна балкою пішла.",
+"Сьогодні весь день сонце так пекло, що й уночі степ пашів."
+],
+"a": 2,
+"id": "skl.28e4e"
+},
+{
+"type": "single",
+"q": "Складне речення з підрядним <b>допусту</b> утвориться, якщо до частини <i>«Мій брат вступатиме до консерваторії …»</i> додати",
+"opts": [
+"бо він живе музикою, дихає нею.",
+"незважаючи на те що батьки проти.",
+"якщо не піде навчатися на інженера.",
+"коли відчуватиме в собі сили й натхнення."
+],
+"a": 1,
+"id": "skl.2994e"
+},
+{
+"type": "single",
+"q": "Складнопідрядним із підрядним <b>допусту</b> є речення",
+"opts": [
+"Як я малим збирався навесні піти у світ незнаними шляхами, сорочку мати вишила мені червоними і чорними нитками.",
+"Випивши зварений із червоних ягід напій, пастух став настільки бадьорим, що втома абсолютно зникла.",
+"Хоч і важко жилося молодому Франкові, проте в гімназії він виявляв феноменальні здібності.",
+"Зачарований світ за вікном проступає з нічного туману, мов подвір’я зробилося дном Океану."
+],
+"a": 2,
+"id": "skl.30d4e"
+},
+{
+"type": "match",
+"q": "Доберіть приклад до кожного виду підрядного речення.<br>Вид підрядного речення — Приклад.",
+"left": [
+"умови",
+"допусту",
+"з’ясувальне",
+"означальне"
+],
+"opts": [
+"Дорослими ви стали того дня, коли вперше по-справжньому посміялися над собою.",
+"Кажуть, що материні сльози й міцне каміння проймають.",
+"Там, де я стою, співає пташка у гаю і зірка сяє наді мною.",
+"Хоч то була ще зима, а вже сонце йшло високо.",
+"А що нам за теє братися, коли біди боятися."
+],
+"a": [
+4,
+3,
+1,
+0
+],
+"id": "skl.3114e"
+},
+{
+"type": "match",
+"q": "Доберіть приклад до кожного виду підрядного речення.<br>Вид підрядного речення — Приклад.",
+"left": [
+"умови",
+"причини",
+"з’ясувальне",
+"означальне"
+],
+"opts": [
+"Серед великої тиші чулося тільки, як шелестіли листочки.",
+"Приходь у гай, коли почне сходити сонце.",
+"Готуйтеся, люди, бо йде грудень!",
+"Дзвенить кришталеве джерело, що вийшло з глибини земної.",
+"Коли б у людства не було фантазії, було б стократ на світі важче жить."
+],
+"a": [
+4,
+2,
+0,
+3
+],
+"id": "skl.32f4e"
+},
+{
+"type": "match",
+"q": "Доберіть приклад до кожного виду підрядного речення.<br>Вид підрядного речення — Приклад.",
+"left": [
+"часу",
+"мети",
+"причини",
+"означальне"
+],
+"opts": [
+"Маючи друзів, вважай, що ти володієш скарбом.",
+"Вдома посадила жоржини я, щоб десь не ходила любов моя.",
+"Як сумно тій людині жить, яка в житті не знала суму.",
+"Не розкошуй замолоду, бо на старість будеш бідувати.",
+"Як прийшла середа, то вчепилася біда."
+],
+"a": [
+4,
+1,
+3,
+2
+],
+"id": "skl.3354e"
+},
+{"type": "single", "q": "Кому пропущено в реченні", "opts": ["Хата, що стала для мене прихистком розміщувалася вище за інші.", "Якщо молодший ні з чим не криється, старший не повинен дорікати.", "Цілком у твоїх силах зробити, щоб світ довкола став трішки кращим.", "З’являться нові машини, рушієм яких буде електромотор і водневе паливо."], "a": 0, "id": "skl.34c7e"},
+{"type": "single", "q": "Кому пропущено в реченні", "opts": ["Нас ніхто не чує, бо нас нікому почути.", "Ми забуваємо, що ліки ростуть із землі.", "Камінь, що котиться мохом не поростає.", "Ігрові шоу не такі важливі, як може здаватися."], "a": 2, "id": "skl.35c7e"},
+{"type": "single", "q": "Кому пропущено в реченні", "opts": ["Часто ми тікаємо в щоденні справи, щоб не відчувати базового незадоволення життям.", "Люди, які споживають хоча б одне яблуко на день лікарів не знають і живуть на 10 років довше.", "Сад стояв по коліна в тумані, який повільно спадав усе нижче й всотувався в землю.", "Вершник поплескав по шиї вірного товариша, що вивів його в білу зиму до України."], "a": 1, "id": "skl.36c7e"},
+{"type": "single", "q": "Кому пропущено в реченні", "opts": ["Думаю про те, хто вмикає зорі й хто їх вимикає.", "Люди носять із собою ліхтарі, щоб краще бачити.", "Якщо не знаєш, що робити роби хоч те, що можеш.", "Якщо ви хочете збирати мед, не перекидайте вулика."], "a": 2, "id": "skl.37c7e"},
+{"type": "single", "q": "Кому пропущено в реченні", "opts": ["За традицією кожний, хто переживає сильне й глибоке почуття відкриває записничок і занотовує, як довго воно тривало.", "Засідання, що відбувалося сьогодні, стало справді цікавим завдяки людині, яка стояла тепер на трибуні.", "Западає тиша, у якій вряди-годи чується порипування крісла, чиєсь покахикування чи бурчання в шлунку.", "Думою тугу розвію, щоб був я завжди таким, яким мене мати вродила й благословила в світи."], "a": 0, "id": "skl.38c7e"},
+{"type": "single", "q": "Кому пропущено в реченні", "opts": ["Ми ще не пізнали світу, у якому живемо.", "З-за дерев, які оточували озеро, проблискувало світло.", "Коли дивлюся, як на очах міняються довколишні барви, мені легшає.", "Цікаво, хто може облікувати скільки людині відведено випробувань?"], "a": 3, "id": "skl.39c7e"},
+{"type": "single", "q": "<b>Пунктуаційну помилку</b> допущено в реченні", "opts": ["Не знаю я, що буде після нас, в які природа убереться шати.", "Зернина, що лягає в ґрунт, не журиться, коли і що з неї виросте.", "Для того, щоб млинець не прилипав до сковороди, треба її змастити маслом.", "Хто хоче мати друзів, той повинен діяти, не шкодуючи сил і часу."], "a": 2, "id": "skl.40c7e"},
+{"type": "single", "q": "<b>Пунктуаційну помилку</b> допущено в реченні", "opts": ["Перед тим як сідати обідати, радимо обов’язково ретельно помити руки милом.", "І хоча життя послало йому калюжу замість океану, душа в нього була океанська.", "Бери стільки, скільки можеш підняти, інакше надірвешся й утратиш усе, що маєш.", "Незважаючи на те, що починалася буря, ми всією юрбою йшли до морського берега."], "a": 3, "id": "skl.41c7e"},
+{"type": "single", "q": "<b>Пунктуаційну помилку</b> допущено в реченні", "opts": ["Мені не шкода того, що моє і що я втрачаю…", "Доки мені Бог сил дасть і доки буду жити, буду робити…", "Є велика різниця між тими, хто розумний і хто інтелектуал.", "Пройшло немало років, як погас вогонь війни, і вичахли гармати."], "a": 3, "id": "skl.42c7e"},
+{"type": "single", "q": "Тире можна поставити на місці крапок у реченні", "opts": ["Часом здається … що життя стає легшим і простішим.", "Будинок має таємницю … про яку перехожі навіть не здогадуються.", "Якщо приїдете вчасно … зможемо сходити в парк, що на тому березі.", "Якщо ти за своє життя не посадив жодного дерева … плати за чисте повітря."], "a": 3, "id": "skl.43c7e"},
+{"type": "single", "q": "Прочитайте речення.<span class=\"quote\">Солов’ї заливисто перетьохкуються у вербах <b>(1)</b> і <b>(2)</b> коли вони тьохкають <b>(3)</b> то здається <b>(4)</b> усе на світі зникає.</span><b>НЕ ТРЕБА</b> ставити кому на місці цифри", "opts": ["1", "2", "3", "4"], "a": 1, "id": "skl.44c7e"},
+{"type": "single", "q": "Прочитайте речення.<span class=\"quote\">Ви скажіть своєму пану <b>(1)</b> що заплати не бажаю <b>(2)</b> бо <b>(3)</b> коли я що дарую <b>(4)</b> то назад не одбираю.</span><b>НЕ ТРЕБА</b> ставити кому на місці цифри", "opts": ["1", "2", "3", "4"], "a": 2, "id": "skl.45c7e"},
+{"type": "single", "q": "Виділене слово є <b>сполучником</b> у реченні", "opts": ["Щасливий, <i>хто</i> сни має милі.", "<i>Скільки</i> голів, стільки й умів.", "Виспівує та щебече, <i>поки</i> місяць зійде.", "Немає такого дерева, <i>щоб</i> на нього птиці не сідали.", "Нещасна нація, <i>котра</i> не вміє цінувати свої таланти."], "a": 3, "id": "skl.46d9"},
+{"type": "single", "q": "Виділене слово є <b>сполучником</b> у реченні", "opts": ["<i>Хоча</i> була північ, спати не хотілося.", "<i>Де</i> кров текла козацька, трава зеленіє.", "<i>Куди</i> серце летить, туди й око глядить.", "<i>Де</i> є страждання, там нема краси.", "<i>Звідки</i> ласка, звідти й казка."], "a": 0, "id": "skl.47d9"},
+{"type": "single", "q": "Виділене слово є <b>сполучником</b> у реченні", "opts": ["Та не злічить віків, <i>що</i> встигли вже пройти.", "Добре тому ковалеві, <i>що</i> на обидві руки кує.", "Не писав я до тебе в останні два дні через те, <i>що</i> був у дорозі.", "О, як потрібно вміти дорожити безцінним спадком, <i>що</i> дали віки.", "Беруть на кпини молоді міста прапращурів, <i>що</i> вийшли з неоліту."], "a": 2, "id": "skl.48d9"},
+{"type": "single", "q": "<b>Сполучне слово</b> приєднує підрядну частину до головної в реченні", "opts": ["Не знав, що любов може розтопити найчерствіше серце.", "Минуле було прожите для того, щоб ствердити майбутнє.", "А наше діло — все це прополоти, аби хоч крихту істини знайти.", "Доки людина не втратила здатності червоніти, вона ще людина.", "Якщо вибирати між красою і правдою, я вибираю красу."], "a": 3, "id": "skl.49d9"},
+{"type": "single", "q": "<b>Сполучне слово</b> приєднує підрядну частину до головної в реченні", "opts": ["Коли в похід виходила батава, її піснями плакала Полтава.", "Як не буде птахів, то й людське серце стане черствим.", "Якби мені, мамо, намисто, то пішла б я завтра в місто.", "Я воскрес, щоб із вами жити під шаленством весняних злив.", "Твій дух не став принизеним і плоским, хоч слала доля чорні килими."], "a": 0, "id": "skl.50d9"},
+{"type": "single", "q": "<b>Сполучне слово</b> приєднує підрядну частину до головної в реченні", "opts": ["Ця подорож неждана, як грім на сніжній рівнині.", "А може, то така правда, як на вербі груші.", "Темрява прозора, як буває перед сходом місяця.", "Як немає чого їсти, то й святий збунтує.", "Розкажи мені, зоре, як правильно жити."], "a": 4, "id": "skl.51d9"},
+{"type": "single", "q": "Складне речення з підрядним <b>означальним</b> утвориться, якщо серед варіантів продовження речення <i>«Стали спускатися в темний яр …»</i> вибрати", "opts": ["коли почало сходити золоте сонце.", "хоч нас умовляли цього не робити.", "що давно обріс цікавими легендами.", "щоб сховатися від пекучого сонця.", "аби до вечора повернутися додому."], "a": 2, "id": "skl.52d9"},
+{"type": "single", "q": "Складнопідрядним з <b>означальною</b> частиною є речення", "opts": ["І де в світі тая сила, щоб в бігу його спинила..?", "Море так бадьоро хлюпає, що аж слухати любо.", "Так літував Іван у полонині, аж доки вона не спустіла.", "Благословен, чий труд прекрасний життя здіймає із руїн.", "Де літо маки стеле килимами, дитя в городі ходить коло мами."], "a": 0, "id": "skl.53d9"},
+{"type": "single", "q": "Складнопідрядним з <b>означальною</b> частиною є речення", "opts": ["Якби оті проміння золоті у струни чарами якими обернути, я б з них зробила золотую арфу.", "Смереки так тісно збилися, що важко було проходити між їхніми шершавими пнями.", "А там, де сонце торкнулося вершечків дерев, листя спалахнуло золото-зеленим вогнем і стало прозорим.", "Ми знали велике озеро, де щороку гуси восени спинялися й жили тижнів зо два, а то й більше.", "Вночі, коли вся природа спить, поринувши в темряву й немогу, лише людина вміє освітити свою домівку і свою дорогу."], "a": 3, "id": "skl.54d9"},
+{"type": "single", "q": "Складне речення з підрядним <b>з’ясувальним</b> утвориться, якщо серед варіантів продовження речення <i>«Мабуть, почну писати …»</i> вибрати", "opts": ["коли настане слушна мить.", "якщо наполягатимуть друзі.", "як велить чисте сумління.", "про що мовчить більшість.", "хоча на творчість немає часу."], "a": 3, "id": "skl.55d9"},
+{"type": "single", "q": "Складнопідрядним із <b>з’ясувальною</b> частиною є речення", "opts": ["Література, яка мала Тичину й Довженка, не має права здрібніти.", "Спинюсь я і довго буду слухать, як бродить серпень по землі моїй.", "І як за сонцем повертає сонях, так довго вслід чомусь дивились ми.", "Хоча на історії дід і не знався, та все ж із ним цікаво було побалакати.", "Мирон бережно підступав до станції, де вже потяга не було."], "a": 1, "id": "skl.56d9"},
+{"type": "single", "q": "Складнопідрядним зі <b>з’ясувальною</b> частиною є речення", "opts": ["Дуже любив професор, коли перед Зеленими святами дівчата приходили в плавні зілля збирати та квіти для вінків.", "На лисицю найвигідніше полювати взимку, коли земля натягне на себе біло-біле та пухку-пухку ковдру.", "Мій перший вірш написаний в окопі, на тій сипкій од вибухів стіні, коли згубило зорі моє дитинство, вбите на війні.", "Повітря було настільки прозоре, що з табору видно було чорне пожарище на південному схилі.", "Ці місця стали дорогими для них уже тому, що тут ходили їхні хлопці, тут заліковували свої рани, звідси писали дівчатам листи."], "a": 0, "id": "skl.57d9"},
+{"type": "single", "q": "Складне речення з підрядним обставинним <b>способу дії</b> утвориться, якщо серед варіантів продовження речення <i>«Так вийшло …»</i> вибрати", "opts": ["оскільки клей наносили нерівномірно.", "хоч ніхто й не сподівався на перемогу.", "бо створене власними руками дороге.", "що аж земля навколо здригається.", "як кожний із нас і планував."], "a": 4, "id": "skl.58d9"},
+{"type": "single", "q": "Складнопідрядним із підрядною частиною <b>способу дії</b> є речення", "opts": ["Як парость виноградної лози, плекайте мову.", "Моєму серцю снишся ти, як морю сняться урагани.", "Розливається кров і по жилах тече, ніби пахне вона лободою.", "На рідні землі січі вертають, щоб сіяти святе своє зерно.", "Зроби так, щоб серце моє солов’їне забуло очей тих блакить."], "a": 4, "id": "skl.59d9"},
+{"type": "single", "q": "Складнопідрядним із підрядною частиною <b>способу дії</b> є речення", "opts": ["Малі дерева схожі на дорослих, як діти на своїх батьків.", "Серед великої тиші чулося тільки, як шелестіли листочки.", "Умій жити так, щоб у тебе з другом була єдність духу, ідеалів.", "Я лиш інструмент, у якому плачуть сни мого народу.", "Люблю, коли хвилі юрбою шумують, ламаючи лід."], "a": 2, "id": "skl.60d9"},
+{"type": "single", "q": "Складне речення з підрядним обставинним <b>міри і ступеня</b> утвориться, якщо серед варіантів продовження речення <i>«Вдарив грім …»</i> вибрати", "opts": ["коли сонце заховалося за хмару.", "хоча негоди прогноз не обіцяв.", "так що птахи вмить розлетілися.", "що аж шибки затряслися в домі.", "якого ой як чекали в таку посуху."], "a": 3, "id": "skl.61d9"},
+{"type": "single", "q": "Складнопідрядним із підрядною частиною <b>міри і ступеня</b> є речення", "opts": ["Стара верба від старості зомліла, забула, що сказав їй водяник.", "За все, що взяв від пирога життя, платити доведеться по рахунку.", "Лани зеленого збіжжя, що саме красувалося в той час, дрімали тихої ночі.", "Цвіте липа так буйно й розкішно, що все місто плаває в задумливому мареві.", "Ти ніяк не можеш зрозуміти, що без науки неможливий розвиток суспільства."], "a": 3, "id": "skl.62d9"},
+{"type": "single", "q": "Складнопідрядним із підрядною частиною <b>міри і ступеня</b> є речення", "opts": ["Я знову згадав ті хвилини, що душу п’янили мою.", "Міста ми бачили, де котиться з узбіч хвилястий виноград.", "Настав час, коли вечірній сутінок швидко западає в нічний.", "І що глибше за пагорби поринало сонце, то нижчою ставала заграва.", "Поки геній стоїть, витираючи сльози, метушлива бездарність отари свої пасе."], "a": 3, "id": "skl.63d9"},
+{"type": "single", "q": "Складне речення з підрядним обставинним <b>порівняльним</b> утвориться, якщо серед варіантів продовження речення <i>«Сестра розповідала …»</i> вибрати", "opts": ["як хвилюється в шторм море.", "ніби в нашому ставку живе сом.", "ніби солов’їха в гаю щебетала.", "як краще готувати великодню паску.", "наче підручники видаватимуть завтра."], "a": 2, "id": "skl.64d9"},
+{"type": "single", "q": "Складнопідрядним із підрядною <b>порівняльною</b> частиною є речення", "opts": ["Дівчина, обсипана квітами, іде, немов пливе лебедонька.", "І вже чув композитор, як народжується пісня.", "Коли в людини є народ, тоді вона уже людина.", "Вода стояла на луках, скільки бачило око.", "Як не знаєш правди до кінця, то й не мудруй."], "a": 0, "id": "skl.65d9"},
+{"type": "single", "q": "Складнопідрядним із підрядною <b>порівняльною</b> частиною є речення", "opts": ["Згадайте в поспіху вагона, в невідворотності звикань, як рафаелівська Мадонна у вічі дивиться віками!", "Як без раннього світання день не піде на полях, так без першого навчання до наук закритий шлях.", "Очі спостерігали, як подячно зітхає земля, звільнена від бур’янів, глибоко зорана, розпушена.", "З дороги видно було, як вився в низині кривульками глибокий та каламутний Прут.", "Ми держалися за руки, підняли догори голови та слухали, як грають у цвіту бджоли."], "a": 1, "id": "skl.66d9"},
+{"type": "single", "q": "Складне речення з підрядним обставинним <b>місця</b> утвориться, якщо частину <i>«де кує зозуля»</i> поставити на місце пропуску в реченні", "opts": ["У гаю, … , свято весни вповні.", "Чекай мене біля ставу, … .", "У тих місцях пісні, … , ліризм посилюється.", "Виглядатиму тебе, … .", "Вислів … є двоскладним реченням."], "a": 3, "id": "skl.67d9"},
+{"type": "single", "q": "Складнопідрядним із підрядною частиною <b>місця</b> є речення", "opts": ["Біля ставка, де ми прощалися, нам випало зустрітися після довгої розлуки.", "А там, де береза витісняла сосну, усе залите було бенгальським вогнем.", "Біля осокорів, де він зустрів свою долю, загримів гарматний грім.", "А на тому місці, де стояла тінь, іскрило сонце широкою плямою.", "Ти борися за луг зелений, де колись виглядав свою милу."], "a": 1, "id": "skl.68d9"},
+{"type": "single", "q": "Складнопідрядним із підрядною частиною <b>місця</b> є речення", "opts": ["Мені на сірому причалі, де стільки злизано слідів, такого море намовчало в своїй одвертості сліпій.", "А крило моє травневе повертає до весни, де на третім полустанку прокидається жасмин.", "На старому забутому звалі, де одвічно сивів полин, в чистій радості, в білій печалі кораблятами вишні пливли.", "Чи, може, це ввижається мені той несказанний камертон природи, де зорі ясні і де тихі води?", "Я іду туди, де мене чекає вільний степ, тихі задумливі озера, пісні на чумацьких дорогах і сміх безтурботних селянок."], "a": 4, "id": "skl.69d9"},
+{"type": "single", "q": "Складне речення з підрядним обставинним <b>часу</b> утвориться, якщо частину <i>«коли випікають паску»</i> поставити на місце пропуску в реченні", "opts": ["Я дуже люблю день, … .", "Відчуття свята посилюється, … .", "Нагадай час, … .", "Речення … неускладнене.", "Завжди збираємося того вечора, … ."], "a": 1, "id": "skl.70d9"},
+{"type": "single", "q": "Складнопідрядним із підрядною частиною <b>часу</b> є речення", "opts": ["Добре, коли чоловік із характером, з переконанням і хмелем неспокою.", "Які б то звуки розігнулись, коли б ви дивних струн торкнулись!", "Нас оточує воркування струмків, коли ми опиняємося в долинці.", "Яке це щастя, коли стіл довгий і тісно за ним від рідні.", "Навіщо мені весна, коли твої очі — пролиски?"], "a": 2, "id": "skl.71d9"},
+{"type": "single", "q": "Складнопідрядним із підрядною частиною <b>часу</b> є речення", "opts": ["Як сьогодні пам’ятаю той день в інституті, коли нам, новоспеченим учителям історії, давали призначення.", "У нас тільки в березні після хуртовини бувають оті несподівано дивовижні дні, коли природа якимсь одним пристрасно-чародійним завершенням поєднує небо й землю.", "А як вечір срібними човнами пропливе між парами в саду, над твоїми чистими думками зіркою щасливою зійду.", "Осіннє сонце, що надвечір спромоглося продерти хмари, схилялося над обрієм і сіяло своє золотаве насіння у вогку землю.", "Благословенна будь та вічна мить, коли йому на думку спала така ідея."], "a": 2, "id": "skl.72d9"},
+{"type": "single", "q": "Складне речення з підрядним обставинним <b>причини</b> утвориться, якщо частину <i>«не можу писати віршів»</i> поставити на місце пропуску в реченні", "opts": ["Коли настає темна ніч … .", "… , адже Муза від мене далеко.", "… , у яких немає душі й ритму.", "Якщо немає натхнення … .", "… , хоч як мене не просіть."], "a": 1, "id": "skl.73d9"},
+{"type": "single", "q": "Складнопідрядним із підрядною частиною <b>причини</b> є речення", "opts": ["Хоча була ще зима, але в газетах дедалі частіше писали про підготовку до посівної.", "Коли я смуток свій на струни клала, з’явилась ціла зграя красних мрій.", "Вигострю, виточу зброю іскристу, скільки достане снаги мені й хисту.", "На морі ставало темно, тому що з берега насувалася важка чорна хмара.", "Дедалі важче знаходити квіти, мед яких обіцяє бути цілющим."], "a": 3, "id": "skl.74d9"},
+{"type": "single", "q": "Складнопідрядним із підрядною частиною <b>причини</b> є речення", "opts": ["Настрілявшись, поверталися ми щасливі, дарма що промахів чимало нас було.", "Після дощу вода в бухті скаламутніла, бо в неї з острова нанесло намулу.", "Настане час, коли на кордонах люди сіятимуть хліб!", "Та не злічить віків, що встигли вже пройти.", "Наговорив стільки, що й у шапку не забереш."], "a": 1, "id": "skl.75d9"},
+{"type": "single", "q": "Складне речення з підрядним обставинним <b>мети</b> утвориться, якщо частину <i>«повертаюся додому»</i> поставити на місце пропуску в реченні", "opts": ["Як тільки велике свято … .", "… так що готуйте, мамо, вечерю.", "Коли тяжко на душі … .", "… аби розвіяти сум і тривогу.", "… бо рідна кличе сторона."], "a": 3, "id": "skl.76d9"},
+{"type": "single", "q": "Складнопідрядним із підрядною частиною <b>мети</b> є речення", "opts": ["Я Нептуну пів копи грошей в руку суну, аби на морі шторм утих.", "Якби лелека голосом озвався, то грек, мабуть, не дуже б здивувався.", "Я нічого не вартий, якщо не в спромозі комусь допомогти.", "Якби я турбувався лиш про себе, вже б онімів давно від самоти.", "Не стануть святами ніколи будні, хоч як би там не мудрували трутні."], "a": 0, "id": "skl.77d9"},
+{"type": "single", "q": "Складнопідрядним із підрядною частиною <b>мети</b> є речення", "opts": ["Досить бути люблени́м хоч би однією людиною, щоб почувати себе щасливим.", "Дарма що стояло тихе, сонячне безвітря, листя тріпотіло на деревах уздовж шляху.", "Щовечора, як зіронька сходить, молодая дівчинонька в садочок виходить.", "Отже, уже не мертвий ліс, бо лебеді принесли на своїх крилах весну й життя!", "Пам’ять могла б убити нас, коли б людина не мала рятівної властивості забувати."], "a": 0, "id": "skl.78d9"},
+{"type": "single", "q": "Складне речення з підрядним обставинним <b>умови</b> утвориться, якщо серед варіантів продовження речення <i>«Поспієш на обід …»</i> вибрати", "opts": ["хоч і часу зовсім мало.", "адже ще часу доволі багато.", "так що голодним не залишишся.", "бо час трапези перенесли.", "коли вдосвіта вийдеш."], "a": 4, "id": "skl.79d9"},
+{"type": "single", "q": "Складнопідрядним із підрядною частиною <b>умови</b> є речення", "opts": ["Людина в небезпеці, коли вона бездуховна.", "Не знаю, коли весна на крилах тепло принесе в наш край.", "Багаття вималювало постаті людей, коли вогонь розгорався яскравіше.", "Найбільше люблю пору, коли збирають жнива й співають пісень.", "Коли мене на фронт ти проводжала, пучок конвалій ти мені дала."], "a": 0, "id": "skl.80d9"},
+{"type": "single", "q": "Складнопідрядним із підрядною частиною <b>умови</b> є речення", "opts": ["І коли я по рідній стежинці в отчий дім повертаю здаля, зустрічають мене чорнобривці і сміється батьківська земля.", "Якщо справді все описане для майбутнього фільму не знадобиться, тоді краще першу частину кінокартини почнемо з пісні.", "Уже зоря золоторога, де полинами зацвіло, кладе на огненні пороги своє сивіюче крило.", "День був душний, незважаючи на те що краплі вчорашнього рясного дощу іскрилися на траві.", "Люблю я ті часи, як сонце вже встає і промінь свій прозорий на села, на поля так вільно, ніжно лле."], "a": 1, "id": "skl.81d9"},
+{"type": "single", "q": "Складне речення з підрядним обставинним <b>наслідку</b> утвориться, якщо серед варіантів продовження речення <i>«Густо ріс очерет …»</i> вибрати", "opts": ["що на березі навпроти старого лісу.", "так що тяжко було крізь нього пробиратися.", "що навесні ще був зовсім рідесенький.", "що аж не видно було великої річки.", "дарма що вода від берега давно відступила."], "a": 1, "id": "skl.82d9"},
+{"type": "single", "q": "Складнопідрядним із підрядною частиною <b>наслідку</b> є речення", "opts": ["Так гарно тут, що шкода ступати по непорочній сніговій білині.", "Клянусь боротись до загину так, як боролись батьки.", "Грім розмахнувся — і вдарив так, що здригнулася бджола.", "Погода стояла сонячна, так що шибки на вікнах миготіли.", "Мені чогось сумно й боязно так, що аж серце моє мре."], "a": 3, "id": "skl.83d9"},
+{"type": "single", "q": "Складнопідрядним із підрядною частиною <b>наслідку</b> є речення", "opts": ["За високою стрункою дзвіницею, що так поривається вгору, десь у білому підхмар’ї зникають лебеді.", "Ота весняна золота бджілка вкинула в хату щось таке, від чого білі стіни під низькою стелею всміхнулися.", "Край неба на сході помітно світлішає, так що в ньому вже можна розпізнати сіру пелену розірваних вітром хмар.", "Від маяка в море простягалася піщана коса, яка закінчувалася довгою грядою підводного каміння.", "У зарості парку вкралося озеро, що було притулком тиші й суму для кількох білих скульптур над водою."], "a": 2, "id": "skl.84d9"},
+{"type": "single", "q": "Складне речення з підрядним обставинним <b>допустовим</b> утвориться, якщо серед варіантів продовження речення <i>«У змаганнях ти обов’язково переможеш …»</i> вибрати", "opts": ["адже тренуєшся дні і ночі.", "якщо до мети йтимеш упевнено.", "коли докладатимеш усіх зусиль.", "так що готуйся до чемпіонату.", "хай як не стараються твої суперники."], "a": 4, "id": "skl.85d9"},
+{"type": "single", "q": "Складнопідрядним із підрядною <b>допустовою</b> частиною є речення", "opts": ["Щоб перебудувати світ, треба бути сміливим і сильним.", "Тепла ще не було, дарма що минуло кілька днів березня.", "Поки мати страву носила, батько став частувати старостів.", "Посідаю саме те місце, яке мені визначила доля, і не прагну кращого.", "Мабуть, тому що село біля річки близько, таке все свіже, зелене та яскраве."], "a": 1, "id": "skl.86d9"},
+{"type": "single", "q": "Складнопідрядним із підрядною <b>допустовою</b> частиною є речення", "opts": ["Молоді чорняві скрипалі позакидали назад голови так, що на них ледве трималися шапки.", "Хіба на Поділлі може народитися людина, яку б обминула пісенна стихія, щира вдача?", "Справжній письменник повинен прагнути до того, щоб читачі глянули на себе, на свій народ його очима.", "Хоча земля ще й не висохла після дощу, проте косарі, поспішаючи впоратися з урожаєм, уже таборилися.", "Як тільки вийдеш за поріг, лишивши рідний клас, немало сонячних доріг тобі розкриє час."], "a": 3, "id": "skl.87d9"},
+{"type": "match", "q": "Установіть відповідність.<br>Підрядне речення — Приклад.", "left": ["обставинне допустове", "обставинне умови", "обставинне місця", "обставинне міри і ступеня"], "opts": ["Куди голова задумає, туди ноги понесуть.", "Що темніша ніч, то яскравіші в ній маяки.", "Коли терпінню приходить край, народ мов буря.", "Держімося землі, бо земля держить нас.", "Не бійся правди, хоч вона гірка."], "a": [4, 2, 0, 1], "id": "skl.88d9"},
+{"type": "match", "q": "Установіть відповідність.<br>Підрядне речення — Приклад.", "left": ["означальне", "з’ясувальне", "обставинне наслідку", "обставинне мети"], "opts": ["Народ, що не знає своєї історії, є народом сліпців.", "Я сідаю на горбик зігрітий, щоб ключі журавлині зустріти.", "Струни чекають, щоб пальці торкнулись до них.", "Дарма що сніг хрумкотить під ногами, але весна своє бере.", "Дощ тут випав менший, так що ледве прибив пил."], "a": [0, 2, 4, 1], "id": "skl.89d9"},
+{"type": "match", "q": "Установіть відповідність.<br>Підрядне речення — Приклад.", "left": ["обставинне часу", "обставинне причини", "обставинне умови", "обставинне міри і ступеня"], "opts": ["Украй стривожилась земля, коли в похід послали атом.", "Стояли двоє посеред весни там, де вербичка віття нахилила.", "Що більший поет, то глибша його творчість.", "Як рясно квітує горобина, то добрий буде урожай вівса.", "Журяться квіти, що на світанні скоро їх укриють сніги, білі сніги."], "a": [0, 4, 3, 2], "id": "skl.90d9"},
+{"type": "match", "q": "Установіть відповідність.<br>Підрядне речення — Приклад.", "left": ["обставинне допустове", "обставинне мети", "з’ясувальне", "означальне"], "opts": ["У гущині заростей, де повітря стояло непорушно, було душно.", "Мабуть, солов’ї знають, де весна зимує.", "А де нема любові і страждання, там не живе, не б’ється і життя.", "Щоб прийшло на землю сподіване щастя, треба великої праці.", "Я відкриваю світ собі щодня, хоч, може, він стократ уже відкритий."], "a": [4, 3, 1, 0], "id": "skl.91d9"},
+{"type": "match", "q": "Установіть відповідність.<br>Частина речення — Підрядне речення.", "left": ["Проспівай мені ту пісню, що … .", "Було холодно, дарма що … .", "Не знає спокою, хто … .", "Вода в Дніпрі піднялася, так що … ."], "opts": ["обставинне допустове", "обставинне порівняльне", "обставинне наслідку", "означальне", "з’ясувальне"], "a": [3, 0, 4, 2], "id": "skl.92d9"},
+{"type": "match", "q": "Установіть відповідність.<br>Частина речення — Підрядне речення.", "left": ["… працював, хоч і … .", "… прийшла, щоб … .", "… зіщулився, бо … .", "… напишу, якщо … ."], "opts": ["обставинне допустове", "обставинне міри і ступеня", "обставинне мети", "обставинне причини", "обставинне умови"], "a": [0, 2, 3, 4], "id": "skl.93d9"},
+{"type": "single", "q": "Відокремленим означенням <b>НЕ МОЖНА</b> замінити підрядну частину в реченні", "opts": ["Донька завжди вибирає кекси, які густо посипані цукровою пудрою.", "Перед гостями стояв стіл, який застелили вишитою скатертиною.", "Люблю читати книжки, які створено за реальними подіями.", "Ми гуляли в садку, що колись посадили наші батьки.", "Верба — дерево, яке росте переважно біля водойм."], "a": 4, "id": "skl.94d9"},
+{"type": "single", "q": "<b>Відокремленою обставиною</b> можна замінити підрядну частину в реченні", "opts": ["Якщо хочеш досягнути успіху, постійно працюй над собою.", "Коли ми повернули за ріг кінотеатру, з неба почав падати сніг.", "Куплю діодні лампи, бо вони економніші й довше слугують.", "Коли прочитаєте новелу, дайте відповідь на дев’ять запитань.", "Ми часто запізнюємося, бо на дорогах Києва багато заторів."], "a": 3, "id": "skl.95d9"}
+];
+
+const POOL_BY_ID = {};
+BANK.forEach(function(q){ POOL_BY_ID[q.id] = q; });
+
+const LETTERS = ["А","Б","В","Г","Д","Е"];
+const LOG_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzDs5WkG3yAOIFbj4BEvTczkCynEAkhIja0ThB3LGtpXerg2pUdtcX1AzDTisH_v36k/exec";
+
+const URLP = new URLSearchParams(location.search);
+const TEACHER = URLP.get('vchytel') === '1';
+const SAMPLED = !!CFG.testSize && CFG.testSize < BANK.length;
+const SET_SIZE = SAMPLED ? CFG.testSize : BANK.length;
+const NEW_LABEL = SAMPLED ? '🔄 Нові питання' : '↻ Пройти ще раз';
+
+function logToSheet(payload){
+  try{
+    return fetch(LOG_WEBAPP_URL, {
+      method: 'POST',
+      headers: {'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    }).then(function(resp){ return resp.ok; }).catch(function(){ return false; });
+  }catch(e){
+    return Promise.resolve(false);
+  }
+}
+
+function pluralZ(n){
+  if(n%10===1 && n%100!==11) return n+" завдання";
+  if(n%10>=2 && n%10<=4 && (n%100<10||n%100>=20)) return n+" завдання";
+  return n+" завдань";
+}
+
+// ---------------- ДЗ: ?hw=17 (з 17-го до кінця) або ?hw=22-28,36-46 (лише ці) ----------------
+function parseHwSpec_(raw){
+  if(!raw) return null;
+  raw = raw.trim();
+  if(/^\d+$/.test(raw)) return { type:'from', start: parseInt(raw,10) };
+  const set = new Set();
+  raw.split(',').forEach(function(part){
+    part = part.trim();
+    if(!part) return;
+    const m = part.match(/^(\d+)\s*-\s*(\d+)$/);
+    if(m){
+      let a = parseInt(m[1],10), b = parseInt(m[2],10);
+      if(a > b){ const t=a; a=b; b=t; }
+      for(let n=a; n<=b; n++) set.add(n);
+    } else {
+      const n = parseInt(part,10);
+      if(!isNaN(n)) set.add(n);
+    }
+  });
+  return set.size ? { type:'subset', numbers: Array.from(set).sort(function(a,b){return a-b;}) } : null;
+}
+const _hwParam = URLP.get('hw');
+const _hwSpec = parseHwSpec_(_hwParam);
+
+// ---------------- Стан ----------------
+let chosenIds = [];      // id завдань цієї добірки (у порядку показу)
+let FULL = [];           // повна добірка
+let QUESTIONS = [];      // те, що показуємо (з урахуванням ?hw=)
+let _hwStartIdx = 0;
+let qIdx = 0;
+let answers = {};        // { i: {picked} | {picks:[...]} , checked? }
+let flags = {};
+let studentName = "";
+let started = false;
+let reportSent = false;
+let finished = false;
+let reviewMode = false;  // сторінку відкрито за посиланням «розбір відповідей»
+let selfReview = false;  // учень після завершення переглядає свої відповіді
+let sending = false;
+
+function shuffle_(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    const t=a[i]; a[i]=a[j]; a[j]=t;
+  }
+  return a;
+}
+
+function pickIds_(avoid){
+  const av = new Set(avoid || []);
+  if(!SAMPLED) return BANK.map(function(q){ return q.id; });
+  const topics = Array.from(new Set(BANK.map(function(q){ return q.topic || ''; })));
+  if(topics.length < 2){
+    const ids = BANK.map(function(q){ return q.id; });
+    const fresh = ids.filter(function(id){ return !av.has(id); });
+    const rest = ids.filter(function(id){ return av.has(id); });
+    return shuffle_(shuffle_(fresh).concat(shuffle_(rest)).slice(0, SET_SIZE));
+  }
+  // рівномірно по темах: по одному з кожної теми, потім другі кола...
+  const byTopic = topics.map(function(t){
+    const all = BANK.filter(function(q){ return (q.topic||'') === t; }).map(function(q){ return q.id; });
+    const fresh = all.filter(function(id){ return !av.has(id); });
+    return shuffle_(fresh.length ? fresh : all);
+  });
+  let order = shuffle_(byTopic.map(function(_, i){ return i; }));
+  const out = [];
+  while(out.length < SET_SIZE && byTopic.some(function(a){ return a.length; })){
+    for(let k=0; k<order.length && out.length<SET_SIZE; k++){
+      const arr = byTopic[order[k]];
+      if(arr.length) out.push(arr.pop());
+    }
+    order = shuffle_(order);
+  }
+  return shuffle_(out);
+}
+
+function buildView_(){
+  QUESTIONS = FULL.map(function(q, i){ return Object.assign({}, q, {origIndex: i}); });
+  _hwStartIdx = 0;
+  if(_hwSpec){
+    if(_hwSpec.type === 'subset'){
+      const f = _hwSpec.numbers.map(function(n){ return QUESTIONS[n-1]; }).filter(Boolean);
+      if(f.length) QUESTIONS = f;
+    } else if(_hwSpec.type === 'from'){
+      if(_hwSpec.start >= 1 && _hwSpec.start <= QUESTIONS.length) _hwStartIdx = _hwSpec.start - 1;
+    }
+  }
+}
+function buildFromIds_(ids){
+  chosenIds = ids.filter(function(id){ return POOL_BY_ID[id]; });
+  FULL = chosenIds.map(function(id){ return POOL_BY_ID[id]; });
+  buildView_();
+}
+function resetAttempt_(){
+  answers = {}; flags = {}; qIdx = _hwStartIdx;
+  finished = false; reportSent = false; selfReview = false;
+  window.__sel = null;
+}
+
+// ---------------- Прогрес (localStorage) ----------------
+function progressKey_(){
+  return 'quizProgress::' + location.pathname + '::' + studentName + (TEACHER ? '::teacher' : '');
+}
+function saveProgress_(){
+  if(reviewMode) return;
+  try{
+    localStorage.setItem(progressKey_(), JSON.stringify({
+      answers: answers, flags: flags, qIdx: qIdx, finished: finished, reportSent: reportSent,
+      chosenIds: chosenIds, hw: _hwParam || '', ts: Date.now()
+    }));
+  }catch(e){}
+}
+function loadProgress_(){
+  try{
+    const raw = localStorage.getItem(progressKey_());
+    if(!raw) return null;
+    const d = JSON.parse(raw);
+    if(!Array.isArray(d.chosenIds) || !d.chosenIds.length) return null;
+    if(!d.chosenIds.every(function(id){ return POOL_BY_ID[id]; })) return null; // банк змінився
+    return d;
+  }catch(e){ return null; }
+}
+function startOrRestore_(){
+  const saved = loadProgress_();
+  if(saved){
+    let ids = saved.chosenIds, grew = false;
+    if(!SAMPLED){
+      // тест без вибірки: завжди всі завдання банку (нові додаємо в кінець, старі відповіді зберігаються)
+      const have = new Set(ids);
+      const extra = BANK.map(function(q){ return q.id; }).filter(function(id){ return !have.has(id); });
+      if(extra.length){ ids = ids.concat(extra); grew = true; }
+    }
+    buildFromIds_(ids);
+    if((saved.hw || '') === (_hwParam || '')){
+      answers = saved.answers || {};
+      flags = saved.flags || {};
+      qIdx = typeof saved.qIdx === 'number' ? saved.qIdx : _hwStartIdx;
+      finished = !!saved.finished;
+      reportSent = !!saved.reportSent;
+      if(grew){ finished = false; reportSent = false; }
+    } else {
+      // інше ДЗ — та сама добірка, але спроба починається спочатку
+      resetAttempt_();
+    }
+  } else {
+    buildFromIds_(pickIds_([]));
+    resetAttempt_();
+    saveProgress_();
+  }
+}
+
+function getStoredName(){ try{ return localStorage.getItem('student_name'); }catch(e){ return null; } }
+function setStoredName(n){ try{ localStorage.setItem('student_name', n); }catch(e){} }
+function clearStoredName(){ try{ localStorage.removeItem('student_name'); }catch(e){} }
+
+// ---------------- Підрахунок ----------------
+function isP_(v){ return v !== null && v !== undefined; }
+function maxPts_(q){ return q.type === 'match' ? q.left.length : 1; }
+function earnedPts_(q, rec){
+  if(!rec) return 0;
+  if(q.type === 'match') return (rec.picks || []).filter(function(p,k){ return isP_(p) && p === q.a[k]; }).length;
+  return rec.picked === q.a ? 1 : 0;
+}
+function answeredPts_(q, rec){
+  if(!rec) return 0;
+  if(q.type === 'match') return (rec.picks || []).filter(isP_).length;
+  return isP_(rec.picked) ? 1 : 0;
+}
+function isComplete_(q, rec){ return answeredPts_(q, rec) === maxPts_(q); }
+
+function scoreOverall(){
+  let correct=0, answered=0, total=0, answeredQ=0;
+  QUESTIONS.forEach(function(q,i){
+    const rec = answers[i];
+    total += maxPts_(q);
+    correct += earnedPts_(q, rec);
+    answered += answeredPts_(q, rec);
+    if(isComplete_(q, rec)) answeredQ++;
+  });
+  return {correct:correct, answered:answered, total:total, answeredQ:answeredQ, totalQ:QUESTIONS.length};
+}
+
+function hasTopics_(){
+  return new Set(QUESTIONS.map(function(q){ return q.topic || ''; })).size > 1;
+}
+function topicStats_(){
+  const order = [], map = {};
+  QUESTIONS.forEach(function(q,i){
+    const t = q.topic || '';
+    if(!map[t]){ map[t] = {topic:t, ok:0, total:0}; order.push(t); }
+    map[t].total += maxPts_(q);
+    map[t].ok += earnedPts_(q, answers[i]);
+  });
+  return order.map(function(t){ return map[t]; });
+}
+
+function renderOpt(o){
+  return String(o).replace(/\[\[([^\]]+)\]\]/g, '<u>$1</u>');
+}
+function stripTags_(s){ return String(s).replace(/<[^>]*>/g,''); }
+function showCorrectFor_(rec){
+  return reviewMode || selfReview || (TEACHER && rec && rec.checked);
+}
+function ansStr_(q){
+  return q.type === 'match'
+    ? q.a.map(function(x,i){ return (i+1) + '–' + LETTERS[x]; }).join(', ')
+    : LETTERS[q.a];
+}
+
+// ---------------- Посилання «розбір відповідей» ----------------
+// ?review=1&name=..&qset=id1,id2,..&ans=0-2,1-0.3._.1,..&flags=..&hw=..
+function encRec_(q, rec){
+  if(!rec) return null;
+  if(q.type === 'match'){
+    const picks = rec.picks || [];
+    if(!picks.some(isP_)) return null;
+    return picks.map(function(p){ return isP_(p) ? p : '_'; }).join('.');
+  }
+  return isP_(rec.picked) ? String(rec.picked) : null;
+}
+function buildReviewLink(){
+  const pairs = [];
+  QUESTIONS.forEach(function(q,i){
+    const e = encRec_(q, answers[i]);
+    if(e !== null) pairs.push(i + '-' + e);
+  });
+  const flagStr = Object.keys(flags).filter(function(i){ return flags[i]; }).join(',');
+  let url = location.origin + location.pathname + '?review=1&name=' + encodeURIComponent(studentName)
+    + '&qset=' + encodeURIComponent(chosenIds.join(',')) + '&ans=' + pairs.join(',');
+  if(flagStr) url += '&flags=' + flagStr;
+  if(_hwParam) url += '&hw=' + encodeURIComponent(_hwParam);
+  return url;
+}
+function parseReviewParam(){
+  if(URLP.get('review') !== '1') return false;
+  const qset = URLP.get('qset');
+  if(!qset) return false;
+  buildFromIds_(qset.split(','));
+  if(!QUESTIONS.length) return false;
+
+  studentName = URLP.get('name') || 'Учень';
+  answers = {};
+  const ansParam = URLP.get('ans') || '';
+  ansParam.split(',').forEach(function(pair){
+    if(!pair) return;
+    const dash = pair.indexOf('-');
+    if(dash < 0) return;
+    const i = Number(pair.slice(0, dash));
+    const v = pair.slice(dash + 1);
+    if(isNaN(i) || i < 0 || i >= QUESTIONS.length) return;
+    const q = QUESTIONS[i];
+    if(q.type === 'match'){
+      const picks = v.split('.').map(function(s){ return s === '_' ? null : Number(s); });
+      if(picks.length !== q.left.length) return;
+      answers[i] = {picks: picks};
+    } else {
+      const picked = Number(v);
+      if(isNaN(picked)) return;
+      answers[i] = {picked: picked};
+    }
+  });
+  flags = {};
+  const fp = URLP.get('flags');
+  if(fp) fp.split(',').forEach(function(s){ const i = Number(s); if(!isNaN(i)) flags[i] = true; });
+
+  started = true; reviewMode = true; finished = false; qIdx = 0;
+  return true;
+}
+
+// ---------------- Надсилання вчительці ----------------
+async function sendTelegramReport(note){
+  const sc = scoreOverall();
+  const wrongList = [], flaggedList = [];
+  QUESTIONS.forEach(function(q,i){
+    const rec = answers[i];
+    const num = q.origIndex + 1;
+    if(q.type === 'match'){
+      if(rec){
+        const wr = [];
+        q.left.forEach(function(w,k){
+          const p = (rec.picks || [])[k];
+          if(isP_(p) && p !== q.a[k]) wr.push(stripTags_(w));
+        });
+        if(wr.length) wrongList.push(num + ' (' + wr.join(', ') + ')');
+      }
+    } else if(rec && isP_(rec.picked) && rec.picked !== q.a){
+      wrongList.push(num);
+    }
+    if(flags[i]) flaggedList.push(num);
+  });
+  const payload = {
+    type: "quiz_result",
+    student: studentName,
+    testName: CFG.testName,
+    correct: sc.correct, answered: sc.answered, total: sc.total,
+    wrongList: wrongList,
+    flaggedList: flaggedList,
+    reviewLink: buildReviewLink()
+  };
+  if(hasTopics_()){
+    payload.topics = topicStats_().map(function(t){ return t.topic + ': ' + t.ok + '/' + t.total; }).join('; ');
+  }
+  if(note) payload.note = note;
+  return await logToSheet(payload);
+}
+
+async function sendFromDoneScreen_(){
+  if(sending) return;
+  sending = true;
+  const el = document.getElementById('sendStatus');
+  if(el){ el.textContent = 'Надсилаємо результат...'; el.className = 'send-status'; }
+  const ok = await sendTelegramReport();
+  sending = false;
+  const el2 = document.getElementById('sendStatus');
+  if(ok){
+    reportSent = true;
+    saveProgress_();
+    if(el2){ el2.textContent = 'Результат надіслано вчителю ✓'; el2.className = 'send-status ok'; }
+  } else if(el2){
+    el2.innerHTML = 'Не вдалося надіслати результат (перевірте інтернет). Прогрес збережено, спробуйте ще раз.<br><button class="btn ghost small" id="retrySendBtn" style="margin:8px auto 0;">Спробувати ще раз</button>';
+    el2.className = 'send-status bad';
+    const rb = document.getElementById('retrySendBtn');
+    if(rb) rb.onclick = sendFromDoneScreen_;
+  }
+}
+
+// Кнопка «Нові питання» / «Пройти ще раз»: спершу вчительці йде результат
+// поточної спроби (навіть якщо вона не завершена) — і лише потім нова добірка.
+async function handleNewSet_(fromDone){
+  if(!TEACHER && !reportSent){
+    if(!fromDone){
+      const sc = scoreOverall();
+      const msg = 'Поточну спробу буде надіслано вчительці як є (виконано ' + sc.answeredQ + ' із ' + sc.totalQ + ' завдань), після чого почнеться нова. Продовжити?';
+      if(!confirm(msg)) return;
+    }
+    const note = fromDone
+      ? '🔄 Учень натиснув «' + (SAMPLED ? 'Нові питання' : 'Пройти ще раз') + '».'
+      : '🔄 Учень натиснув «' + (SAMPLED ? 'Нові питання' : 'Пройти ще раз') + '» ДО завершення тесту — надіслано те, що встиг виконати.';
+    const ok = await sendTelegramReport(note);
+    if(!ok){
+      alert('Не вдалося надіслати результат вчительці — перевірте інтернет і спробуйте ще раз. Нову добірку не створено.');
+      return;
+    }
+    reportSent = true;
+  }
+  if(SAMPLED) buildFromIds_(pickIds_(chosenIds));
+  resetAttempt_();
+  saveProgress_();
+  renderQuiz();
+}
+
+function finishFlow_(){
+  const sc = scoreOverall();
+  const un = sc.totalQ - sc.answeredQ;
+  let msg;
+  if(sc.answeredQ === 0) msg = 'Ти ще не відповів на жодне питання. Завершити тест зараз?';
+  else if(un > 0) msg = 'Без відповіді лишилось ' + un + ' із ' + sc.totalQ + ' завдань. Завершити тест' + (TEACHER ? '?' : ' і надіслати результат?');
+  else msg = 'Завершити тест' + (TEACHER ? '?' : ' і надіслати результат?');
+  if(confirm(msg)){
+    finished = true; selfReview = false;
+    saveProgress_();
+    renderQuiz();
+  }
+}
+
+// ---------------- Екрани ----------------
+const quizArea = document.getElementById('quizArea');
+
+function renderNameScreen(prefill){
+  quizArea.innerHTML = `
+    <div class="name-screen">
+      <label for="nameInput">Як тебе звати?</label>
+      <input type="text" id="nameInput" placeholder="Ім'я" autocomplete="off" value="${prefill ? prefill.replace(/"/g,'&quot;') : ''}">
+      <button class="btn primary" id="startBtn" style="width:100%;justify-content:center;">Почати тест</button>
+    </div>`;
+  const input = document.getElementById('nameInput');
+  input.focus();
+  const go = function(){
+    studentName = input.value.trim() || "Без імені";
+    setStoredName(studentName);
+    started = true;
+    startOrRestore_();
+    renderQuiz();
+  };
+  document.getElementById('startBtn').onclick = go;
+  input.addEventListener('keydown', function(e){ if(e.key==='Enter') go(); });
+}
+
+function renderDone_(){
+  const sc = scoreOverall();
+  let stats = '';
+  if(hasTopics_()){
+    stats = '<div style="text-align:left;margin:16px 0 4px;"><div class="mhead">Результат за темами</div>' +
+      topicStats_().map(function(t){
+        const color = t.ok === t.total ? 'var(--correct-ink)' : (t.ok === 0 ? 'var(--wrong-ink)' : 'var(--ink)');
+        return '<div class="stat-row"><span>' + t.topic + '</span><b style="color:' + color + ';">' + t.ok + '/' + t.total + '</b></div>';
+      }).join('') + '</div>';
+  }
+  const wrongNums = [], emptyNums = [];
+  QUESTIONS.forEach(function(q,i){
+    const rec = answers[i];
+    const num = q.origIndex + 1;
+    if(answeredPts_(q, rec) === 0) emptyNums.push(num);
+    else if(earnedPts_(q, rec) < maxPts_(q)) wrongNums.push(num);
+  });
+  const lists =
+    (wrongNums.length ? '<p class="done-list bad">Помилки в завданнях: ' + wrongNums.join(', ') + '</p>' : '') +
+    (emptyNums.length ? '<p class="done-list">Без відповіді: ' + emptyNums.join(', ') + '</p>' : '') +
+    (!wrongNums.length && !emptyNums.length ? '<p class="done-list ok">Помилок немає 🎉</p>' : '');
+
+  let actions;
+  if(reviewMode){
+    actions = '<div class="actions"><button class="btn ghost" id="backToQBtn">← Назад до питань</button></div>';
+  } else {
+    actions = `
+      ${TEACHER ? '' : '<div class="send-status" id="sendStatus"></div>'}
+      <div class="actions">
+        <button class="btn secondary" id="reviewOwnBtn">🔍 Переглянути відповіді</button>
+        <button class="btn primary" id="newSetBtn">${NEW_LABEL}</button>
+      </div>`;
+  }
+
+  quizArea.innerHTML = `
+    <div class="done-screen">
+      <div class="ring"><div class="big">${sc.correct}/${sc.total}</div></div>
+      <p class="sub" style="margin:0 auto 4px;">${studentName} · ${CFG.shortName} · балів ${sc.correct} із ${sc.total} · виконано ${sc.answeredQ} із ${sc.totalQ} завдань</p>
+      ${lists}
+      ${stats}
+      ${actions}
+    </div>`;
+
+  if(reviewMode){
+    document.getElementById('backToQBtn').onclick = function(){ finished = false; qIdx = QUESTIONS.length-1; renderQuiz(); };
+    return;
+  }
+  document.getElementById('reviewOwnBtn').onclick = function(){ selfReview = true; qIdx = 0; window.__sel=null; renderQuiz(); };
+  document.getElementById('newSetBtn').onclick = function(){ handleNewSet_(true); };
+
+  if(TEACHER){ return; }
+  const st = document.getElementById('sendStatus');
+  if(reportSent){
+    st.textContent = 'Результат надіслано вчителю ✓'; st.className = 'send-status ok';
+  } else {
+    sendFromDoneScreen_();
+  }
+}
+
+function renderMatchBody_(q, rec, showCorrect){
+  const picks = (rec && rec.picks) ? rec.picks : q.left.map(function(){ return null; });
+  const sel = (typeof window.__sel === 'number') ? window.__sel : null;
+  const leftHtml = q.left.map(function(word,k){
+    const pk = picks[k];
+    let bc = 'ans-box', label = isP_(pk) ? LETTERS[pk] : '?';
+    if(showCorrect){
+      if(pk === q.a[k]) bc += ' filled correct';
+      else {
+        bc += ' filled wrong';
+        label = isP_(pk) ? LETTERS[pk] + ' → ' + LETTERS[q.a[k]] : LETTERS[q.a[k]];
+      }
+    } else if(isP_(pk)) bc += ' filled';
+    return `<div class="match-word-row">
+      <div class="match-word-card"><b>${k+1}.</b>${renderOpt(word)}</div>
+      <div class="match-arrow">→</div>
+      <div class="${bc}" data-k="${k}">${label}</div>
+    </div>`;
+  }).join('');
+  const rightHtml = q.opts.map(function(o,li){
+    let cls = 'opt-card';
+    if(showCorrect) cls += ' disabled';
+    else if(sel === li) cls += ' active';
+    else if(picks.indexOf(li) !== -1) cls += ' used';
+    return `<div class="${cls}" data-l="${li}" ${showCorrect ? '' : 'draggable="true"'}>${LETTERS[li]}. ${renderOpt(o)}</div>`;
+  }).join('');
+  return `<div class="match-grid"><div class="match-col">${leftHtml}</div><div class="match-col">${rightHtml}</div></div>`;
+}
+
+function renderQuiz(){
+  const banner = document.getElementById('reviewBanner');
+  if(reviewMode){ banner.textContent = '👀 Режим перегляду відповідей учня'; banner.classList.add('show'); }
+  else if(selfReview){ banner.textContent = '🔍 Перегляд твоїх відповідей — правильні відповіді підсвічено'; banner.classList.add('show'); }
+  else if(TEACHER){ banner.textContent = '🧑‍🏫 Режим вчителя — відповідь одразу, результат не надсилається'; banner.classList.add('show'); }
+  else banner.classList.remove('show');
+
+  document.getElementById('totalTag').textContent = QUESTIONS.length ? pluralZ(QUESTIONS.length) : pluralZ(SET_SIZE);
+
+  if(!started){ renderNameScreen(); return; }
+
+  const total = QUESTIONS.length;
+  if(finished && !selfReview){ renderDone_(); return; }
+  if(qIdx >= total) qIdx = total - 1;
+  if(qIdx < 0) qIdx = 0;
+
+  const q = QUESTIONS[qIdx];
+  const rec = answers[qIdx];
+  const sc = scoreOverall();
+  const showCorrect = showCorrectFor_(rec);
+  const isFlagged = !!flags[qIdx];
+  const isMatch = q.type === 'match';
+  const lastQ = qIdx === total - 1;
+
+  let segs = '';
+  QUESTIONS.forEach(function(qq,i){
+    const r = answers[i];
+    let cls = '';
+    if(r && showCorrectFor_(r)){
+      const e = earnedPts_(qq, r), m = maxPts_(qq);
+      cls = e === m ? 'done-correct' : (e === 0 ? 'done-wrong' : 'done-partial');
+    } else if(r && answeredPts_(qq, r) > 0){
+      cls = 'done-answered';
+    }
+    if(i === qIdx) cls = 'current';
+    segs += `<div class="seg ${cls}" data-i="${i}"></div>`;
+  });
+
+  const pill = (reviewMode || selfReview)
+    ? `<div class="score">${sc.correct}/${sc.total}</div>`
+    : (TEACHER
+        ? `<div class="score">${sc.correct}/${sc.answered || 0}</div>`
+        : `<div class="score neutral" title="Виконано завдань">${sc.answeredQ}/${sc.totalQ}</div>`);
+
+  // тіло завдання
+  let body;
+  if(isMatch){
+    body = renderMatchBody_(q, rec, showCorrect);
+  } else {
+    body = '<div class="options">' + q.opts.map(function(o,i){
+      let cls = 'opt', badge = '';
+      if(showCorrect){
+        if(i === q.a){ cls += ' correct'; badge = '<span class="badge ok">✓</span>'; }
+        else if(rec && rec.picked === i){ cls += ' wrong'; badge = '<span class="badge no">✕</span>'; }
+        else cls += ' dim';
+      } else if(rec && rec.picked === i){
+        cls += ' sel';
+      }
+      return `<button class="${cls}" data-i="${i}" ${showCorrect ? 'disabled' : ''}>
+        <span class="tile"><span>${LETTERS[i]}</span>${badge}</span><span>${renderOpt(o)}</span>
+      </button>`;
+    }).join('') + '</div>';
+  }
+
+  // підказка/відповідь — лише у режимах, де її дозволено
+  let fb = '';
+  if(showCorrect){
+    const a = ansStr_(q);
+    const has = answeredPts_(q, rec) > 0;
+    if(!has){
+      fb = `<div class="feedback show bad"><span>${reviewMode ? 'Учень не відповів' : (selfReview ? 'Ти не відповів(ла)' : 'Без відповіді')}. Правильна відповідь — ${a}.</span></div>`;
+    } else if(isMatch){
+      const e = earnedPts_(q, rec), m = maxPts_(q);
+      fb = `<div class="feedback show ${e===m ? 'ok' : (e===0 ? 'bad' : 'mixed')}"><span>Правильних відповідей: ${e} із ${m}. Правильно: ${a}.</span></div>`;
+    } else if(rec.picked === q.a){
+      fb = `<div class="feedback show ok"><span><b>Правильно.</b> Відповідь — ${a}.</span></div>`;
+    } else {
+      fb = `<div class="feedback show bad"><span>Правильна відповідь — ${a}.</span></div>`;
+    }
+  }
+
+  // права кнопка
+  const teacherCheck = TEACHER && isMatch && !showCorrect;
+  const allPicked = !!(rec && rec.picks && rec.picks.every(isP_));
+  let rightBtn;
+  if(teacherCheck){
+    rightBtn = `<button class="btn primary" id="checkBtn" ${allPicked ? '' : 'disabled'}>Перевірити</button>`;
+  } else if(lastQ){
+    const lbl = (reviewMode || selfReview || TEACHER) ? 'До результату' : 'Завершити тест';
+    rightBtn = `<button class="btn primary" id="nextBtn">${lbl}</button>`;
+  } else {
+    rightBtn = `<button class="btn primary" id="nextBtn">Далі →</button>`;
+  }
+
+  const canChangeName = !URLP.get('student');
+  const resetRow = (reviewMode || selfReview) ? '' : `
+    <div class="reset-row">
+      <button class="btn ghost small" id="finishBtn">${TEACHER ? 'Завершити тест' : 'Завершити і надіслати результат'}</button>
+      <button class="btn ghost small" id="newMidBtn">${NEW_LABEL}</button>
+      ${canChangeName ? '<button class="btn ghost small" id="changeNameBtn">Змінити ім\'я</button>' : ''}
+    </div>`;
+
+  quizArea.innerHTML = `
+    <div class="progress-row">
+      <div class="qnum">${studentName} · Питання ${qIdx+1} з ${total}</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        ${!reviewMode ? `<button id="flagBtn" type="button" title="Позначити, якщо незрозуміло" style="background:${isFlagged?'#FFE27A':'none'};border:none;cursor:pointer;font-size:13px;line-height:1;padding:4px 7px;border-radius:8px;opacity:${isFlagged?'1':'0.3'};">❓</button>` : ''}
+        ${pill}
+      </div>
+    </div>
+    ${q.topic && (reviewMode || selfReview) ? `<p class="sub" style="margin:0 0 6px;font-weight:600;">Тема: ${q.topic}</p>` : ''}
+    ${reviewMode && isFlagged ? `<p class="sub" style="color:#B8860B;font-weight:700;margin:0 0 6px;">❓ Учень позначив це питання як незрозуміле</p>` : ''}
+    <div class="segbar">${segs}</div>
+    <p class="qtext">${q.q}</p>
+    ${body}
+    ${fb}
+    <div class="nav-row">
+      <button class="btn ghost" id="prevBtn" ${qIdx===0 ? 'disabled' : ''}>← Назад</button>
+      ${rightBtn}
+    </div>
+    ${resetRow}`;
+
+  // --- взаємодія ---
+  if(!showCorrect){
+    if(isMatch){
+      const place = function(k, li){
+        const cur = answers[qIdx] || {picks: q.left.map(function(){ return null; })};
+        const pk = cur.picks.slice();
+        pk.forEach(function(v,i){ if(v === li) pk[i] = null; });  // один варіант — одне віконце
+        pk[k] = li;
+        answers[qIdx] = Object.assign({}, cur, {picks: pk});
+        window.__sel = null;
+        saveProgress_();
+        renderQuiz();
+      };
+      quizArea.querySelectorAll('.opt-card').forEach(function(card){
+        card.onclick = function(){ window.__sel = (window.__sel === +card.dataset.l) ? null : +card.dataset.l; renderQuiz(); };
+        card.ondragstart = function(e){ e.dataTransfer.setData('text/plain', card.dataset.l); e.dataTransfer.effectAllowed = 'move'; };
+      });
+      quizArea.querySelectorAll('.ans-box').forEach(function(box){
+        const k = +box.dataset.k;
+        box.ondragover = function(e){ e.preventDefault(); };
+        box.ondrop = function(e){ e.preventDefault(); const v = e.dataTransfer.getData('text/plain'); if(v !== '') place(k, +v); };
+        box.onclick = function(){
+          if(typeof window.__sel === 'number'){ place(k, window.__sel); return; }
+          if(rec && rec.picks && isP_(rec.picks[k])){
+            const pk = rec.picks.slice(); pk[k] = null;
+            answers[qIdx] = Object.assign({}, rec, {picks: pk});
+            saveProgress_(); renderQuiz();
+          }
+        };
+      });
+      const cb = document.getElementById('checkBtn');
+      if(cb) cb.onclick = function(){
+        answers[qIdx] = Object.assign({}, answers[qIdx], {checked: true});
+        saveProgress_(); renderQuiz();
+      };
+    } else {
+      quizArea.querySelectorAll('.opt').forEach(function(btn){
+        btn.onclick = function(){
+          const picked = +btn.dataset.i;
+          if(TEACHER){
+            answers[qIdx] = {picked: picked, checked: true};
+          } else if(rec && rec.picked === picked){
+            delete answers[qIdx];                    // повторний клік — зняти вибір
+          } else {
+            answers[qIdx] = {picked: picked};
+          }
+          saveProgress_(); renderQuiz();
+        };
+      });
+    }
+  }
+
+  const goTo = function(i){ window.__sel = null; qIdx = i; if(window.clearDrawing) window.clearDrawing(); saveProgress_(); renderQuiz(); };
+  document.getElementById('prevBtn').onclick = function(){ goTo(qIdx-1); };
+  const nb = document.getElementById('nextBtn');
+  if(nb) nb.onclick = function(){
+    if(!lastQ){ goTo(qIdx+1); return; }
+    if(reviewMode || selfReview){ selfReview = false; finished = true; renderQuiz(); return; }
+    if(TEACHER){ finished = true; saveProgress_(); renderQuiz(); return; }
+    finishFlow_();
+  };
+  quizArea.querySelectorAll('.seg').forEach(function(d){ d.onclick = function(){ goTo(+d.dataset.i); }; });
+
+  const flagBtn = document.getElementById('flagBtn');
+  if(flagBtn) flagBtn.onclick = function(){ flags[qIdx] = !flags[qIdx]; saveProgress_(); renderQuiz(); };
+
+  const fbtn = document.getElementById('finishBtn');
+  if(fbtn) fbtn.onclick = finishFlow_;
+  const nmb = document.getElementById('newMidBtn');
+  if(nmb) nmb.onclick = function(){ handleNewSet_(false); };
+  const cn = document.getElementById('changeNameBtn');
+  if(cn) cn.onclick = function(){
+    clearStoredName();
+    started = false;
+    renderNameScreen(studentName);
+  };
+}
+
+function init(){
+  if(parseReviewParam()){ renderQuiz(); return; }
+  const fromUrl = URLP.get('student');
+  if(fromUrl){
+    studentName = fromUrl.trim() || "Без імені";
+    started = true;
+    startOrRestore_();
+    renderQuiz();
+    return;
+  }
+  const saved = getStoredName();
+  if(saved){
+    studentName = saved;
+    started = true;
+    startOrRestore_();
+  }
+  renderQuiz();
+}
+init();
+
+// ======================================================================
+// МАЛЮВАННЯ ПОВЕРХ ЕКРАНА (режим "учитель")
+// ======================================================================
+(function(){
+  const canvas = document.getElementById('drawCanvas');
+  const ctx = canvas.getContext('2d');
+  const toggleBtn = document.getElementById('drawToggleBtn');
+  const toolbar = document.getElementById('drawToolbar');
+  const thinBtn = document.getElementById('thinBtn');
+  const thickBtn = document.getElementById('thickBtn');
+  const eraserBtn = document.getElementById('eraserBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const swatches = document.querySelectorAll('.swatch');
+
+  let drawingActive = false;
+  let isDrawing = false;
+  let currentColor = "#E5484D";
+  let currentWidth = 4;
+  let eraserMode = false;
+  let lastX = 0, lastY = 0;
+  let activePointerId = null;
+
+  function currentDocHeight(){
+    return Math.max(
+      document.documentElement.scrollHeight,
+      document.body.scrollHeight,
+      window.innerHeight
+    );
+  }
+
+  function resizeCanvas(){
+    const docWidth = document.documentElement.clientWidth;
+    const docHeight = currentDocHeight();
+
+    const prev = document.createElement('canvas');
+    prev.width = canvas.width;
+    prev.height = canvas.height;
+    if(canvas.width && canvas.height){
+      prev.getContext('2d').drawImage(canvas, 0, 0);
+    }
+
+    canvas.width = docWidth * devicePixelRatio;
+    canvas.height = docHeight * devicePixelRatio;
+    canvas.style.width = docWidth + 'px';
+    canvas.style.height = docHeight + 'px';
+    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    if(prev.width && prev.height){
+      ctx.drawImage(prev, 0, 0, prev.width / devicePixelRatio, prev.height / devicePixelRatio);
+    }
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+  window.addEventListener('orientationchange', resizeCanvas);
+  if(window.ResizeObserver){
+    new ResizeObserver(()=> resizeCanvas()).observe(document.body);
+  }
+
+  window.clearDrawing = function(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  };
+
+  function setActive(on){
+    drawingActive = on;
+    toolbar.classList.toggle('show', on);
+    toggleBtn.classList.toggle('on', on);
+    toggleBtn.title = on ? 'Вимкнути малювання' : 'Малювати';
+  }
+
+  toggleBtn.addEventListener('click', ()=> setActive(!drawingActive));
+
+  swatches.forEach(sw=>{
+    sw.addEventListener('click', ()=>{
+      swatches.forEach(s=>s.classList.remove('selected'));
+      sw.classList.add('selected');
+      currentColor = sw.dataset.color;
+      eraserMode = false;
+      eraserBtn.classList.remove('selected');
+    });
+  });
+
+  thinBtn.addEventListener('click', ()=>{
+    currentWidth = 4;
+    thinBtn.classList.add('selected');
+    thickBtn.classList.remove('selected');
+  });
+  thickBtn.addEventListener('click', ()=>{
+    currentWidth = 12;
+    thickBtn.classList.add('selected');
+    thinBtn.classList.remove('selected');
+  });
+  eraserBtn.addEventListener('click', ()=>{
+    eraserMode = !eraserMode;
+    eraserBtn.classList.toggle('selected', eraserMode);
+  });
+  clearBtn.addEventListener('click', ()=>{
+    window.clearDrawing();
+  });
+
+  function pointerPos(e){
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+      pressure: e.pressure || 0.5,
+    };
+  }
+
+  function isOnControls(e){
+    return !!(e.target.closest && e.target.closest('#drawToolbar, #drawToggleBtn'));
+  }
+
+  document.addEventListener('pointerdown', (e)=>{
+    if(!drawingActive) return;
+    if(e.pointerType !== 'pen') return;
+    if(isOnControls(e)) return;
+
+    e.preventDefault();
+    isDrawing = true;
+    activePointerId = e.pointerId;
+    const p = pointerPos(e);
+    lastX = p.x; lastY = p.y;
+  }, { passive: false });
+
+  document.addEventListener('pointermove', (e)=>{
+    if(!drawingActive || !isDrawing) return;
+    if(e.pointerId !== activePointerId) return;
+
+    e.preventDefault();
+    const p = pointerPos(e);
+    ctx.globalCompositeOperation = eraserMode ? 'destination-out' : 'source-over';
+    ctx.strokeStyle = currentColor;
+    const pressureFactor = 0.6 + (p.pressure || 0.5) * 0.8;
+    ctx.lineWidth = (eraserMode ? currentWidth * 3 : currentWidth) * pressureFactor;
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+    lastX = p.x; lastY = p.y;
+  }, { passive: false });
+
+  function stopDrawing(e){
+    if(e && e.pointerId !== undefined && e.pointerId !== activePointerId) return;
+    isDrawing = false;
+    activePointerId = null;
+  }
+  document.addEventListener('pointerup', stopDrawing);
+  document.addEventListener('pointercancel', stopDrawing);
+
+  document.addEventListener('touchmove', function(e){
+    if(drawingActive && e.touches && e.touches[0] && e.touches[0].touchType === 'stylus'){
+      e.preventDefault();
+    }
+  }, { passive: false });
+})();
+</script>
+<script src="memes.js"></script>
+</body>
+</html>
