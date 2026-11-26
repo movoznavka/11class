@@ -399,76 +399,187 @@
   }
 
   #fx{ position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:0; }
-  .fx-p{ position:absolute; top:-10%; will-change:transform; opacity:.85; animation:fxFall linear infinite; }
-  .fx-p.rise{ top:auto; bottom:-10%; animation-name:fxRise; }
-  @keyframes fxFall{
-    0%{ transform:translate3d(0,-10vh,0) rotate(0deg); }
-    100%{ transform:translate3d(var(--dx),115vh,0) rotate(var(--rot)); }
+  #scene{ position:fixed; inset:0; pointer-events:none; z-index:0;
+    background:#F6E8D6 center / cover no-repeat; }
+  #scene::after{ content:''; position:absolute; inset:0; background:var(--veil-bg, none); }
+  @media (max-width:700px){ #scene::after{ background:var(--veil-m, none); } }
+
+  /* частинки: листя, пелюстки, сніжинки, серця, кажани... */
+  .fx-p{ position:absolute; left:0; top:0; opacity:0; will-change:transform; animation:fxMove linear infinite; }
+  @keyframes fxMove{
+    0%{ transform:translate3d(0,0,0) rotate(0deg); opacity:0; }
+    8%{ opacity:1; }
+    85%{ opacity:1; }
+    100%{ transform:translate3d(var(--dx),var(--dy),0) rotate(var(--rot)); opacity:0; }
   }
-  @keyframes fxRise{
-    0%{ transform:translate3d(0,0,0) rotate(0deg); }
-    100%{ transform:translate3d(var(--dx),-120vh,0) rotate(var(--rot)); }
+  .fx-i{ display:block; line-height:0; animation:fxSway ease-in-out infinite alternate; }
+  .fx-i svg{ display:block; }
+  @keyframes fxSway{
+    0%{ transform:translateX(calc(var(--sw,20px) * -1)) rotate(calc(var(--sr,30deg) * -1)); }
+    100%{ transform:translateX(var(--sw,20px)) rotate(var(--sr,30deg)); }
   }
+  .fx-i.s-bat{ animation:fxFlap .24s ease-in-out infinite alternate; }
+  @keyframes fxFlap{ 0%{ transform:scaleY(1); } 100%{ transform:scaleY(.4); } }
+  .fx-i.s-spark{ animation:fxTw 1.3s ease-in-out infinite alternate; }
+  @keyframes fxTw{ 0%{ transform:scale(.5); opacity:.35; } 100%{ transform:scale(1.1); opacity:1; } }
+  .k-snow .fx-i{ filter:drop-shadow(0 0 2px rgba(80,120,190,.55)); }
+  .k-spark .fx-i{ filter:drop-shadow(0 0 5px rgba(255,205,90,.95)); }
+  .k-petal .fx-i, .k-heart .fx-i{ filter:drop-shadow(0 1px 1px rgba(0,0,0,.18)); }
   @media (prefers-reduced-motion: reduce){ #fx{ display:none; } }
 
-  body[data-theme="winter"]{
-    --bg:#D2E6F7; --bg-soft:#E6F1FB; --c1-a:#7FB2E8; --c1-b:#2F6FB5; --c1-sh:rgba(47,111,181,.45);
-    --bg-img:linear-gradient(180deg,#C4DDF4 0%,#EAF4FC 100%);
-    --tile-tint:rgba(47,111,181,.2); --accent-soft:rgba(47,111,181,.10);
-  }
-  body[data-theme="newyear"]{
-    --bg:#DCEBFA; --bg-soft:#EEF5FD; --c1-a:#FF7A85; --c1-b:#C62839; --c1-sh:rgba(198,40,57,.4);
-    --bg-img:linear-gradient(180deg,#CFE4F8 0%,#F7E3E5 100%);
-    --tile-tint:rgba(198,40,57,.2); --accent-soft:rgba(198,40,57,.10);
-  }
-  body[data-theme="love"]{
-    --bg:#FFD9E4; --bg-soft:#FFEAF0; --c1-a:#FF8DB0; --c1-b:#D6336C; --c1-sh:rgba(214,51,108,.4);
-    --bg-img:linear-gradient(180deg,#FFD0DF 0%,#FFEFF4 100%);
-    --tile-tint:rgba(214,51,108,.2); --accent-soft:rgba(214,51,108,.10);
-  }
-  body[data-theme="women"]{
-    --bg:#F1DDF9; --bg-soft:#F8EEFD; --c1-a:#C98AE6; --c1-b:#A23FBF; --c1-sh:rgba(162,63,191,.4);
-    --bg-img:linear-gradient(180deg,#EBD2F7 0%,#FCEFF8 100%);
-    --tile-tint:rgba(162,63,191,.2); --accent-soft:rgba(162,63,191,.10);
-  }
-  body[data-theme="spring"]{
-    --bg:#DDF3D2; --bg-soft:#EDF9E6; --c1-a:#7FD16F; --c1-b:#3E9B3A; --c1-sh:rgba(62,155,58,.4);
-    --bg-img:linear-gradient(180deg,#D3EFC6 0%,#F4FBEF 100%);
-    --tile-tint:rgba(62,155,58,.2); --accent-soft:rgba(62,155,58,.10);
-  }
-  body[data-theme="easter"]{
-    --bg:#FFF1C9; --bg-soft:#FFF8E1; --c1-a:#F6B24A; --c1-b:#D9791A; --c1-sh:rgba(217,121,26,.4);
-    --bg-img:linear-gradient(180deg,#FFEAB5 0%,#E9F7DC 100%);
-    --tile-tint:rgba(217,121,26,.2); --accent-soft:rgba(217,121,26,.10);
-  }
-  body[data-theme="summer"]{
-    --bg:#FFF0B8; --bg-soft:#FFF8DA; --c1-a:#FFB347; --c1-b:#E8740C; --c1-sh:rgba(232,116,12,.4);
-    --bg-img:linear-gradient(180deg,#BFEAFF 0%,#FFF3BF 100%);
-    --tile-tint:rgba(232,116,12,.2); --accent-soft:rgba(232,116,12,.10);
-  }
+  /* ===== кольори та фони тем ===== */
   body[data-theme="autumn"]{
-    --bg:#FBE3C4; --bg-soft:#FDEFDB; --c1-a:#E8955A; --c1-b:#C4571A; --c1-sh:rgba(196,87,26,.4);
-    --bg-img:linear-gradient(180deg,#F7D8AE 0%,#FDF0DE 100%);
-    --tile-tint:rgba(196,87,26,.2); --accent-soft:rgba(196,87,26,.10);
+    --c1-a:#F7C58E; --c1-b:#E67E22; --c1-sh:rgba(230,126,34,0.4); --bg-soft:#FFE9CC; --card:#FFFCF6; --ink:#4A2C12; --ink-soft:#8B5E3C; --c2-b:#C0392B;
+    --tile-tint:rgba(230,126,34,0.22); --accent-soft:rgba(230,126,34,0.12);
+    --veil-bg:linear-gradient(90deg, rgba(255,246,234,0.55) 0%, rgba(255,246,234,0.3) 55%, rgba(255,246,234,0) 88%); --veil-m:rgba(255,246,234,0.62);
   }
-  body[data-theme="school"]{
-    /* кольори — як зараз, додається лише плашка й олівці/книжки */
+  body[data-theme="autumn"] #scene{ background-image:url("bg/autumn.jpg"); background-position:100% center; }
+  @media (max-width:700px){ body[data-theme="autumn"] #scene{ background-position:78% center; } }
+  body[data-theme="winter"]{
+    --c1-a:#7FB2E8; --c1-b:#2F6FB5; --c1-sh:rgba(47,111,181,0.4);
+    --tile-tint:rgba(47,111,181,0.22); --accent-soft:rgba(47,111,181,0.12);
+    --veil-bg:linear-gradient(90deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.22) 55%, rgba(255,255,255,0) 88%); --veil-m:rgba(255,255,255,0.5);
   }
+  body[data-theme="winter"] #scene{ background-image:url("bg/winter.jpg"); background-position:100% center; }
+  @media (max-width:700px){ body[data-theme="winter"] #scene{ background-position:85% center; } }
+  body[data-theme="newyear"]{
+    --c1-a:#FFB067; --c1-b:#D4501A; --c1-sh:rgba(212,80,26,0.4);
+    --tile-tint:rgba(212,80,26,0.22); --accent-soft:rgba(212,80,26,0.12);
+    --veil-bg:linear-gradient(90deg, rgba(255,236,210,0.3) 0%, rgba(255,236,210,0.12) 55%, rgba(255,236,210,0) 88%); --veil-m:rgba(255,236,210,0.5);
+  }
+  body[data-theme="newyear"] #scene{ background-image:url("bg/newyear.jpg"); background-position:100% center; }
+  @media (max-width:700px){ body[data-theme="newyear"] #scene{ background-position:90% center; } }
+  body[data-theme="love"]{
+    --c1-a:#FF8DB0; --c1-b:#D6336C; --c1-sh:rgba(214,51,108,0.4);
+    --tile-tint:rgba(214,51,108,0.22); --accent-soft:rgba(214,51,108,0.12);
+    --veil-bg:linear-gradient(90deg, rgba(255,240,248,0.35) 0%, rgba(255,240,248,0.15) 55%, rgba(255,240,248,0) 88%); --veil-m:rgba(255,240,248,0.5);
+  }
+  body[data-theme="love"] #scene{ background-image:url("bg/love.jpg"); background-position:100% center; }
+  @media (max-width:700px){ body[data-theme="love"] #scene{ background-position:92% center; } }
+  body[data-theme="spring"]{
+    --c1-a:#8FD06B; --c1-b:#3E9B3A; --c1-sh:rgba(62,155,58,0.4);
+    --tile-tint:rgba(62,155,58,0.22); --accent-soft:rgba(62,155,58,0.12);
+    --veil-bg:linear-gradient(90deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.2) 55%, rgba(255,255,255,0) 88%); --veil-m:rgba(255,255,255,0.5);
+  }
+  body[data-theme="spring"] #scene{ background-image:url("bg/spring.jpg"); background-position:100% center; }
+  @media (max-width:700px){ body[data-theme="spring"] #scene{ background-position:85% center; } }
+  body[data-theme="summer"]{
+    --c1-a:#FFB347; --c1-b:#E8740C; --c1-sh:rgba(232,116,12,0.4);
+    --tile-tint:rgba(232,116,12,0.22); --accent-soft:rgba(232,116,12,0.12);
+    --veil-bg:linear-gradient(90deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.2) 55%, rgba(255,255,255,0) 88%); --veil-m:rgba(255,255,255,0.5);
+  }
+  body[data-theme="summer"] #scene{ background-image:url("bg/summer.jpg"); background-position:100% center; }
+  @media (max-width:700px){ body[data-theme="summer"] #scene{ background-position:85% center; } }
+  body[data-theme="women"]{
+    --c1-a:#F28CB1; --c1-b:#C2185B; --c1-sh:rgba(194,24,91,0.4);
+    --tile-tint:rgba(194,24,91,0.22); --accent-soft:rgba(194,24,91,0.12);
+    --veil-bg:rgba(255,245,248,0.3); --veil-m:rgba(255,245,248,0.55);
+  }
+  body[data-theme="women"] #scene{ background-image:url("bg/women.jpg"); background-position:50% center; }
+  @media (max-width:700px){ body[data-theme="women"] #scene{ background-position:70% center; } }
+  body[data-theme="easter"]{
+    --c1-a:#F2A65A; --c1-b:#B5352A; --c1-sh:rgba(181,53,42,0.4);
+    --tile-tint:rgba(181,53,42,0.22); --accent-soft:rgba(181,53,42,0.12);
+    --veil-bg:rgba(255,250,240,0.32); --veil-m:rgba(255,250,240,0.55);
+  }
+  body[data-theme="easter"] #scene{ background-image:url("bg/easter.jpg"); background-position:50% center; }
+  @media (max-width:700px){ body[data-theme="easter"] #scene{ background-position:50% center; } }
   body[data-theme="independence"]{
-    --bg:#CFE6FF; --bg-soft:#E4F1FF; --c1-a:#5BA3F0; --c1-b:#0057B8; --c1-sh:rgba(0,87,184,.4);
-    --bg-img:linear-gradient(180deg,#9CCBFF 0%,#FFE98A 100%);
-    --tile-tint:rgba(0,87,184,.2); --accent-soft:rgba(0,87,184,.10);
+    --c1-a:#5BA3F0; --c1-b:#0057B8; --c1-sh:rgba(0,87,184,0.4);
+    --tile-tint:rgba(0,87,184,0.22); --accent-soft:rgba(0,87,184,0.12);
+    --veil-bg:rgba(255,255,255,0.38); --veil-m:rgba(255,255,255,0.6);
   }
-  body[data-theme="halloween"]{
-    --bg:#FFD9B0; --bg-soft:#FFEBD2; --c1-a:#A478E6; --c1-b:#7A3FD1; --c1-sh:rgba(122,63,209,.4);
-    --bg-img:linear-gradient(180deg,#FFCB94 0%,#EBDDFB 100%);
-    --tile-tint:rgba(122,63,209,.2); --accent-soft:rgba(122,63,209,.10);
+  body[data-theme="independence"] #scene{ background-image:url("bg/independence.jpg"); background-position:50% center; }
+  @media (max-width:700px){ body[data-theme="independence"] #scene{ background-position:50% center; } }
+  body[data-theme="school"]{
+    --c1-a:#6C8CFF; --c1-b:#2457C5; --c1-sh:rgba(36,87,197,0.4);
+    --tile-tint:rgba(36,87,197,0.22); --accent-soft:rgba(36,87,197,0.12);
+    --veil-bg:rgba(255,255,255,0.22); --veil-m:rgba(255,255,255,0.5);
   }
+  body[data-theme="school"] #scene{ background-image:url("bg/school.jpg"); background-position:50% center; }
+  @media (max-width:700px){ body[data-theme="school"] #scene{ background-position:50% center; } }
   body[data-theme="vyshyvanka"]{
-    --bg:#F8E3E3; --bg-soft:#FCF0F0; --c1-a:#E86A70; --c1-b:#C0222B; --c1-sh:rgba(192,34,43,.4);
-    --bg-img:linear-gradient(180deg,#F5D6D6 0%,#FFF6F0 100%);
-    --tile-tint:rgba(192,34,43,.2); --accent-soft:rgba(192,34,43,.10);
+    --c1-a:#E86A70; --c1-b:#C0222B; --c1-sh:rgba(192,34,43,0.4);
+    --tile-tint:rgba(192,34,43,0.22); --accent-soft:rgba(192,34,43,0.12);
+    --veil-bg:rgba(255,250,244,0.3); --veil-m:rgba(255,250,244,0.55);
   }
+  body[data-theme="vyshyvanka"] #scene{ background-image:url("bg/vyshyvanka.jpg"); background-position:50% center; }
+  @media (max-width:700px){ body[data-theme="vyshyvanka"] #scene{ background-position:50% center; } }
+  body[data-theme="halloween"]{
+    --c1-a:#FFA94D; --c1-b:#D9530B; --c1-sh:rgba(217,83,11,0.4);
+    --tile-tint:rgba(217,83,11,0.22); --accent-soft:rgba(217,83,11,0.12);
+    --veil-bg:rgba(20,8,35,0.3); --veil-m:rgba(20,8,35,0.5);
+  }
+  body[data-theme="halloween"] #scene{ background-image:url("bg/halloween.jpg"); background-position:50% center; }
+  @media (max-width:700px){ body[data-theme="halloween"] #scene{ background-position:22% center; } }
+
+  body[data-theme="autumn"] .card{ border-radius:26px; }
+  body[data-theme] h1, body[data-theme] .sub, body[data-theme] .kicker,
+  body[data-theme] .block-title, body[data-theme] footer{ text-shadow:0 0 10px rgba(255,255,255,.85), 0 0 3px rgba(255,255,255,.8); }
+
+  /* «скляні» підкладки під заголовком там, де фото строкате */
+  body[data-theme="independence"], body[data-theme="easter"], body[data-theme="women"],
+  body[data-theme="vyshyvanka"], body[data-theme="school"]{ --glass:rgba(255,255,255,.66); }
+  body[data-theme="halloween"]{ --glass:rgba(28,10,44,.6); }
+  body[data-theme="independence"] h1, body[data-theme="easter"] h1, body[data-theme="women"] h1,
+  body[data-theme="vyshyvanka"] h1, body[data-theme="school"] h1, body[data-theme="halloween"] h1{
+    width:fit-content; padding:8px 18px; border-radius:16px; background:var(--glass);
+    -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); text-shadow:none; }
+  body[data-theme="independence"] .sub, body[data-theme="easter"] .sub, body[data-theme="women"] .sub,
+  body[data-theme="vyshyvanka"] .sub, body[data-theme="school"] .sub, body[data-theme="halloween"] .sub{
+    width:fit-content; padding:12px 16px; border-radius:16px; background:var(--glass);
+    -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); text-shadow:none; }
+  body[data-theme="independence"] .block-title, body[data-theme="easter"] .block-title, body[data-theme="women"] .block-title,
+  body[data-theme="vyshyvanka"] .block-title, body[data-theme="school"] .block-title, body[data-theme="halloween"] .block-title{
+    padding:3px 14px; border-radius:14px; background:var(--glass);
+    -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); text-shadow:none; }
+
+  /* Геловін: темне небо — світлий текст */
+  body[data-theme="halloween"] h1, body[data-theme="halloween"] .sub,
+  body[data-theme="halloween"] .block-title, body[data-theme="halloween"] .kicker,
+  body[data-theme="halloween"] footer{ color:#FFEBD0; }
+  body[data-theme="halloween"] h1 .hl{ color:#FFB15A; }
+  body[data-theme="halloween"] .kicker, body[data-theme="halloween"] footer{ opacity:.9; text-shadow:0 1px 4px rgba(0,0,0,.6); }
+  body[data-theme="halloween"] .topbar, body[data-theme="halloween"] .block-header{ border-bottom-color:rgba(255,232,204,.35); }
+  body[data-theme="halloween"] .subgroup-title{ background:rgba(255,240,222,.93); }
+  body[data-theme="halloween"] .season-badge{ background:rgba(255,240,222,.93); }
+
+  /* ===== Новий рік: гірлянди й тепле сяйво ===== */
+  body[data-theme="newyear"] .card{
+    background:rgba(255,249,238,.93);
+    box-shadow:0 0 0 1px rgba(255,205,130,.7), 0 0 24px 3px rgba(255,170,70,.55), 0 14px 30px -22px rgba(90,40,10,.5); }
+  body[data-theme="newyear"] .card.ready:hover{
+    box-shadow:0 0 0 1px rgba(255,205,130,.9), 0 0 32px 6px rgba(255,170,70,.7), 0 18px 34px -20px rgba(90,40,10,.55); }
+  body[data-theme="newyear"] .test-pill, body[data-theme="newyear"] .block-test-pill,
+  body[data-theme="newyear"] .subgroup-test-pill{ box-shadow:0 0 14px 1px rgba(255,200,110,.55); }
+  body[data-theme="newyear"] .teacher-banner{ position:relative; box-shadow:0 0 22px 2px rgba(220,40,55,.55); }
+  body[data-theme="newyear"] .teacher-banner::before,
+  body[data-theme="newyear"] .block-header::after{
+    content:''; position:absolute; left:0; right:0; height:16px; pointer-events:none;
+    background:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='16' viewBox='0 0 120 16'><path d='M0 3Q60 13 120 3' stroke='%235b4326' stroke-opacity='.65' stroke-width='1.2' fill='none'/><circle cx='10' cy='4.53' r='5.5' fill='%23FFD36B' fill-opacity='.30'/><circle cx='10' cy='4.53' r='2.5' fill='%23FFD36B'/><circle cx='9.3' cy='3.7300000000000004' r='.8' fill='white' fill-opacity='.85'/><circle cx='30' cy='6.75' r='5.5' fill='%23FF8A5B' fill-opacity='.30'/><circle cx='30' cy='6.75' r='2.5' fill='%23FF8A5B'/><circle cx='29.3' cy='5.95' r='.8' fill='white' fill-opacity='.85'/><circle cx='50' cy='7.86' r='5.5' fill='%23FFF1B8' fill-opacity='.30'/><circle cx='50' cy='7.86' r='2.5' fill='%23FFF1B8'/><circle cx='49.3' cy='7.0600000000000005' r='.8' fill='white' fill-opacity='.85'/><circle cx='70' cy='7.86' r='5.5' fill='%23FFD36B' fill-opacity='.30'/><circle cx='70' cy='7.86' r='2.5' fill='%23FFD36B'/><circle cx='69.3' cy='7.0600000000000005' r='.8' fill='white' fill-opacity='.85'/><circle cx='90' cy='6.75' r='5.5' fill='%23FF6F6F' fill-opacity='.30'/><circle cx='90' cy='6.75' r='2.5' fill='%23FF6F6F'/><circle cx='89.3' cy='5.95' r='.8' fill='white' fill-opacity='.85'/><circle cx='110' cy='4.53' r='5.5' fill='%23FFF1B8' fill-opacity='.30'/><circle cx='110' cy='4.53' r='2.5' fill='%23FFF1B8'/><circle cx='109.3' cy='3.7300000000000004' r='.8' fill='white' fill-opacity='.85'/></svg>") repeat-x left top / 120px 16px; animation:glowPulse 2.6s ease-in-out infinite alternate; }
+  body[data-theme="newyear"] .teacher-banner::before{ top:-8px; }
+  body[data-theme="newyear"] .block-header{ position:relative; border-bottom:none; padding-bottom:20px; margin-bottom:6px; }
+  body[data-theme="newyear"] .block-header::after{ bottom:0; }
+  body[data-theme="newyear"] .topbar{ border-bottom-color:rgba(120,80,40,.3); }
+  @keyframes glowPulse{ 0%{ opacity:.78; filter:brightness(.95); } 100%{ opacity:1; filter:brightness(1.15); } }
+  @media (prefers-reduced-motion: reduce){
+    body[data-theme="newyear"] .teacher-banner::before, body[data-theme="newyear"] .block-header::after{ animation:none; } }
+
+  /* підзаголовок і підписи вгорі — на «склі», щоб не губились на кроні та гірляндах */
+  body[data-theme="spring"], body[data-theme="summer"], body[data-theme="winter"],
+  body[data-theme="autumn"], body[data-theme="love"], body[data-theme="newyear"]{ --glass:rgba(255,255,255,.62); }
+  body[data-theme="spring"] .sub, body[data-theme="summer"] .sub, body[data-theme="winter"] .sub,
+  body[data-theme="autumn"] .sub, body[data-theme="love"] .sub{
+    width:fit-content; padding:12px 16px; border-radius:16px; background:var(--glass);
+    -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); text-shadow:none; }
+  @media (max-width:700px){
+    body[data-theme="newyear"] .sub{ width:fit-content; padding:12px 16px; border-radius:16px; background:var(--glass);
+      -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); text-shadow:none; }
+  }
+  body[data-theme] .kicker{ padding:4px 12px; border-radius:999px; background:rgba(255,255,255,.6); opacity:.9; }
+  body[data-theme="halloween"] .kicker{ background:rgba(28,10,44,.6); }
+  body[data-theme="independence"], body[data-theme="easter"], body[data-theme="women"],
+  body[data-theme="vyshyvanka"], body[data-theme="school"]{ --glass:rgba(255,255,255,.74); }
 </style>
 </head>
 <body>
@@ -1272,7 +1383,8 @@ function showNamePicker_(studentCode, allowed, members){
 // ============================================================
 // СЕЗОННІ ТЕМИ
 // Пріоритет: ?theme=... у посиланні → вибір у боті (учню або всім) → дата.
-// &theme=off — вимкнути тему.
+// &theme=off у посиланні — вимкнути тему. У боті є пункт «🚫 Вимкнути теми».
+// Фото лежать у папці bg/ поруч з index.html.
 // ============================================================
 (function(){
   function orthodoxEaster(y){
@@ -1305,81 +1417,811 @@ function showNamePicker_(studentCode, allowed, members){
     return 'autumn';
   }
 
+  // Кожна тема: фото (img, w, h, px — вирівнювання по горизонталі) і частинки.
+  // sp — де вони з'являються (у координатах фото), to — до якої висоти падають/летять,
+  // dx — зсув убік (вітер), dur — тривалість, size — розмір.
   var THEMES = {
-    winter:      {label:'❄️ Зимовий настрій',        emoji:['❄️','❄️','❅','❆'],           mode:'fall', count:22},
-    newyear:     {label:'🎄 З Новим роком і Різдвом!', emoji:['❄️','⭐','🎄','✨'],         mode:'fall', count:22},
-    love:        {label:'💘 З Днем закоханих!',       emoji:['💖','💗','💕','❤️'],          mode:'rise', count:16},
-    women:       {label:'🌷 З 8 Березня!',            emoji:['🌷','🌸','🌼','💐'],          mode:'fall', count:16},
-    spring:      {label:'🌸 Весна прийшла',           emoji:['🌸','🌿','🌼','🍃'],          mode:'fall', count:14},
-    easter:      {label:'🐣 Христос Воскрес!',        emoji:['🥚','🐣','🌷','🐇'],          mode:'fall', count:14},
-    summer:      {label:'☀️ Літній настрій',          emoji:['☀️','🌻','🍉','🦋'],          mode:'fall', count:12},
-    autumn:      {label:'🍂 Осінній настрій',         emoji:['🍂','🍁','🍃','🌰'],          mode:'fall', count:18},
-    school:      {label:'📚 Навчальний рік',          emoji:['✏️','📚','📝','🔤'],          mode:'fall', count:10},
-    independence:{label:'💙💛 З Днем Незалежності!',  emoji:['💙','💛','🇺🇦'],              mode:'rise', count:16},
-    halloween:   {label:'🎃 Щасливого Геловіну!',     emoji:['🎃','🦇','👻','🕸️'],          mode:'fall', count:16},
-    vyshyvanka:  {label:'🌺 З Днем вишиванки!',       emoji:['🌺','❤️','🖤','🌾'],          mode:'fall', count:14}
-  };
+ "autumn": {
+  "label": "🍂 Осінній настрій",
+  "parts": [
+   {
+    "kind": "leaf",
+    "n": 26,
+    "sp": {
+     "x": [
+      1040,
+      1745
+     ],
+     "y": [
+      30,
+      470
+     ]
+    },
+    "to": [
+     760,
+     860
+    ],
+    "dx": [
+     -300,
+     -40
+    ],
+    "dur": [
+     9,
+     17
+    ],
+    "size": [
+     16,
+     30
+    ],
+    "colors": [
+     "#E8741A",
+     "#F29A2E",
+     "#C8421C",
+     "#F5B040",
+     "#D9541E",
+     "#E58A24"
+    ]
+   }
+  ],
+  "img": "bg/autumn.jpg",
+  "w": 1759,
+  "h": 894,
+  "px": 1.0,
+  "pxm": 0.78
+ },
+ "winter": {
+  "label": "❄️ Зимовий настрій",
+  "parts": [
+   {
+    "kind": "snow",
+    "n": 44,
+    "sp": {
+     "x": [
+      0,
+      1759
+     ],
+     "y": [
+      -60,
+      40
+     ]
+    },
+    "to": [
+     760,
+     880
+    ],
+    "dx": [
+     -70,
+     70
+    ],
+    "dur": [
+     10,
+     19
+    ],
+    "size": [
+     3,
+     9
+    ],
+    "colors": [
+     "#FFFFFF"
+    ],
+    "sw": [
+     6,
+     20
+    ],
+    "rot": [
+     0,
+     0
+    ]
+   }
+  ],
+  "img": "bg/winter.jpg",
+  "w": 1759,
+  "h": 894,
+  "px": 1.0,
+  "pxm": 0.85
+ },
+ "newyear": {
+  "label": "🎄 З Новим роком і Різдвом!",
+  "parts": [
+   {
+    "kind": "spark",
+    "n": 18,
+    "sp": {
+     "x": [
+      150,
+      1759
+     ],
+     "y": [
+      -60,
+      40
+     ]
+    },
+    "to": [
+     700,
+     860
+    ],
+    "dx": [
+     -40,
+     40
+    ],
+    "dur": [
+     12,
+     22
+    ],
+    "size": [
+     8,
+     16
+    ],
+    "colors": [
+     "#FFD36B",
+     "#FFE9A8",
+     "#FFB45A"
+    ],
+    "rot": [
+     0,
+     0
+    ]
+   }
+  ],
+  "img": "bg/newyear.jpg",
+  "w": 1759,
+  "h": 894,
+  "px": 1.0,
+  "pxm": 0.9
+ },
+ "love": {
+  "label": "💘 З Днем закоханих!",
+  "parts": [
+   {
+    "kind": "heart",
+    "n": 14,
+    "sp": {
+     "x": [
+      880,
+      1750
+     ],
+     "y": [
+      640,
+      820
+     ]
+    },
+    "to": [
+     40,
+     320
+    ],
+    "dx": [
+     -90,
+     40
+    ],
+    "dur": [
+     9,
+     16
+    ],
+    "size": [
+     14,
+     26
+    ],
+    "colors": [
+     "#FF5C8A",
+     "#FF8DB0",
+     "#D6336C",
+     "#FFB3C7"
+    ],
+    "rot": [
+     -40,
+     40
+    ],
+    "sw": [
+     8,
+     22
+    ]
+   }
+  ],
+  "img": "bg/love.jpg",
+  "w": 1759,
+  "h": 894,
+  "px": 1.0,
+  "pxm": 0.92
+ },
+ "women": {
+  "label": "🌷 З 8 Березня!",
+  "parts": [
+   {
+    "kind": "petal",
+    "n": 18,
+    "sp": {
+     "x": [
+      150,
+      780
+     ],
+     "y": [
+      -30,
+      160
+     ]
+    },
+    "to": [
+     820,
+     900
+    ],
+    "dx": [
+     -30,
+     170
+    ],
+    "dur": [
+     10,
+     18
+    ],
+    "size": [
+     14,
+     24
+    ],
+    "colors": [
+     "#F7A8C4",
+     "#FBC4D6",
+     "#F48FB1",
+     "#FFE0EA"
+    ]
+   }
+  ],
+  "img": "bg/women.jpg",
+  "w": 1672,
+  "h": 941,
+  "px": 0.5,
+  "pxm": 0.7
+ },
+ "spring": {
+  "label": "🌸 Весна прийшла",
+  "parts": [
+   {
+    "kind": "petal",
+    "n": 22,
+    "sp": {
+     "x": [
+      900,
+      1750
+     ],
+     "y": [
+      30,
+      470
+     ]
+    },
+    "to": [
+     780,
+     870
+    ],
+    "dx": [
+     -260,
+     -40
+    ],
+    "dur": [
+     9,
+     17
+    ],
+    "size": [
+     12,
+     20
+    ],
+    "colors": [
+     "#FFFFFF",
+     "#FFD9E6",
+     "#F9B9CF",
+     "#F7A1BE"
+    ]
+   }
+  ],
+  "img": "bg/spring.jpg",
+  "w": 1759,
+  "h": 894,
+  "px": 1.0,
+  "pxm": 0.85
+ },
+ "easter": {
+  "label": "🐣 Христос Воскрес!",
+  "parts": [
+   {
+    "kind": "petal",
+    "n": 18,
+    "sp": {
+     "x": [
+      0,
+      830
+     ],
+     "y": [
+      0,
+      330
+     ]
+    },
+    "to": [
+     800,
+     900
+    ],
+    "dx": [
+     20,
+     200
+    ],
+    "dur": [
+     10,
+     18
+    ],
+    "size": [
+     13,
+     22
+    ],
+    "colors": [
+     "#FFFFFF",
+     "#FFF0F5",
+     "#FFD9E6"
+    ]
+   }
+  ],
+  "img": "bg/easter.jpg",
+  "w": 1672,
+  "h": 941,
+  "px": 0.5,
+  "pxm": 0.5
+ },
+ "summer": {
+  "label": "☀️ Літній настрій",
+  "parts": [
+   {
+    "kind": "leaf",
+    "n": 8,
+    "sp": {
+     "x": [
+      940,
+      1750
+     ],
+     "y": [
+      20,
+      470
+     ]
+    },
+    "to": [
+     760,
+     880
+    ],
+    "dx": [
+     -240,
+     -40
+    ],
+    "dur": [
+     10,
+     18
+    ],
+    "size": [
+     14,
+     24
+    ],
+    "colors": [
+     "#6DB33F",
+     "#8CC63F",
+     "#4E9A2E",
+     "#A6D14A"
+    ]
+   },
+   {
+    "kind": "spark",
+    "n": 10,
+    "sp": {
+     "x": [
+      0,
+      1760
+     ],
+     "y": [
+      350,
+      720
+     ]
+    },
+    "to": [
+     60,
+     300
+    ],
+    "dx": [
+     -30,
+     30
+    ],
+    "dur": [
+     10,
+     18
+    ],
+    "size": [
+     6,
+     11
+    ],
+    "colors": [
+     "#FFF3B0",
+     "#FFE066"
+    ],
+    "rot": [
+     0,
+     0
+    ]
+   }
+  ],
+  "img": "bg/summer.jpg",
+  "w": 1760,
+  "h": 894,
+  "px": 1.0,
+  "pxm": 0.85
+ },
+ "school": {
+  "label": "📚 Навчальний рік",
+  "parts": [
+   {
+    "kind": "leaf",
+    "n": 12,
+    "sp": {
+     "x": [
+      0,
+      420
+     ],
+     "y": [
+      0,
+      300
+     ]
+    },
+    "to": [
+     820,
+     900
+    ],
+    "dx": [
+     40,
+     260
+    ],
+    "dur": [
+     10,
+     18
+    ],
+    "size": [
+     16,
+     26
+    ],
+    "colors": [
+     "#F2C230",
+     "#C9D43A",
+     "#8BB83A",
+     "#E3A21A"
+    ]
+   }
+  ],
+  "img": "bg/school.jpg",
+  "w": 1672,
+  "h": 941,
+  "px": 0.5,
+  "pxm": 0.5
+ },
+ "independence": {
+  "label": "💙💛 З Днем Незалежності!",
+  "parts": [
+   {
+    "kind": "heart",
+    "n": 14,
+    "sp": {
+     "x": [
+      0,
+      1672
+     ],
+     "y": [
+      800,
+      940
+     ]
+    },
+    "to": [
+     40,
+     420
+    ],
+    "dx": [
+     -60,
+     60
+    ],
+    "dur": [
+     10,
+     18
+    ],
+    "size": [
+     14,
+     24
+    ],
+    "colors": [
+     "#0057B8",
+     "#FFD500",
+     "#4B8EE6",
+     "#FFE066"
+    ],
+    "rot": [
+     -40,
+     40
+    ],
+    "sw": [
+     8,
+     22
+    ]
+   }
+  ],
+  "img": "bg/independence.jpg",
+  "w": 1672,
+  "h": 941,
+  "px": 0.5,
+  "pxm": 0.5
+ },
+ "halloween": {
+  "label": "🎃 Щасливого Геловіну!",
+  "parts": [
+   {
+    "kind": "leaf",
+    "n": 11,
+    "sp": {
+     "x": [
+      0,
+      660
+     ],
+     "y": [
+      0,
+      260
+     ]
+    },
+    "to": [
+     780,
+     900
+    ],
+    "dx": [
+     30,
+     220
+    ],
+    "dur": [
+     10,
+     18
+    ],
+    "size": [
+     16,
+     28
+    ],
+    "colors": [
+     "#E8741A",
+     "#F29A2E",
+     "#C8421C",
+     "#F5B040"
+    ]
+   },
+   {
+    "kind": "bat",
+    "n": 4,
+    "sp": {
+     "x": [
+      1620,
+      1720
+     ],
+     "y": [
+      120,
+      360
+     ]
+    },
+    "to": [
+     0,
+     0
+    ],
+    "dx": [
+     0,
+     0
+    ],
+    "dur": [
+     14,
+     24
+    ],
+    "size": [
+     28,
+     46
+    ],
+    "colors": [
+     "#150B1E"
+    ],
+    "exit": true,
+    "dy": [
+     -120,
+     140
+    ],
+    "rot": [
+     0,
+     0
+    ]
+   }
+  ],
+  "img": "bg/halloween.jpg",
+  "w": 1672,
+  "h": 941,
+  "px": 0.5,
+  "pxm": 0.22
+ },
+ "vyshyvanka": {
+  "label": "🌺 З Днем вишиванки!",
+  "parts": [
+   {
+    "kind": "petal",
+    "n": 14,
+    "sp": {
+     "x": [
+      1050,
+      1670
+     ],
+     "y": [
+      0,
+      170
+     ]
+    },
+    "to": [
+     820,
+     920
+    ],
+    "dx": [
+     -260,
+     -40
+    ],
+    "dur": [
+     10,
+     18
+    ],
+    "size": [
+     12,
+     22
+    ],
+    "colors": [
+     "#4F74E3",
+     "#F5C518",
+     "#FFFFFF",
+     "#FFD84D"
+    ]
+   }
+  ],
+  "img": "bg/vyshyvanka.jpg",
+  "w": 1671,
+  "h": 941,
+  "px": 0.5,
+  "pxm": 0.5
+ }
+};
 
   var params = new URLSearchParams(location.search);
   var forced = params.get('theme');
   if (forced === 'off') return;
 
+  var code = (params.get('u') || '').trim().replace(/\s+/g,' ').toLowerCase();
+  var cacheKey = 'themeCache:' + code;
+  function cacheGet(){ try { return localStorage.getItem(cacheKey); } catch(e){ return null; } }
+  function cacheSet(v){ try { localStorage.setItem(cacheKey, v); } catch(e){} }
+
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var fx = null, current = null;
+  var fx = null, scene = null, current = null, cur = null;
+  var autoName = pickTheme(new Date());
+
+  function rnd(a,b){ return a + Math.random()*(b-a); }
+  function rr(r){ return rnd(r[0], r[1]); }
+  function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+  // ---------- форми частинок ----------
+  var SHAPES = {
+    leaf:  { f:function(c){
+      return Math.random()<0.6
+        ? '<path d="M12 1l2.3 5.4 3.7-2.4-.7 5.3 5.4-1-3.6 4 2.7 3.7-5.1-.2-1.1 5.1L12 17.4 9.4 21.9l-1.1-5.1-5.1.2L5.9 13 2.3 9l5.4 1-.7-5.3 3.7 2.4z" fill="'+c+'"/><path d="M12 21V9" stroke="rgba(0,0,0,.2)" fill="none"/>'
+        : '<path d="M12 2C6 7 4 13 12 22 20 13 18 7 12 2z" fill="'+c+'"/><path d="M12 21V8" stroke="rgba(0,0,0,.2)" fill="none"/>'; } },
+    petal: { f:function(c){ return '<path d="M12 2c4.5 3.5 7 8.5 5 13.5-1.4 3.4-5 6.5-5 6.5s-3.6-3.1-5-6.5C5 10.5 7.5 5.5 12 2z" fill="'+c+'"/><path d="M12 6v12" stroke="rgba(255,255,255,.4)" fill="none"/>'; } },
+    heart: { f:function(c){ return '<path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z" fill="'+c+'"/>'; } },
+    snow:  { f:function(c){ return '<circle cx="12" cy="12" r="6" fill="'+c+'" fill-opacity=".92"/>'; } },
+    spark: { f:function(c){ return '<path d="M12 1l2.2 8.8L23 12l-8.8 2.2L12 23l-2.2-8.8L1 12l8.8-2.2z" fill="'+c+'"/>'; } },
+    bat:   { vb:'0 0 24 14', ar:14/24, f:function(c){ return '<path d="M12 13c-.7-1.6-1.2-2.4-2.1-2.4C8.2 8.4 5 8.7 1 10.8c1.2-1.8 1.4-3.6.6-5.6 2.8 1.4 5.2 1.2 7.2-.8L10 2.2l1 1.6c.6-.2 1.4-.2 2 0l1-1.6 1.2 2.2c2 2 4.4 2.2 7.2.8-.8 2-.6 3.8.6 5.6-4-2.1-7.2-2.4-8.9-.2-.9 0-1.4.8-2.1 2.4z" fill="'+c+'"/>'; } }
+  };
+  function svg(kind, c, s){
+    var sh = SHAPES[kind];
+    return '<svg width="'+s+'" height="'+(s*(sh.ar||1))+'" viewBox="'+(sh.vb||'0 0 24 24')+'">'+sh.f(c)+'</svg>';
+  }
+
+  // ---------- де на екрані яка точка фото ----------
+  function map(){
+    var W=window.innerWidth, H=window.innerHeight;
+    var k=Math.max(W/cur.w, H/cur.h), dw=cur.w*k, dh=cur.h*k;
+    var f = W<=700 ? cur.pxm : cur.px;
+    return { ox:(W-dw)*f, oy:(H-dh)/2, k:k, W:W };
+  }
+  function respawn(p){
+    var c=p._c, m=map();
+    var x=rr(c.sp.x), y=rr(c.sp.y);
+    var ax=m.ox+x*m.k, ay=m.oy+y*m.k, dx, dy;
+    ax=Math.min(Math.max(ax,8), m.W-8);                 // щоб листок не з'являвся за екраном
+    if (c.exit){ dx=-(ax+170); dy=rr(c.dy)*m.k; }
+    else { dy=(m.oy+rr(c.to)*m.k)-ay; dx=rr(c.dx)*m.k; }
+    p.style.left=ax+'px'; p.style.top=ay+'px';
+    p.style.setProperty('--dx', dx+'px');
+    p.style.setProperty('--dy', Math.max(Math.abs(dy)>60?dy:60,-9999)+'px');
+    p.style.setProperty('--rot', rr(c.rot||[-200,200])+'deg');
+    p.style.animationDuration = rr(c.dur)+'s';
+    var s = Math.round(rr(c.size)*Math.max(.75,Math.min(1.25,m.k)));
+    p.firstChild.innerHTML = svg(c.kind, pick(c.colors), s);
+  }
+  function build(c, i){
+    var p=document.createElement('span'), inner=document.createElement('span');
+    p.className='fx-p k-'+c.kind;
+    inner.className='fx-i s-'+c.kind;
+    if (c.kind!=='bat' && c.kind!=='spark'){
+      var sw=c.sw||[14,36];
+      inner.style.animationDuration = rnd(2.6,4.8)+'s';
+      inner.style.animationDelay = (-rnd(0,4))+'s';
+      inner.style.setProperty('--sw', rr(sw)+'px');
+      inner.style.setProperty('--sr', rnd(18,55)+'deg');
+    } else {
+      inner.style.animationDelay = (-rnd(0,1))+'s';
+    }
+    p.appendChild(inner);
+    p._c=c;
+    respawn(p);
+    p.style.animationDelay = (c.kind==='bat' ? rnd(0,12) : i*0.35+rnd(0,1.5))+'s';
+    p.addEventListener('animationiteration', function(e){ if (e.target===p) respawn(p); });
+    return p;
+  }
+
+  function clearTheme(){
+    var b=document.querySelector('.season-badge'); if (b) b.remove();
+    if (fx) { fx.remove(); fx=null; }
+    if (scene) { scene.remove(); scene=null; }
+    document.body.removeAttribute('data-theme');
+    current=null; cur=null;
+  }
 
   function applyTheme(name){
-    var t = THEMES[name];
-    if (!t || name === current) return;
-    current = name;
-
-    var oldBadge = document.querySelector('.season-badge');
-    if (oldBadge) oldBadge.remove();
-    if (fx) { fx.remove(); fx = null; }
-
+    var t=THEMES[name];
+    if (!t || name===current) return;
+    clearTheme();
+    current=name; cur=t;
     document.body.setAttribute('data-theme', name);
 
-    var h1 = document.querySelector('h1');
+    var h1=document.querySelector('h1');
     if (h1) {
-      var badge = document.createElement('div');
-      badge.className = 'season-badge';
-      badge.textContent = t.label;
+      var badge=document.createElement('div');
+      badge.className='season-badge';
+      badge.textContent=t.label;
       h1.parentNode.insertBefore(badge, h1);
     }
 
+    scene=document.createElement('div');
+    scene.id='scene';
+    document.body.appendChild(scene);
+
     if (reduce) return;
-    fx = document.createElement('div');
-    fx.id = 'fx';
-    var n = window.innerWidth < 600 ? Math.round(t.count*0.6) : t.count;
-    for (var i=0; i<n; i++){
-      var p = document.createElement('span');
-      p.className = 'fx-p' + (t.mode==='rise' ? ' rise' : '');
-      p.textContent = t.emoji[i % t.emoji.length];
-      p.style.left = (Math.random()*100) + 'vw';
-      p.style.fontSize = (14 + Math.random()*16) + 'px';
-      p.style.animationDuration = (9 + Math.random()*10) + 's';
-      p.style.animationDelay = (-Math.random()*18) + 's';
-      p.style.setProperty('--dx', ((Math.random()*80)-40) + 'px');
-      p.style.setProperty('--rot', ((Math.random()*360)-180) + 'deg');
-      fx.appendChild(p);
-    }
+    fx=document.createElement('div');
+    fx.id='fx';
+    var f = window.innerWidth<600 ? 0.6 : 1;
+    t.parts.forEach(function(c){
+      var n=Math.max(2, Math.round(c.n*f));
+      for (var i=0;i<n;i++) fx.appendChild(build(c,i));
+    });
     document.body.appendChild(fx);
   }
 
-  var autoName = pickTheme(new Date());
-  applyTheme((forced && THEMES[forced]) ? forced : autoName);
+  window.addEventListener('resize', function(){
+    if (fx && cur) fx.querySelectorAll('.fx-p').forEach(respawn);
+  });
+
+  function show(n){
+    if (!n || n==='auto') n=autoName;
+    if (n==='off') { clearTheme(); return; }
+    if (THEMES[n]) applyTheme(n);
+  }
+
+  if (forced && THEMES[forced]) {
+    applyTheme(forced);
+  } else {
+    show(cacheGet());   // остання тема з бота — щоб сторінка не «блимала»
+  }
 
   // Вибір із бота (персональний або для всіх), якщо в посиланні немає ?theme=
   if (!forced && typeof HOMEWORK_API_URL !== 'undefined' && HOMEWORK_API_URL && HOMEWORK_API_URL.indexOf('ВСТАВТЕ') !== 0) {
     window.applyThemeOverride = function(r){
-      var n = r && r.theme;
-      if (n === 'auto') n = autoName;
-      if (n && THEMES[n]) applyTheme(n);
+      var n=(r && r.theme) || 'auto';
+      cacheSet(n);
+      show(n);
     };
-    var code = (params.get('u') || '').trim().replace(/\s+/g,' ').toLowerCase();
     var sep = HOMEWORK_API_URL.indexOf('?') > -1 ? '&' : '?';
-    var s = document.createElement('script');
-    s.src = HOMEWORK_API_URL + sep + 'mode=theme&callback=applyThemeOverride&student=' + encodeURIComponent(code) + '&_=' + Date.now();
-    document.body.appendChild(s);
+    var sc = document.createElement('script');
+    sc.src = HOMEWORK_API_URL + sep + 'mode=theme&callback=applyThemeOverride&student=' + encodeURIComponent(code) + '&_=' + Date.now();
+    document.body.appendChild(sc);
   }
 })();
 </script>
