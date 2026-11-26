@@ -605,9 +605,9 @@
   .garland.paused .gb-glow, .garland.paused .gb-dot{ animation-play-state:paused; }
   .gb-dot{ position:absolute; aspect-ratio:1; border-radius:50%; pointer-events:none; opacity:0;
     transform:translate(-50%,-50%) scale(.8);
-    background:radial-gradient(circle, rgba(255,252,240,1) 0, rgba(255,232,170,.85) 12%, rgba(255,190,100,.42) 38%, rgba(255,184,92,0) 70%);
+    background:radial-gradient(circle, rgba(255,253,245,1) 0, rgba(255,240,190,.95) 14%, rgba(255,205,115,.55) 36%, rgba(255,184,92,.18) 58%, rgba(255,184,92,0) 72%);
     animation:gbDot var(--t,4s) ease-in-out infinite alternate; animation-delay:var(--d,0s); }
-  @keyframes gbDot{ 0%{ opacity:0; transform:translate(-50%,-50%) scale(.8); } 100%{ opacity:var(--hi,1); transform:translate(-50%,-50%) scale(1.18); } }
+  @keyframes gbDot{ 0%{ opacity:0; transform:translate(-50%,-50%) scale(.55); } 100%{ opacity:var(--hi,1); transform:translate(-50%,-50%) scale(1.25); } }
 
   /* Фон кімнати: мерехтіння ялинки, жива лампа каміна, сніг за вікном — один canvas, змішування «screen» */
   #nycv{ position:fixed; left:0; top:0; pointer-events:none; z-index:0; mix-blend-mode:screen; }
@@ -615,7 +615,6 @@
   @media (prefers-reduced-motion: reduce){
     body[data-theme="newyear"] .card::before{ animation:none; opacity:.85; }
     .gb-glow{ animation:none; opacity:.85; }
-    .gb-dot{ animation-duration:14s; }
     #nycv{ display:none; }
   }
 
@@ -2409,6 +2408,8 @@ function showNamePicker_(studentCode, allowed, members){
   // Усе — окремі елементи поверх фону, не частина фотографії.
   // Координати нижче — у пікселях фото bg/newyear.jpg (1759×894).
   // ============================================================
+  var CANDLES = [[1112, 324], [1159, 317], [1183, 320], [1400, 320], [1438, 310], [1119, 578], [1141, 562], [1159, 580], [68, 510]];            // полум'я свічок (координати фото)
+  var EXTRA_LIGHTS = [[75, 13], [52, 86], [53, 153], [82, 187], [70, 181], [80, 224], [0, 240], [20, 270], [44, 290], [35, 279], [1352, 310], [6, 347], [1195, 365], [1219, 368], [170, 503], [196, 503], [185, 519], [51, 516], [159, 519], [200, 520]];        // вогники фіранки, гірлянди каміна, кулі зі снігом, зірки
   var TREE_LIGHTS = [[1400,322],[1438,312],[1494,527],[1633,385],[1644,247],[1654,537],[1558,608],[1710,638],[1649,106],[1740,313],[1563,703],[1648,39],[1494,460],[1738,394],[1428,337],[1494,648],[1671,168],[1702,520],[1466,528],[1574,214],[1594,377],[1578,488],[1667,107],[1740,554],[1460,647],[1557,282],[1741,426],[1447,599],[1669,649],[1626,679],[1622,116],[1702,326],[1676,328],[1541,464],[1546,396],[1518,419],[1688,256],[1473,515],[1681,69],[1615,73],[1666,88],[1630,91],[1633,146],[1707,204],[1738,528],[1426,615],[1617,633],[1546,679],[1668,63],[1627,67],[1632,253],[1668,252],[1574,275],[1717,345],[1511,541],[1695,157],[1591,212],[1644,65],[1655,55],[1621,233],[1560,237],[1658,407],[1621,362],[1669,398],[1679,526],[1605,232],[1615,293],[1719,320],[1691,513],[1581,617],[1406,340],[1624,516],[1540,566],[1616,270],[1730,380],[1547,382],[1593,569],[1413,617],[1606,252],[1590,397],[1690,438],[1594,604],[1451,615],[1655,156],[1721,205],[1674,231],[1655,333],[1604,388],[1575,433],[1521,470],[1721,523],[1437,352],[1520,376],[1622,392],[1578,447],[1463,495],[1502,513],[1605,644],[1641,82],[1612,177],[1686,197],[1670,206],[1713,263],[1470,596],[1518,626],[1753,285],[1583,367],[1569,375],[1506,398],[1687,415],[1529,536],[1756,553],[1566,589],[1541,607],[1698,628]];
   // шибки вікна (сніг падає лише в них, не на штори й не в кімнаті)
   var WINDOW_PANES = [
@@ -2500,7 +2501,7 @@ function showNamePicker_(studentCode, allowed, members){
     if (kind==='header'){                                    // під заголовками — готове зображення гірлянди + мерехтіння кожного вогника
       var qq=mulberry32(seed+7), r2=function(a,b){ return a+qq()*(b-a); }, h='';
       GARLAND_BULBS.forEach(function(b){
-        h+='<i class="gb-dot" style="left:'+b[0]+'%;top:'+b[1]+'%;width:'+(b[2]*3.8).toFixed(2)+'%;--t:'+r2(2.6,6.2).toFixed(2)+'s;--d:'+(-r2(0,6)).toFixed(2)+'s;--hi:'+r2(.65,1).toFixed(2)+'"></i>';
+        h+='<i class="gb-dot" style="left:'+b[0]+'%;top:'+b[1]+'%;width:'+(b[2]*5.4).toFixed(2)+'%;--t:'+r2(1.5,3.6).toFixed(2)+'s;--d:'+(-r2(0,4)).toFixed(2)+'s;--hi:'+r2(.8,1).toFixed(2)+'"></i>';
       });
       return h;
     }
@@ -2622,13 +2623,24 @@ function showNamePicker_(studentCode, allowed, members){
     size(); E.onr=size; window.addEventListener('resize',size);
 
     var spLight=makeSprite([[0,'rgba(255,250,225,1)'],[.18,'rgba(255,236,170,.85)'],[.45,'rgba(255,196,96,.32)'],[1,'rgba(255,170,60,0)']],64);
+    var spCandle=makeSprite([[0,'rgba(255,249,222,1)'],[.22,'rgba(255,218,140,.9)'],[.5,'rgba(255,172,72,.3)'],[1,'rgba(255,150,40,0)']],64);
     var spFire =makeSprite([[0,'rgba(255,205,110,1)'],[.35,'rgba(255,160,60,.55)'],[1,'rgba(255,120,30,0)']],128);
 
     // кожна лампочка ялинки має свій ритм: повільно й м'яко, без різкого блимання
-    var lights=TREE_LIGHTS.map(function(p){
-      return { x:p[0], y:p[1], r:rnd(11,20), lo:rnd(0.04,0.22), hi:rnd(0.8,1), 
+    function nearCandle(p){ for (var c=0;c<CANDLES.length;c++) if (Math.hypot(p[0]-CANDLES[c][0],p[1]-CANDLES[c][1])<16) return true; return false; }
+    var lights=TREE_LIGHTS.filter(function(p){ return !nearCandle(p); }).map(function(p){
+      return { x:p[0], y:p[1], r:rnd(11,20), lo:rnd(0.04,0.22), hi:rnd(0.8,1),
                w1:rnd(1.1,3.2)*(calm?.45:1), p1:rnd(0,6.28), w2:rnd(0.5,1.5)*(calm?.45:1), p2:rnd(0,6.28) };
+    }).concat(EXTRA_LIGHTS.map(function(p){
+      return { x:p[0], y:p[1], r:rnd(9,15), lo:rnd(0.05,0.25), hi:rnd(0.75,1),
+               w1:rnd(1.2,3.4)*(calm?.45:1), p1:rnd(0,6.28), w2:rnd(0.5,1.6)*(calm?.45:1), p2:rnd(0,6.28) };
+    }));
+    // свічки: кожне полум'я живе власним ритмом — легке тремтіння, похитування й рідкі «подихи протягу»
+    var candles=CANDLES.map(function(c){
+      return { x:c[0], y:c[1], s:rnd(0.85,1.15), a:rnd(5.5,8.5), b:rnd(9,14), c:rnd(15,22), pa:rnd(0,6.28), pb:rnd(0,6.28), pc:rnd(0,6.28), g:rnd(0.25,0.5), pg:rnd(0,6.28), sw:rnd(1.2,2.6) };
     });
+    // великий світловий відблиск зірки на ялинці
+    var star={ x:1648, y:90 };
     // сніжинки за вікном (координати фото); дуже повільні
     var flakes=[], nf=36;
     for (var i=0;i<nf;i++) flakes.push({ x:rnd(26,194), y:rnd(36,420), r:rnd(0.8,2.1), vy:rnd(5,15), amp:rnd(3,9), sw:rnd(0.5,1.4), ph:rnd(0,6.28), a:rnd(0.55,0.95) });
@@ -2692,6 +2704,22 @@ function showNamePicker_(studentCode, allowed, members){
           glow(m,spFire,ex,ey,em.s*4,em.s*4,ctx.globalAlpha);
         }
       }
+
+      // 2b) свічки
+      var cmul=calm?.4:1;
+      for (var ci=0;ci<candles.length;ci++){
+        var C=candles[ci];
+        var sx0=m.ox+C.x*m.k; if (sx0<-60||sx0>W+60) continue;
+        var dip=Math.pow(Math.max(0,Math.sin(now*C.g+C.pg)),14)*0.35;
+        var fl=0.8+cmul*(0.1*Math.sin(now*C.a+C.pa)+0.07*Math.sin(now*C.b+C.pb)+0.05*Math.sin(now*C.c+C.pc)-dip);
+        var sway=C.sw*cmul*Math.sin(now*C.a*0.7+C.pb);
+        glow(m,spCandle,C.x,C.y-3,30*C.s,30*C.s,0.3*fl);                                    // відблиск на стіні
+        glow(m,spCandle,C.x+sway*0.5,C.y-2,8.5*C.s*(0.92+0.16*fl),15*C.s*(0.8+0.4*fl),0.95*fl); // язичок полум'я
+        glow(m,spCandle,C.x+sway,C.y-6*fl,3.2*C.s,7*C.s,0.75*fl);                            // яскраве ядро
+      }
+      // відблиск зірки
+      var sp2=0.5+0.5*Math.sin(now*0.9)*Math.sin(now*0.37+1);
+      glow(m,spLight,star.x,star.y,96,96,(0.14+0.2*sp2)*(calm?.6:1));
 
       // 3) вогники ялинки
       for (var j=0;j<lights.length;j++){
