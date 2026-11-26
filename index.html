@@ -147,7 +147,7 @@
     gap:8px;
     padding:5px 14px 5px 12px;
     border-radius:999px;
-    background: rgba(51,85,238,0.10);
+    background: var(--accent-soft, rgba(51,85,238,0.10));
   }
   .subgroup-title::before{
     content:'';
@@ -261,7 +261,7 @@
     font-weight:800;
     font-size:15px;
     color:var(--c1-b);
-    background: linear-gradient(150deg, rgba(255,255,255,0.75), rgba(108,140,255,0.22));
+    background: linear-gradient(150deg, rgba(255,255,255,0.75), var(--tile-tint, rgba(108,140,255,0.22)));
     backdrop-filter: blur(6px) saturate(160%);
     -webkit-backdrop-filter: blur(6px) saturate(160%);
     border:1px solid rgba(255,255,255,0.7);
@@ -379,6 +379,96 @@
   }
   .open-badge.open{ background:var(--correct-bg); color:var(--correct-ink); }
   .open-badge.closed{ background:rgba(229,72,77,0.12); color:var(--c2-b); }
+
+  /* ===== СЕЗОННІ ТЕМИ ===== */
+  body{ background:var(--bg-img, var(--bg)); background-attachment:fixed; transition:background .4s ease; }
+  .wrap{ position:relative; z-index:1; }
+
+  .season-badge{
+    display:inline-block;
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:13px;
+    letter-spacing:.03em;
+    padding:7px 14px;
+    border-radius:999px;
+    background:rgba(255,255,255,.75);
+    color:var(--c1-b);
+    box-shadow:0 8px 18px -12px var(--c1-sh);
+    margin:0 0 12px;
+  }
+
+  #fx{ position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:0; }
+  .fx-p{ position:absolute; top:-10%; will-change:transform; opacity:.85; animation:fxFall linear infinite; }
+  .fx-p.rise{ top:auto; bottom:-10%; animation-name:fxRise; }
+  @keyframes fxFall{
+    0%{ transform:translate3d(0,-10vh,0) rotate(0deg); }
+    100%{ transform:translate3d(var(--dx),115vh,0) rotate(var(--rot)); }
+  }
+  @keyframes fxRise{
+    0%{ transform:translate3d(0,0,0) rotate(0deg); }
+    100%{ transform:translate3d(var(--dx),-120vh,0) rotate(var(--rot)); }
+  }
+  @media (prefers-reduced-motion: reduce){ #fx{ display:none; } }
+
+  body[data-theme="winter"]{
+    --bg:#D2E6F7; --bg-soft:#E6F1FB; --c1-a:#7FB2E8; --c1-b:#2F6FB5; --c1-sh:rgba(47,111,181,.45);
+    --bg-img:linear-gradient(180deg,#C4DDF4 0%,#EAF4FC 100%);
+    --tile-tint:rgba(47,111,181,.2); --accent-soft:rgba(47,111,181,.10);
+  }
+  body[data-theme="newyear"]{
+    --bg:#DCEBFA; --bg-soft:#EEF5FD; --c1-a:#FF7A85; --c1-b:#C62839; --c1-sh:rgba(198,40,57,.4);
+    --bg-img:linear-gradient(180deg,#CFE4F8 0%,#F7E3E5 100%);
+    --tile-tint:rgba(198,40,57,.2); --accent-soft:rgba(198,40,57,.10);
+  }
+  body[data-theme="love"]{
+    --bg:#FFD9E4; --bg-soft:#FFEAF0; --c1-a:#FF8DB0; --c1-b:#D6336C; --c1-sh:rgba(214,51,108,.4);
+    --bg-img:linear-gradient(180deg,#FFD0DF 0%,#FFEFF4 100%);
+    --tile-tint:rgba(214,51,108,.2); --accent-soft:rgba(214,51,108,.10);
+  }
+  body[data-theme="women"]{
+    --bg:#F1DDF9; --bg-soft:#F8EEFD; --c1-a:#C98AE6; --c1-b:#A23FBF; --c1-sh:rgba(162,63,191,.4);
+    --bg-img:linear-gradient(180deg,#EBD2F7 0%,#FCEFF8 100%);
+    --tile-tint:rgba(162,63,191,.2); --accent-soft:rgba(162,63,191,.10);
+  }
+  body[data-theme="spring"]{
+    --bg:#DDF3D2; --bg-soft:#EDF9E6; --c1-a:#7FD16F; --c1-b:#3E9B3A; --c1-sh:rgba(62,155,58,.4);
+    --bg-img:linear-gradient(180deg,#D3EFC6 0%,#F4FBEF 100%);
+    --tile-tint:rgba(62,155,58,.2); --accent-soft:rgba(62,155,58,.10);
+  }
+  body[data-theme="easter"]{
+    --bg:#FFF1C9; --bg-soft:#FFF8E1; --c1-a:#F6B24A; --c1-b:#D9791A; --c1-sh:rgba(217,121,26,.4);
+    --bg-img:linear-gradient(180deg,#FFEAB5 0%,#E9F7DC 100%);
+    --tile-tint:rgba(217,121,26,.2); --accent-soft:rgba(217,121,26,.10);
+  }
+  body[data-theme="summer"]{
+    --bg:#FFF0B8; --bg-soft:#FFF8DA; --c1-a:#FFB347; --c1-b:#E8740C; --c1-sh:rgba(232,116,12,.4);
+    --bg-img:linear-gradient(180deg,#BFEAFF 0%,#FFF3BF 100%);
+    --tile-tint:rgba(232,116,12,.2); --accent-soft:rgba(232,116,12,.10);
+  }
+  body[data-theme="autumn"]{
+    --bg:#FBE3C4; --bg-soft:#FDEFDB; --c1-a:#E8955A; --c1-b:#C4571A; --c1-sh:rgba(196,87,26,.4);
+    --bg-img:linear-gradient(180deg,#F7D8AE 0%,#FDF0DE 100%);
+    --tile-tint:rgba(196,87,26,.2); --accent-soft:rgba(196,87,26,.10);
+  }
+  body[data-theme="school"]{
+    /* кольори — як зараз, додається лише плашка й олівці/книжки */
+  }
+  body[data-theme="independence"]{
+    --bg:#CFE6FF; --bg-soft:#E4F1FF; --c1-a:#5BA3F0; --c1-b:#0057B8; --c1-sh:rgba(0,87,184,.4);
+    --bg-img:linear-gradient(180deg,#9CCBFF 0%,#FFE98A 100%);
+    --tile-tint:rgba(0,87,184,.2); --accent-soft:rgba(0,87,184,.10);
+  }
+  body[data-theme="halloween"]{
+    --bg:#FFD9B0; --bg-soft:#FFEBD2; --c1-a:#A478E6; --c1-b:#7A3FD1; --c1-sh:rgba(122,63,209,.4);
+    --bg-img:linear-gradient(180deg,#FFCB94 0%,#EBDDFB 100%);
+    --tile-tint:rgba(122,63,209,.2); --accent-soft:rgba(122,63,209,.10);
+  }
+  body[data-theme="vyshyvanka"]{
+    --bg:#F8E3E3; --bg-soft:#FCF0F0; --c1-a:#E86A70; --c1-b:#C0222B; --c1-sh:rgba(192,34,43,.4);
+    --bg-img:linear-gradient(180deg,#F5D6D6 0%,#FFF6F0 100%);
+    --tile-tint:rgba(192,34,43,.2); --accent-soft:rgba(192,34,43,.10);
+  }
 </style>
 </head>
 <body>
@@ -1176,6 +1266,120 @@ function showNamePicker_(studentCode, allowed, members){
     msg.className = 'sub';
     msg.textContent = 'Це посилання недійсне. Зверніться до вчительки за новим.';
     document.querySelector('.wrap').appendChild(msg);
+  }
+})();
+
+// ============================================================
+// СЕЗОННІ ТЕМИ
+// Пріоритет: ?theme=... у посиланні → вибір у боті (учню або всім) → дата.
+// &theme=off — вимкнути тему.
+// ============================================================
+(function(){
+  function orthodoxEaster(y){
+    var a=y%4, b=y%7, c=y%19, d=(19*c+15)%30, e=(2*a+4*b-d+34)%7;
+    var m=Math.floor((d+e+114)/31), day=((d+e+114)%31)+1;
+    var dt=new Date(y, m-1, day);
+    dt.setDate(dt.getDate()+13);          // юліанський → григоріанський (1900–2099)
+    return dt;
+  }
+  function thirdThursdayOfMay(y){
+    var d=new Date(y,4,1), shift=(4-d.getDay()+7)%7;
+    return 1+shift+14;
+  }
+  function pickTheme(now){
+    var y=now.getFullYear(), m=now.getMonth()+1, d=now.getDate(), md=m*100+d;
+    var today=new Date(y,m-1,d);
+    var diff=Math.round((today-orthodoxEaster(y))/86400000);
+    if (diff>=-7 && diff<=6) return 'easter';
+    if (md>=1220 || md<=108) return 'newyear';
+    if (md>=212 && md<=214) return 'love';
+    if (md>=306 && md<=308) return 'women';
+    if (md>=820 && md<=824) return 'independence';
+    if (md>=1028 && md<=1031) return 'halloween';
+    if (m===5 && d===thirdThursdayOfMay(y)) return 'vyshyvanka';
+    if (md>=1201 && md<=1219) return 'winter';
+    if (md<=305) return 'winter';
+    if (md<=531) return 'spring';
+    if (md<=831) return 'summer';
+    if (md<=930) return 'school';
+    return 'autumn';
+  }
+
+  var THEMES = {
+    winter:      {label:'❄️ Зимовий настрій',        emoji:['❄️','❄️','❅','❆'],           mode:'fall', count:22},
+    newyear:     {label:'🎄 З Новим роком і Різдвом!', emoji:['❄️','⭐','🎄','✨'],         mode:'fall', count:22},
+    love:        {label:'💘 З Днем закоханих!',       emoji:['💖','💗','💕','❤️'],          mode:'rise', count:16},
+    women:       {label:'🌷 З 8 Березня!',            emoji:['🌷','🌸','🌼','💐'],          mode:'fall', count:16},
+    spring:      {label:'🌸 Весна прийшла',           emoji:['🌸','🌿','🌼','🍃'],          mode:'fall', count:14},
+    easter:      {label:'🐣 Христос Воскрес!',        emoji:['🥚','🐣','🌷','🐇'],          mode:'fall', count:14},
+    summer:      {label:'☀️ Літній настрій',          emoji:['☀️','🌻','🍉','🦋'],          mode:'fall', count:12},
+    autumn:      {label:'🍂 Осінній настрій',         emoji:['🍂','🍁','🍃','🌰'],          mode:'fall', count:18},
+    school:      {label:'📚 Навчальний рік',          emoji:['✏️','📚','📝','🔤'],          mode:'fall', count:10},
+    independence:{label:'💙💛 З Днем Незалежності!',  emoji:['💙','💛','🇺🇦'],              mode:'rise', count:16},
+    halloween:   {label:'🎃 Щасливого Геловіну!',     emoji:['🎃','🦇','👻','🕸️'],          mode:'fall', count:16},
+    vyshyvanka:  {label:'🌺 З Днем вишиванки!',       emoji:['🌺','❤️','🖤','🌾'],          mode:'fall', count:14}
+  };
+
+  var params = new URLSearchParams(location.search);
+  var forced = params.get('theme');
+  if (forced === 'off') return;
+
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var fx = null, current = null;
+
+  function applyTheme(name){
+    var t = THEMES[name];
+    if (!t || name === current) return;
+    current = name;
+
+    var oldBadge = document.querySelector('.season-badge');
+    if (oldBadge) oldBadge.remove();
+    if (fx) { fx.remove(); fx = null; }
+
+    document.body.setAttribute('data-theme', name);
+
+    var h1 = document.querySelector('h1');
+    if (h1) {
+      var badge = document.createElement('div');
+      badge.className = 'season-badge';
+      badge.textContent = t.label;
+      h1.parentNode.insertBefore(badge, h1);
+    }
+
+    if (reduce) return;
+    fx = document.createElement('div');
+    fx.id = 'fx';
+    var n = window.innerWidth < 600 ? Math.round(t.count*0.6) : t.count;
+    for (var i=0; i<n; i++){
+      var p = document.createElement('span');
+      p.className = 'fx-p' + (t.mode==='rise' ? ' rise' : '');
+      p.textContent = t.emoji[i % t.emoji.length];
+      p.style.left = (Math.random()*100) + 'vw';
+      p.style.fontSize = (14 + Math.random()*16) + 'px';
+      p.style.animationDuration = (9 + Math.random()*10) + 's';
+      p.style.animationDelay = (-Math.random()*18) + 's';
+      p.style.setProperty('--dx', ((Math.random()*80)-40) + 'px');
+      p.style.setProperty('--rot', ((Math.random()*360)-180) + 'deg');
+      fx.appendChild(p);
+    }
+    document.body.appendChild(fx);
+  }
+
+  var autoName = pickTheme(new Date());
+  applyTheme((forced && THEMES[forced]) ? forced : autoName);
+
+  // Вибір із бота (персональний або для всіх), якщо в посиланні немає ?theme=
+  if (!forced && typeof HOMEWORK_API_URL !== 'undefined' && HOMEWORK_API_URL && HOMEWORK_API_URL.indexOf('ВСТАВТЕ') !== 0) {
+    window.applyThemeOverride = function(r){
+      var n = r && r.theme;
+      if (n === 'auto') n = autoName;
+      if (n && THEMES[n]) applyTheme(n);
+    };
+    var code = (params.get('u') || '').trim().replace(/\s+/g,' ').toLowerCase();
+    var sep = HOMEWORK_API_URL.indexOf('?') > -1 ? '&' : '?';
+    var s = document.createElement('script');
+    s.src = HOMEWORK_API_URL + sep + 'mode=theme&callback=applyThemeOverride&student=' + encodeURIComponent(code) + '&_=' + Date.now();
+    document.body.appendChild(s);
   }
 })();
 </script>
