@@ -382,6 +382,9 @@
 
   /* ===== СЕЗОННІ ТЕМИ ===== */
   body{ background:var(--bg-img, var(--bg)); background-attachment:fixed; transition:background .4s ease; }
+  /* під темою нічого блакитного: колір під фоном і під панеллю браузера = теплий, а не стандартний блакитний */
+  body[data-theme]{ background:var(--bg-soft, #F6E8D6); }
+  html:has(body[data-theme]){ background:var(--bg-soft, #F6E8D6); }
   .wrap{ position:relative; z-index:1; }
 
   .season-badge{
@@ -432,84 +435,84 @@
   body[data-theme="autumn"]{
     --c1-a:#F7C58E; --c1-b:#E67E22; --c1-sh:rgba(230,126,34,0.4); --bg-soft:#FFE9CC; --card:#FFFCF6; --ink:#4A2C12; --ink-soft:#8B5E3C; --c2-b:#C0392B;
     --tile-tint:rgba(230,126,34,0.22); --accent-soft:rgba(230,126,34,0.12);
-    --veil-bg:linear-gradient(90deg, rgba(255,246,234,0.55) 0%, rgba(255,246,234,0.3) 55%, rgba(255,246,234,0) 88%); --veil-m:rgba(255,246,234,0.25);
+    --veil-bg:linear-gradient(90deg, rgba(255,246,234,0.55) 0%, rgba(255,246,234,0.3) 55%, rgba(255,246,234,0) 88%); --veil-m:none;
   }
   body[data-theme="autumn"] #scene{ background-image:url("bg/autumn.jpg"); background-position:100% center; }
   @media (max-width:700px){ body[data-theme="autumn"] #scene{ background-position:78% center; } }
   body[data-theme="winter"]{
     --c1-a:#7FB2E8; --c1-b:#2F6FB5; --c1-sh:rgba(47,111,181,0.4);
     --tile-tint:rgba(47,111,181,0.22); --accent-soft:rgba(47,111,181,0.12);
-    --veil-bg:linear-gradient(90deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.22) 55%, rgba(255,255,255,0) 88%); --veil-m:rgba(255,255,255,0.2);
+    --veil-bg:linear-gradient(90deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.22) 55%, rgba(255,255,255,0) 88%); --veil-m:none;
   }
   body[data-theme="winter"] #scene{ background-image:url("bg/winter.jpg"); background-position:100% center; }
   @media (max-width:700px){ body[data-theme="winter"] #scene{ background-position:85% center; } }
   body[data-theme="newyear"]{
     --c1-a:#FFB067; --c1-b:#D4501A; --c1-sh:rgba(212,80,26,0.4);
     --tile-tint:rgba(212,80,26,0.22); --accent-soft:rgba(212,80,26,0.12);
-    --veil-bg:linear-gradient(90deg, rgba(255,236,210,0.3) 0%, rgba(255,236,210,0.12) 55%, rgba(255,236,210,0) 88%); --veil-m:rgba(255,236,210,0.2);
+    --veil-bg:linear-gradient(90deg, rgba(255,236,210,0.3) 0%, rgba(255,236,210,0.12) 55%, rgba(255,236,210,0) 88%); --veil-m:none;
   }
   body[data-theme="newyear"] #scene{ background-image:url("bg/newyear.jpg"); background-position:100% center; }
   @media (max-width:700px){ body[data-theme="newyear"] #scene{ background-position:90% center; } }
   body[data-theme="love"]{
     --c1-a:#FF8DB0; --c1-b:#D6336C; --c1-sh:rgba(214,51,108,0.4);
     --tile-tint:rgba(214,51,108,0.22); --accent-soft:rgba(214,51,108,0.12);
-    --veil-bg:linear-gradient(90deg, rgba(255,240,248,0.35) 0%, rgba(255,240,248,0.15) 55%, rgba(255,240,248,0) 88%); --veil-m:rgba(255,240,248,0.2);
+    --veil-bg:linear-gradient(90deg, rgba(255,240,248,0.35) 0%, rgba(255,240,248,0.15) 55%, rgba(255,240,248,0) 88%); --veil-m:none;
   }
   body[data-theme="love"] #scene{ background-image:url("bg/love.jpg"); background-position:100% center; }
   @media (max-width:700px){ body[data-theme="love"] #scene{ background-position:92% center; } }
   body[data-theme="spring"]{
     --c1-a:#8FD06B; --c1-b:#3E9B3A; --c1-sh:rgba(62,155,58,0.4);
     --tile-tint:rgba(62,155,58,0.22); --accent-soft:rgba(62,155,58,0.12);
-    --veil-bg:linear-gradient(90deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.2) 55%, rgba(255,255,255,0) 88%); --veil-m:rgba(255,255,255,0.2);
+    --veil-bg:linear-gradient(90deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.2) 55%, rgba(255,255,255,0) 88%); --veil-m:none;
   }
   body[data-theme="spring"] #scene{ background-image:url("bg/spring.jpg"); background-position:100% center; }
   @media (max-width:700px){ body[data-theme="spring"] #scene{ background-position:85% center; } }
   body[data-theme="summer"]{
     --c1-a:#FFB347; --c1-b:#E8740C; --c1-sh:rgba(232,116,12,0.4);
     --tile-tint:rgba(232,116,12,0.22); --accent-soft:rgba(232,116,12,0.12);
-    --veil-bg:linear-gradient(90deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.2) 55%, rgba(255,255,255,0) 88%); --veil-m:rgba(255,255,255,0.2);
+    --veil-bg:linear-gradient(90deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.2) 55%, rgba(255,255,255,0) 88%); --veil-m:none;
   }
   body[data-theme="summer"] #scene{ background-image:url("bg/summer.jpg"); background-position:100% center; }
   @media (max-width:700px){ body[data-theme="summer"] #scene{ background-position:85% center; } }
   body[data-theme="women"]{
     --c1-a:#F28CB1; --c1-b:#C2185B; --c1-sh:rgba(194,24,91,0.4);
     --tile-tint:rgba(194,24,91,0.22); --accent-soft:rgba(194,24,91,0.12);
-    --veil-bg:rgba(255,245,248,0.3); --veil-m:rgba(255,245,248,0.22);
+    --veil-bg:rgba(255,245,248,0.3); --veil-m:none;
   }
   body[data-theme="women"] #scene{ background-image:url("bg/women.jpg"); background-position:50% center; }
   @media (max-width:700px){ body[data-theme="women"] #scene{ background-position:70% center; } }
   body[data-theme="easter"]{
     --c1-a:#F2A65A; --c1-b:#B5352A; --c1-sh:rgba(181,53,42,0.4);
     --tile-tint:rgba(181,53,42,0.22); --accent-soft:rgba(181,53,42,0.12);
-    --veil-bg:rgba(255,250,240,0.32); --veil-m:rgba(255,250,240,0.22);
+    --veil-bg:rgba(255,250,240,0.32); --veil-m:none;
   }
   body[data-theme="easter"] #scene{ background-image:url("bg/easter.jpg"); background-position:50% center; }
   @media (max-width:700px){ body[data-theme="easter"] #scene{ background-position:50% center; } }
   body[data-theme="independence"]{
     --c1-a:#5BA3F0; --c1-b:#0057B8; --c1-sh:rgba(0,87,184,0.4);
     --tile-tint:rgba(0,87,184,0.22); --accent-soft:rgba(0,87,184,0.12);
-    --veil-bg:rgba(255,255,255,0.38); --veil-m:rgba(255,255,255,0.24);
+    --veil-bg:rgba(255,255,255,0.38); --veil-m:none;
   }
   body[data-theme="independence"] #scene{ background-image:url("bg/independence.jpg"); background-position:50% center; }
   @media (max-width:700px){ body[data-theme="independence"] #scene{ background-position:50% center; } }
   body[data-theme="school"]{
     --c1-a:#6C8CFF; --c1-b:#2457C5; --c1-sh:rgba(36,87,197,0.4);
     --tile-tint:rgba(36,87,197,0.22); --accent-soft:rgba(36,87,197,0.12);
-    --veil-bg:rgba(255,255,255,0.22); --veil-m:rgba(255,255,255,0.2);
+    --veil-bg:rgba(255,255,255,0.22); --veil-m:none;
   }
   body[data-theme="school"] #scene{ background-image:url("bg/school.jpg"); background-position:50% center; }
   @media (max-width:700px){ body[data-theme="school"] #scene{ background-position:50% center; } }
   body[data-theme="vyshyvanka"]{
     --c1-a:#E86A70; --c1-b:#C0222B; --c1-sh:rgba(192,34,43,0.4);
     --tile-tint:rgba(192,34,43,0.22); --accent-soft:rgba(192,34,43,0.12);
-    --veil-bg:rgba(255,250,244,0.3); --veil-m:rgba(255,250,244,0.22);
+    --veil-bg:rgba(255,250,244,0.3); --veil-m:none;
   }
   body[data-theme="vyshyvanka"] #scene{ background-image:url("bg/vyshyvanka.jpg"); background-position:50% center; }
   @media (max-width:700px){ body[data-theme="vyshyvanka"] #scene{ background-position:50% center; } }
   body[data-theme="halloween"]{
     --c1-a:#FFA94D; --c1-b:#D9530B; --c1-sh:rgba(217,83,11,0.4);
     --tile-tint:rgba(217,83,11,0.22); --accent-soft:rgba(217,83,11,0.12);
-    --veil-bg:rgba(20,8,35,0.3); --veil-m:rgba(20,8,35,0.2);
+    --veil-bg:rgba(20,8,35,0.3); --veil-m:none;
   }
   body[data-theme="halloween"] #scene{ background-image:url("bg/halloween.jpg"); background-position:50% center; }
   @media (max-width:700px){ body[data-theme="halloween"] #scene{ background-position:22% center; } }
@@ -628,6 +631,9 @@
     width:fit-content; padding:12px 16px; border-radius:16px; background:var(--glass);
     -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); text-shadow:none; }
   @media (max-width:700px){
+    body[data-theme="autumn"] h1, body[data-theme="spring"] h1, body[data-theme="summer"] h1, body[data-theme="winter"] h1, body[data-theme="love"] h1{
+      width:fit-content; padding:4px 16px; border-radius:16px; background:var(--glass);
+      -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); }
     body[data-theme="newyear"] .sub{ width:fit-content; padding:12px 16px; border-radius:16px; background:var(--glass);
       -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); text-shadow:none; }
   }
