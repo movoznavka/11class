@@ -556,44 +556,36 @@
     position:relative; isolation:isolate;
     background:rgba(255,250,238,.9);
     box-shadow:
-      inset 0 0 0 1px rgba(255,241,205,.95),
-      inset 0 0 12px 1px rgba(255,225,155,.42),
-      0 0 0 1px rgba(255,216,145,.6),
-      0 0 9px 1px rgba(255,218,140,.55),
-      0 0 22px 3px rgba(255,192,95,.28),
-      0 14px 28px -22px rgba(90,40,10,.5);
+      0 0 0 1px rgba(255,246,222,.95),
+      0 0 10px 1px rgba(255,224,160,.5),
+      0 0 24px 2px rgba(255,200,110,.2);
     transition:box-shadow .5s ease, transform .15s ease;
   }
   body[data-theme="newyear"] .card.ready:hover{
     box-shadow:
-      inset 0 0 0 1px rgba(255,246,220,1),
-      inset 0 0 16px 2px rgba(255,228,160,.55),
-      0 0 0 1px rgba(255,222,155,.8),
-      0 0 12px 2px rgba(255,224,150,.7),
-      0 0 28px 5px rgba(255,196,100,.38),
-      0 18px 32px -22px rgba(90,40,10,.55);
+      0 0 0 1px rgba(255,250,232,1),
+      0 0 14px 2px rgba(255,228,165,.65),
+      0 0 32px 4px rgba(255,200,110,.3);
   }
   body[data-theme="newyear"] .card.repeat{
     box-shadow:
       0 0 0 2px rgba(139,92,246,.6),
-      inset 0 0 12px 1px rgba(255,225,155,.35),
-      0 0 14px 2px rgba(255,218,140,.45),
-      0 14px 28px -22px rgba(90,40,10,.5);
+      0 0 12px 2px rgba(255,218,140,.4);
   }
   body[data-theme="newyear"] .card::before,
   body[data-theme="newyear"] .card::after{
     content:''; position:absolute; inset:0; border-radius:inherit; z-index:-1; pointer-events:none; }
   body[data-theme="newyear"] .card::before{
-    box-shadow:0 0 18px 3px rgba(255,210,125,.5), 0 0 44px 10px rgba(255,186,85,.28), 0 0 84px 24px rgba(255,170,60,.15);
+    box-shadow:0 0 16px 2px rgba(255,214,135,.3);
     animation:nyBreathe 7.5s ease-in-out infinite alternate; }
   body[data-theme="newyear"] .card::after{
-    box-shadow:0 0 22px 5px rgba(255,224,150,.7), 0 0 58px 16px rgba(255,192,92,.4);
+    box-shadow:0 0 18px 3px rgba(255,226,160,.45);
     opacity:0; transition:opacity .5s ease; }
   body[data-theme="newyear"] .card.ready:hover::after{ opacity:1; }
   body[data-theme="newyear"] .card-wrap:nth-child(2n) .card::before{ animation-delay:-2.3s; }
   body[data-theme="newyear"] .card-wrap:nth-child(3n) .card::before{ animation-delay:-4.1s; animation-duration:9s; }
   body[data-theme="newyear"] .card-wrap:nth-child(5n) .card::before{ animation-delay:-1s; animation-duration:6.4s; }
-  @keyframes nyBreathe{ 0%{ opacity:.55; } 100%{ opacity:1; } }
+  @keyframes nyBreathe{ 0%{ opacity:.5; } 100%{ opacity:1; } }
 
   body[data-theme="newyear"] .test-pill, body[data-theme="newyear"] .block-test-pill,
   body[data-theme="newyear"] .subgroup-test-pill{ box-shadow:0 0 14px 1px rgba(255,200,110,.5); }
@@ -608,10 +600,7 @@
   .garland svg{ display:block; overflow:visible; }
   .gb-glow{ transform-box:fill-box; transform-origin:center;
     animation:gbGlow var(--t,4s) ease-in-out infinite alternate; animation-delay:var(--d,0s); }
-  @keyframes gbGlow{
-    0%{ opacity:var(--lo,.5); transform:scale(.86); }
-    55%{ opacity:.86; transform:scale(1); }
-    100%{ opacity:1; transform:scale(1.07); } }
+  @keyframes gbGlow{ 0%{ opacity:var(--lo,.7); } 100%{ opacity:1; } }
   .garland.paused .gb-glow{ animation-play-state:paused; }
 
   /* Фон кімнати: мерехтіння ялинки, жива лампа каміна, сніг за вікном — один canvas, змішування «screen» */
@@ -2429,44 +2418,27 @@ function showNamePicker_(studentCode, allowed, members){
   // Одна гірлянда: тонкий скручений дріт із природним провисанням і теплими лампочками
   function garlandSVG(w, seed, kind){
     var q=mulberry32(seed), R=function(a,b){ return a+q()*(b-a); };
-    var H=42, y0=8, id='gl'+(++gGid);
-    var swags=[], x=0;
-    while (x<w-1){ var len=R(150,230); if (w-x-len<80) len=w-x; swags.push({a:x,b:x+len,s:(kind==='banner'?R(2.5,5):R(7,11))}); x+=len; }
-    function yAt(px){
-      for (var i=0;i<swags.length;i++){
-        var S=swags[i];
-        if (px<=S.b || i===swags.length-1){ var t=Math.max(0,Math.min(1,(px-S.a)/(S.b-S.a))); return y0+4*S.s*t*(1-t)+1.8*Math.sin(px*0.071+S.s); }
-      }
-      return y0;
-    }
-    var ph=R(0,6.28), A='', B='', px;
-    for (px=0; px<=w; px+=4){
-      var yy=yAt(px), tw=0.7*Math.sin(px*0.17+ph);
-      A+=(px?'L':'M')+px.toFixed(1)+' '+(yy+tw).toFixed(2)+' ';
-      B+=(px?'L':'M')+px.toFixed(1)+' '+(yy-tw).toFixed(2)+' ';
-    }
+    var H=42, y0=(kind==='banner'?11:9), id='gl'+(++gGid);
+    var amp=(kind==='banner'?1.6:3), p1=R(0,6.28), p2=R(0,6.28), L1=R(150,230), L2=R(70,110);
+    function yAt(px){ return y0+amp*Math.sin(px/L1*6.283+p1)+amp*0.35*Math.sin(px/L2*6.283+p2); }
+    var D='', px;
+    for (px=0; px<=w+6; px+=6) D+=(px?'L':'M')+px.toFixed(1)+' '+yAt(px).toFixed(2)+' ';
     var svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+H+'" viewBox="0 0 '+w+' '+H+'" aria-hidden="true"><defs>'
-      +'<radialGradient id="'+id+'c"><stop offset="0" stop-color="#FFFFFA"/><stop offset=".5" stop-color="#FFF1BC"/><stop offset="1" stop-color="#FFC863"/></radialGradient>'
-      +'<radialGradient id="'+id+'a"><stop offset="0" stop-color="#FFFBEA" stop-opacity="1"/><stop offset="1" stop-color="#FFEBB0" stop-opacity="0"/></radialGradient>'
-      +'<radialGradient id="'+id+'b"><stop offset="0" stop-color="#FFD98A" stop-opacity=".95"/><stop offset=".45" stop-color="#FFC15E" stop-opacity=".42"/><stop offset="1" stop-color="#FFB347" stop-opacity="0"/></radialGradient>'
-      +'<radialGradient id="'+id+'d"><stop offset="0" stop-color="#FFC863" stop-opacity=".4"/><stop offset="1" stop-color="#FFB347" stop-opacity="0"/></radialGradient>'
+      +'<radialGradient id="'+id+'a"><stop offset="0" stop-color="#FFFDF4"/><stop offset=".55" stop-color="#FFF3CF"/><stop offset="1" stop-color="#FFE29A" stop-opacity="0"/></radialGradient>'
+      +'<radialGradient id="'+id+'b"><stop offset="0" stop-color="#FFE3A3" stop-opacity=".75"/><stop offset=".4" stop-color="#FFD27A" stop-opacity=".32"/><stop offset="1" stop-color="#FFC060" stop-opacity="0"/></radialGradient>'
       +'</defs>'
-      +'<path d="'+A+'" fill="none" stroke="#8c6c3a" stroke-opacity=".9" stroke-width="1.05" stroke-linecap="round"/>'
-      +'<path d="'+B+'" fill="none" stroke="#dcc48f" stroke-opacity=".95" stroke-width=".9" stroke-linecap="round"/>';
-    var bx=R(16,38);
-    while (bx<w-10){
-      var by=yAt(bx), sl=(yAt(bx+2)-yAt(bx-2))/4, ang=Math.atan(sl)*57.3*0.6+R(-14,14);
-      var t=R(2.6,6.4), d=-R(0,6.4), lo=R(0.38,0.62);
-      svg+='<g transform="translate('+bx.toFixed(1)+' '+by.toFixed(2)+') rotate('+ang.toFixed(1)+')">'
-        +'<g class="gb-glow" style="--t:'+t.toFixed(2)+'s;--d:'+d.toFixed(2)+'s;--lo:'+lo.toFixed(2)+'">'
-        +'<circle cx="0" cy="9.6" r="28" fill="url(#'+id+'d)"/>'
-        +'<circle cx="0" cy="9.6" r="16" fill="url(#'+id+'b)"/>'
-        +'<circle cx="0" cy="9.6" r="7" fill="url(#'+id+'a)"/></g>'
-        +'<path d="M0 0V3.4" stroke="#8c6c3a" stroke-width="1"/>'
-        +'<rect x="-2" y="3" width="4" height="3.6" rx="1" fill="#efe1c0" stroke="#b99a64" stroke-width=".4"/>'
-        +'<path d="M-2.9 6.5Q-3.7 11 0 12.8Q3.7 11 2.9 6.5Z" fill="url(#'+id+'c)"/>'
-        +'<circle cx="-1" cy="8.6" r=".9" fill="#fff" opacity=".95"/></g>';
-      bx+=R(34,52);
+      // ледь підсвічена тонка золотиста нитка
+      +'<path d="'+D+'" fill="none" stroke="#FFE7AE" stroke-opacity=".16" stroke-width="3" stroke-linecap="round"/>'
+      +'<path d="'+D+'" fill="none" stroke="#F4DCA0" stroke-opacity=".9" stroke-width=".7" stroke-linecap="round"/>';
+    var bx=R(14,30);
+    while (bx<w-8){
+      var by=yAt(bx)+R(0.6,2.4), big=q()<0.22, k=big?1.3:1;
+      var t=R(5,11), d=-R(0,11), lo=R(0.62,0.8);
+      svg+='<g class="gb-glow" style="--t:'+t.toFixed(2)+'s;--d:'+d.toFixed(2)+'s;--lo:'+lo.toFixed(2)+'" transform="translate('+bx.toFixed(1)+' '+by.toFixed(2)+')">'
+        +'<circle r="'+(11*k).toFixed(1)+'" fill="url(#'+id+'b)"/>'
+        +'<circle r="'+(4.6*k).toFixed(1)+'" fill="url(#'+id+'a)" opacity=".85"/>'
+        +'<circle r="'+(1.7*k).toFixed(2)+'" fill="#FFFDF3"/></g>';
+      bx+=R(24,40);
     }
     return svg+'</svg>';
   }
