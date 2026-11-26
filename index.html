@@ -595,7 +595,8 @@
   /* Гірлянди (SVG генерується скриптом): замість лінії під заголовками розділів і над червоною плашкою */
   body[data-theme="newyear"] .block-header{ position:relative; border-bottom:none; padding-bottom:14px; }
   .garland{ position:absolute; left:0; width:100%; height:42px; pointer-events:none; z-index:2; }
-  .garland.header{ top:calc(100% - 14px); }
+  .garland.header{ top:100%; height:auto; aspect-ratio:1900/175; transform:translateY(-47%);
+    background:url("bg/garland.png") center / 100% 100% no-repeat; }
   .garland.banner{ top:-14px; }
   .garland svg{ display:block; overflow:visible; }
   .gb-glow{ transform-box:fill-box; transform-origin:center;
@@ -2489,6 +2490,7 @@ function showNamePicker_(studentCode, allowed, members){
 
   function garlandSVG(w, seed, kind, segs, sc){
     var q=mulberry32(seed), R=function(a,b){ return a+q()*(b-a); };
+    if (kind==='header') return '';                         // під заголовками — готове зображення гірлянди (CSS)
     if (kind!=='banner') return pairSVG(w, seed, kind);
     var H=42, id='gl'+(++gGid), y0=14; sc=(sc||1)*1.2;
     var out='<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+H+'" viewBox="0 0 '+w+' '+H+'" aria-hidden="true"><defs>'
