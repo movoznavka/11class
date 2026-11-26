@@ -597,7 +597,6 @@
   .garland{ position:absolute; left:0; width:100%; height:42px; pointer-events:none; z-index:2; }
   .garland.header{ top:calc(100% - 14px); }
   .garland.banner{ top:-14px; }
-  .garland.top{ top:0; z-index:3; }
   .garland svg{ display:block; overflow:visible; }
   .gb-glow{ transform-box:fill-box; transform-origin:center;
     animation:gbGlow var(--t,4s) ease-in-out infinite alternate; animation-delay:var(--d,0s); }
@@ -2465,19 +2464,19 @@ function showNamePicker_(studentCode, allowed, members){
       +'<radialGradient id="'+id+'o"><stop offset="0" stop-color="#FFB85C" stop-opacity=".72"/><stop offset=".4" stop-color="#FFB85C" stop-opacity=".26"/><stop offset="1" stop-color="#FFB85C" stop-opacity="0"/></radialGradient>'
       +'<radialGradient id="'+id+'i"><stop offset="0" stop-color="#FFE2A1" stop-opacity="1"/><stop offset=".5" stop-color="#FFE2A1" stop-opacity=".42"/><stop offset="1" stop-color="#FFE2A1" stop-opacity="0"/></radialGradient>'
       +'</defs>';
-    var A=wanderPts(x0,x1,GARLAND_LARGE,1.25,q()<.5?-1:1,q), O=wanderPts(x0,x1,GARLAND_SHAPES,.95,q()<.5?-1:1,q);
-    var ya=[], yb=[], da='', db='', X=[];
+    var O=wanderPts(x0,x1,GARLAND_SHAPES,1.5,q()<.5?-1:1,q);
+    var yb=[], db='', X=[];
     for (var px=x0; px<=x1; px+=3){
-      var a=y0+interpPts(A,px), b=a+interpPts(O,px);
-      X.push(px); ya.push(a); yb.push(b);
-      var c=(px===x0?'M':'L'); da+=c+px.toFixed(0)+' '+a.toFixed(2)+' '; db+=c+px.toFixed(0)+' '+b.toFixed(2)+' ';
+      var b=y0+interpPts(O,px);
+      X.push(px); yb.push(b);
+      db+=(px===x0?'M':'L')+px.toFixed(0)+' '+b.toFixed(2)+' ';
     }
-    out+='<path d="'+da+'" fill="none" stroke="#FFD58A" stroke-opacity=".16" stroke-width="3.6" stroke-linecap="round"/>'
-      +'<path d="'+db+'" fill="none" stroke="#D2A24C" stroke-opacity=".92" stroke-width=".85" stroke-linecap="round"/>'
-      +'<path d="'+da+'" fill="none" stroke="#E6BE6A" stroke-opacity=".95" stroke-width=".9" stroke-linecap="round"/>';
+    out+='<path d="'+db+'" fill="none" stroke="#FFD58A" stroke-opacity=".16" stroke-width="3.6" stroke-linecap="round"/>'
+      +'<path d="M'+x0+' '+y0+' L'+x1+' '+y0+'" fill="none" stroke="#8F6B3F" stroke-opacity=".9" stroke-width=".9" stroke-linecap="round"/>'
+      +'<path d="'+db+'" fill="none" stroke="#E9C77C" stroke-opacity=".97" stroke-width=".95" stroke-linecap="round"/>';
     var leds='', bx=x0+R(6,22);
     while (bx<x1-4){
-      var idx=Math.min(X.length-1,Math.round((bx-x0)/3)), by=(q()<.5?ya[idx]:yb[idx])+R(-1.3,1.3);
+      var idx=Math.min(X.length-1,Math.round((bx-x0)/3)), by=(q()<.3?y0:yb[idx])+R(-1.3,1.3);
       var k2=R(.75,1.35), br=R(.72,1), tt=R(5,11), dl=-R(0,11), lw=R(.68,.85), cr=R(1.15,1.6);
       leds+='<g class="gb-glow" style="--t:'+tt.toFixed(2)+'s;--d:'+dl.toFixed(2)+'s;--lo:'+lw.toFixed(2)+'" transform="translate('+bx.toFixed(1)+' '+by.toFixed(2)+')">'
         +'<circle r="'+(14*k2).toFixed(1)+'" fill="url(#'+id+'o)" opacity="'+br.toFixed(2)+'"/>'
@@ -2576,7 +2575,6 @@ function showNamePicker_(studentCode, allowed, members){
     function decorate(){
       document.querySelectorAll('.teacher-banner').forEach(function(el){ ensure(el,'banner'); });
       document.querySelectorAll('.block-header').forEach(function(el){ ensure(el,'header'); });
-      ensure(document.body,'top');                             // гірлянда на самому верху сторінки
     }
     function later(){ if (pend) return; pend=true; requestAnimationFrame(function(){ pend=false; if (nyEng===E) decorate(); }); }
     if (window.ResizeObserver) ro=new ResizeObserver(later);
