@@ -595,9 +595,8 @@
   /* Гірлянди (SVG генерується скриптом): замість лінії під заголовками розділів і над червоною плашкою */
   body[data-theme="newyear"] .block-header{ position:relative; border-bottom:none; padding-bottom:14px; }
   .garland{ position:absolute; left:0; width:100%; height:42px; pointer-events:none; z-index:2; }
-  .garland.header{ top:calc(100% - 10px); }
-  .garland.banner{ top:-3px; }
-  .garland.banner.over{ top:-14px; }
+  .garland.header{ top:calc(100% - 14px); }
+  .garland.banner{ top:-14px; }
   .garland svg{ display:block; overflow:visible; }
   .gb-glow{ transform-box:fill-box; transform-origin:center;
     animation:gbGlow var(--t,4s) ease-in-out infinite alternate; animation-delay:var(--d,0s); }
@@ -2417,52 +2416,60 @@ function showNamePicker_(studentCode, allowed, members){
   function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; var t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
 
   // Одна гірлянда: тонкий скручений дріт із природним провисанням і теплими лампочками
-  // Гірлянда «Роса» (micro LED fairy lights) — як на зразку:
-  //  • на червоній плашці: тонка світла нитка з великими м'якими провисаннями від верхнього краю, вогники на вершинах і трохи нижче нитки;
-  //  • під заголовками: майже пряма тонка нитка + світла нитка, що провисає дугами між вузлами, вогники на вузлах і на дугах.
-  function garlandSVG(w, seed, kind, segs){
+  // Гірлянда «Роса» (micro LED fairy lights): одна майже пряма тонка нитка + друга світла, що вільно лежить навколо неї.
+  // Форму другої нитки задано вручну кубічними кривими Безьє (шаблони нижче, без синусоїд); шаблони тасуються,
+  // розтягуються й злегка зсуваються, тому однакових ділянок немає.
+  // Рядок сегмента: [довжина px, x-частка 1-ї ручки, y 1-ї ручки, x-частка 2-ї ручки, y 2-ї ручки, y кінця]; y — відхилення від прямої нитки (+ вниз)
+  var GARLAND_SHAPES=[
+    [[118,.22,-9,.70,-8,-2],[132,.35,3,.72,9,5],[104,.30,8,.68,2,-1],[166,.28,-6,.60,-10,-4],[145,.40,2,.75,8,3],[115,.25,6,.70,1,0]],
+    [[160,.30,-7,.68,-6,1],[98,.40,5,.70,7,4],[187,.22,9,.62,11,2],[124,.35,-3,.75,-8,-3],[101,.30,1,.70,5,2]],
+    [[105,.30,-5,.70,-9,-6],[173,.25,-8,.55,0,7],[131,.40,11,.70,6,3],[150,.30,1,.65,-4,-2],[96,.35,5,.70,8,0]]
+  ];
+
+  function garlandSVG(w, seed, kind, segs, sc){
     var q=mulberry32(seed), R=function(a,b){ return a+q()*(b-a); };
-    var H=42, id='gl'+(++gGid), ban=(kind==='banner'), y0=ban?3:10;
+    var H=42, id='gl'+(++gGid), y0=14; sc=(sc||1)*1.2;
     var out='<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+H+'" viewBox="0 0 '+w+' '+H+'" aria-hidden="true"><defs>'
-      +'<radialGradient id="'+id+'o"><stop offset="0" stop-color="#FFB85C" stop-opacity=".45"/><stop offset=".5" stop-color="#FFB85C" stop-opacity=".15"/><stop offset="1" stop-color="#FFB85C" stop-opacity="0"/></radialGradient>'
-      +'<radialGradient id="'+id+'i"><stop offset="0" stop-color="#FFE2A1" stop-opacity=".95"/><stop offset=".45" stop-color="#FFE2A1" stop-opacity=".42"/><stop offset="1" stop-color="#FFE2A1" stop-opacity="0"/></radialGradient>'
+      +'<radialGradient id="'+id+'o"><stop offset="0" stop-color="#FFB85C" stop-opacity=".7"/><stop offset=".4" stop-color="#FFB85C" stop-opacity=".25"/><stop offset="1" stop-color="#FFB85C" stop-opacity="0"/></radialGradient>'
+      +'<radialGradient id="'+id+'i"><stop offset="0" stop-color="#FFE2A1" stop-opacity="1"/><stop offset=".5" stop-color="#FFE2A1" stop-opacity=".4"/><stop offset="1" stop-color="#FFE2A1" stop-opacity="0"/></radialGradient>'
       +'</defs>';
-    var leds='';
-    function led(xx,yy){
-      var big=q()<.25, kk=big?1.25:1, t=R(5,11), dl=-R(0,11), lw=R(.6,.8), c=(big?R(1.8,2.2):R(1.3,1.7));
-      leds+='<g class="gb-glow" style="--t:'+t.toFixed(2)+'s;--d:'+dl.toFixed(2)+'s;--lo:'+lw.toFixed(2)+'" transform="translate('+xx.toFixed(1)+' '+yy.toFixed(2)+')">'
-        +'<circle r="'+(13*kk).toFixed(1)+'" fill="url(#'+id+'o)"/>'
-        +'<circle r="'+(6*kk).toFixed(1)+'" fill="url(#'+id+'i)"/>'
-        +'<circle r="'+c.toFixed(2)+'" fill="#FFF8E7"/></g>';
-    }
+    var wires='', leds='';
     (segs||[[0,w]]).forEach(function(sg){
-      var x0=sg[0]+(ban?4:0), x1=sg[1]-(ban?4:0); if (x1-x0<40) return;
-      // вузли (точки кріплення) — нерівномірні
-      var N=[x0], x=x0;
-      while (true){ var st=ban?R(105,150):R(100,155); if (x1-x-st<55){ N.push(x1); break; } x+=st; N.push(x); }
-      var dl='', dd='';
-      if (!ban){   // майже пряма тонка нитка
-        out+='<path d="M'+x0.toFixed(1)+' '+y0+' Q'+((x0+x1)/2).toFixed(1)+' '+(y0+1.2)+' '+x1.toFixed(1)+' '+y0+'" fill="none" stroke="#A3825A" stroke-opacity=".8" stroke-width=".8" stroke-linecap="round"/>';
+      var x0=sg[0]+3, x1=sg[1]-3; if (x1-x0<40) return;
+      // пряма нитка (ледь провисає)
+      wires+='<path d="M'+x0.toFixed(1)+' '+y0+' Q'+((x0+x1)/2).toFixed(1)+' '+(y0+1.4).toFixed(1)+' '+x1.toFixed(1)+' '+y0+'" fill="none" stroke="#876A47" stroke-opacity=".85" stroke-width=".9" stroke-linecap="round"/>';
+      // вільна нитка: шаблони з довільним порядком, дзеркалом і дрібними відхиленнями
+      var order=[0,1,2].sort(function(){ return q()-.5; }), flip=q()<.5?-1:1;
+      var x=x0, yPrev=0, d='M'+x0.toFixed(1)+' '+y0+' ', pts=[[x0,y0]], si=0, ti=0, guard=0;
+      while (x<x1-2 && guard++<40){
+        var T=GARLAND_SHAPES[order[ti%3]], S=T[si%T.length]; si++; if (si>=T.length){ si=0; ti++; }
+        var dx=S[0]*R(.9,1.1), last=false;
+        if (x+dx>x1-40){ dx=x1-x; last=true; }
+        if (dx<30) break;
+        var j=function(){ return R(-1.2,1.2); };
+        var c1x=x+dx*S[1], c1y=y0+flip*sc*(S[2]+j()), c2x=x+dx*S[3], c2y=y0+flip*sc*(S[4]+j());
+        var ey=last?0:flip*sc*(S[5]+j()), ex=x+dx, sy=y0+yPrev;
+        d+='C'+c1x.toFixed(1)+' '+c1y.toFixed(2)+' '+c2x.toFixed(1)+' '+c2y.toFixed(2)+' '+ex.toFixed(1)+' '+(y0+ey).toFixed(2)+' ';
+        for (var k=1;k<=24;k++){ var t=k/24, u=1-t;
+          pts.push([u*u*u*x+3*u*u*t*c1x+3*u*t*t*c2x+t*t*t*ex, u*u*u*sy+3*u*u*t*c1y+3*u*t*t*c2y+t*t*t*(y0+ey)]); }
+        x=ex; yPrev=ey;
+        if (last) break;
       }
-      for (var i=0;i<N.length-1;i++){
-        var a=N[i], b2=N[i+1], len=b2-a, sag, sign=1;
-        if (ban) sag=R(8,11)*Math.min(1,len/120);
-        else { sign=(q()<.25)?-1:1; sag=sign>0?R(5,9):R(2.5,4); }
-        var cy=y0+2*sag*sign;
-        dd+=(i?'':'M'+a.toFixed(1)+' '+y0+' ')+'Q'+((a+b2)/2).toFixed(1)+' '+cy.toFixed(2)+' '+b2.toFixed(1)+' '+y0+' ';
-        var arcY=function(t){ return y0+4*sag*sign*t*(1-t); };
-        // вогники на вершинах/вузлах
-        if (i===0 && !ban) led(a,y0);
-        if (i>0 || ban) led(a,y0);
-        // вогники на дузі (трохи нижче нитки, як підвішені)
-        var nb=len>128?2:1, ts=nb===2?[R(.2,.32),R(.66,.8)]:[R(.32,.68)];
-        ts.forEach(function(t){ led(a+len*t, arcY(t)+(sign>0?R(1.8,3):R(0,.6))); });
+      wires+='<path d="'+d+'" fill="none" stroke="#FFD58A" stroke-opacity=".2" stroke-width="3.6" stroke-linecap="round"/>'
+        +'<path d="'+d+'" fill="none" stroke="#FFF2D2" stroke-opacity=".96" stroke-width="1" stroke-linecap="round"/>';
+      function yOn(xx){ for (var n=1;n<pts.length;n++) if (pts[n][0]>=xx){ var a=pts[n-1], b=pts[n], f=(xx-a[0])/Math.max(b[0]-a[0],.01); return a[1]+(b[1]-a[1])*f; } return y0; }
+      // вогники: нерівномірно (20–55 px), частина трохи вище, частина трохи нижче
+      var bx=x0+R(6,22);
+      while (bx<x1-4){
+        var by=yOn(bx)+R(-2.6,2.6), k2=R(.75,1.3), br=R(.7,1), tt=R(5,11), dl=-R(0,11), lw=R(.68,.85), cr=R(1.1,1.5);
+        leds+='<g class="gb-glow" style="--t:'+tt.toFixed(2)+'s;--d:'+dl.toFixed(2)+'s;--lo:'+lw.toFixed(2)+'" transform="translate('+bx.toFixed(1)+' '+by.toFixed(2)+')">'
+          +'<circle r="'+(13*k2).toFixed(1)+'" fill="url(#'+id+'o)" opacity="'+br.toFixed(2)+'"/>'
+          +'<circle r="'+(6*k2).toFixed(1)+'" fill="url(#'+id+'i)" opacity="'+br.toFixed(2)+'"/>'
+          +'<circle r="'+cr.toFixed(2)+'" fill="#FFFBEF"/></g>';
+        bx+=R(20,55);
       }
-      led(x1,y0);
-      out+='<path d="'+dd+'" fill="none" stroke="#FFE2A1" stroke-opacity=".16" stroke-width="4.5" stroke-linecap="round"/>'
-        +'<path d="'+dd+'" fill="none" stroke="#FFF4DA" stroke-opacity=".95" stroke-width=".85" stroke-linecap="round"/>';
     });
-    return out+leds+'</svg>';
+    return out+wires+leds+'</svg>';
   }
 
   function makeSprite(stops,size){
@@ -2500,7 +2507,7 @@ function showNamePicker_(studentCode, allowed, members){
       }
       g._k=key; g.classList.toggle('over',over);
       if (!el._gs) el._gs=(++gSeed)*9973+11;
-      g.innerHTML=garlandSVG(w, el._gs, kind, segs);
+      g.innerHTML=garlandSVG(w, el._gs, kind, segs, over?0.45:1);
       if (ro && el._ro!==E){ ro.observe(el); el._ro=E; }
     }
     function decorate(){
