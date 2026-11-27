@@ -8,17 +8,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#FDE9DD;
-    --bg-soft:#FFF3EC;
+    --bg:#C4DAE8;
+    --bg-soft:#E2EDF4;
     --card:#FFFFFF;
-    --ink:#3A2416;
-    --ink-soft:#9C7C68;
-    --line: rgba(58,36,22,0.08);
+    --ink:#432F2E;
+    --ink-soft:#7A6361;
+    --line: rgba(67,47,46,0.08);
 
-    --c1-a:#FFA36C; --c1-b:#F2661F; --c1-sh: rgba(242,102,31,0.45);
+    --c1-a:#7A5A55; --c1-b:#432F2E; --c1-sh: rgba(67,47,46,0.45);
     --c3-a:#5FE0A8; --c3-b:#17A863; --c3-sh: rgba(23,168,99,0.4);
     --c2-b:#E5484D;
-    --c4-a:#FFB86C; --c4-b:#F5820D;
+    --c4-a:#FEEFB8; --c4-b:#E3C65E;
 
     --correct-bg:#E6F8EE;
     --correct-ink:#128A54;
@@ -39,7 +39,7 @@
   .topbar{
     display:flex;justify-content:space-between;align-items:center;
     padding-bottom:16px;margin-bottom:22px;
-    border-bottom:1.5px solid rgba(19,33,59,0.14);
+    border-bottom:1.5px solid rgba(67,47,46,0.14);
   }
   .kicker{
     font-family:'Manrope',sans-serif;font-weight:800;font-size:12.5px;
@@ -62,11 +62,11 @@
     padding:10px 15px 10px 10px;border-radius:999px;border:none;background:var(--card);
     color:var(--ink-soft);font-family:'Manrope',sans-serif;font-weight:800;font-size:12.5px;
     cursor:pointer;display:flex;align-items:center;gap:8px;
-    box-shadow: 0 8px 18px -14px rgba(19,33,59,0.3);
+    box-shadow: 0 8px 18px -14px rgba(67,47,46,0.3);
   }
   .tabbar.nested .tab{background:var(--bg-soft);box-shadow:none;}
   .tab .dot{
-    width:22px;height:22px;border-radius:8px;background:rgba(242,102,31,.1);color:var(--c1-b);
+    width:22px;height:22px;border-radius:8px;background:rgba(67,47,46,.1);color:var(--c1-b);
     display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;
   }
   .tab.active{
@@ -75,12 +75,12 @@
   }
   .tab.active .dot{background:rgba(255,255,255,.25);color:#fff;}
 
-  .tabbar.nested .tab.active{background:#fff;color:var(--c1-b);box-shadow:0 6px 16px -10px rgba(19,33,59,.3);}
+  .tabbar.nested .tab.active{background:#fff;color:var(--c1-b);box-shadow:0 6px 16px -10px rgba(67,47,46,.3);}
   .tabbar.nested .tab.active .dot{background:var(--c1-b);color:#fff;}
 
   .card{
     background:var(--card);border-radius:28px;padding:28px 24px;
-    box-shadow: 0 20px 44px -28px rgba(19,33,59,0.35);
+    box-shadow: 0 20px 44px -28px rgba(67,47,46,0.35);
   }
 
   .section-title{font-family:'Manrope',sans-serif;font-weight:800;font-size:20px;letter-spacing:-0.005em;margin:0 0 8px;}
@@ -88,10 +88,10 @@
   .section-intro b{color:var(--ink);}
 
   .callout{
-    background:linear-gradient(155deg, rgba(255,184,108,.22), rgba(245,130,13,.10));
+    background:linear-gradient(155deg, rgba(254,239,184,.95), rgba(254,239,184,.7));
     border-radius:18px;padding:14px 18px;margin-bottom:20px;font-size:13.5px;line-height:1.55;color:var(--ink);
   }
-  .callout b{color:var(--c4-b);font-family:'Manrope',sans-serif;}
+  .callout b{color:var(--c1-b);font-family:'Manrope',sans-serif;}
 
   .mnemo{margin-top:16px;font-size:13px;line-height:1.55;color:var(--ink-soft);}
   .mnemo b{color:var(--ink);}
@@ -105,6 +105,13 @@
   .flip-face{position:absolute;inset:0;border-radius:20px;padding:16px 18px;backface-visibility:hidden;display:flex;flex-direction:column;justify-content:center;}
   .flip-front{background:var(--bg-soft);}
   .flip-back{background:linear-gradient(155deg,var(--c1-a),var(--c1-b));color:#fff;transform:rotateY(180deg);align-items:center;text-align:center;}
+  .flip-inner{-webkit-transform-style:preserve-3d;}
+  .flip-face{-webkit-backface-visibility:hidden;}
+  .flip-front{visibility:visible;transition:visibility 0s linear .25s;}
+  .flip-back{visibility:hidden;transition:visibility 0s linear .25s;}
+  .flip.open .flip-front{visibility:hidden;}
+  .flip.open .flip-back{visibility:visible;}
+  .flip-tag{font-family:'Manrope',sans-serif;font-weight:800;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;opacity:.55;margin-bottom:7px;}
   .flip-tag{font-family:'Manrope',sans-serif;font-weight:800;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;opacity:.55;margin-bottom:7px;}
   .flip-back .flip-tag{opacity:.75;}
   .flip-rule{font-family:'Manrope',sans-serif;font-weight:800;font-size:14px;line-height:1.32;}
@@ -148,7 +155,7 @@
     position:relative;width:30px;height:30px;min-width:30px;border-radius:10px;
     display:flex;align-items:center;justify-content:center;
     font-family:'Manrope',sans-serif;font-weight:800;font-size:13px;color:var(--c1-b);
-    background: linear-gradient(150deg, rgba(255,255,255,0.75), rgba(255,163,108,0.22));
+    background: linear-gradient(150deg, rgba(255,255,255,0.75), rgba(122,90,85,0.22));
     backdrop-filter: blur(6px) saturate(160%);
     border:1px solid rgba(255,255,255,0.7);
     box-shadow: 0 4px 12px -7px var(--c1-sh), inset 0 1px 1px rgba(255,255,255,0.8);
@@ -207,7 +214,7 @@
     top:8px;
     left:8px;
     z-index:10000;
-    background:rgba(19,33,59,0.82);
+    background:rgba(67,47,46,0.82);
     color:#fff;
     font-family:'Manrope',monospace;
     font-size:12px;
@@ -277,7 +284,7 @@
     padding:9px 16px;
     border-radius:999px;
     box-shadow:
-      0 24px 48px -20px rgba(19,33,59,0.45),
+      0 24px 48px -20px rgba(67,47,46,0.45),
       inset 0 1px 1px rgba(255,255,255,0.9);
     z-index:9999;
     transition:transform .25s cubic-bezier(.34,1.56,.64,1), opacity .2s ease;
@@ -323,7 +330,7 @@
     border-radius:50%;
     border:none;
     box-shadow:
-      0 3px 8px -2px rgba(19,33,59,0.35),
+      0 3px 8px -2px rgba(67,47,46,0.35),
       inset 0 1px 1px rgba(255,255,255,0.5);
     cursor:pointer;
     padding:0;
@@ -369,7 +376,7 @@
   .tool-sep{
     width:1px;
     height:22px;
-    background:rgba(19,33,59,0.14);
+    background:rgba(67,47,46,0.14);
   }
 
   @media (max-width:480px){
@@ -383,6 +390,32 @@
     .tool-btn{width:30px;height:30px;}
     .tool-btn svg{width:14px;height:14px;}
   }
+  .flip{position:relative;}
+  .tab.active,.btn.primary,.flip-back,.done-screen .big,.topictoggle button.active{color:#FEEFB8;}
+  .tab.active .dot{color:#FEEFB8;}
+  .chip.open .w,.chip .ipa{color:#432F2E;}
+  .section-title{background:#432F2E;color:#FEEFB8;padding:11px 18px;border-radius:16px;margin:0 0 12px;}
+  .scheme{margin-top:6px;}
+  .sch-top{background:#432F2E;color:#FEEFB8;font-family:'Manrope',sans-serif;font-weight:800;font-size:16px;text-align:center;padding:14px 18px;border-radius:18px;width:60%;margin:0 auto;}
+  .sch-arrows{position:relative;height:46px;}
+  .sch-arrows span{position:absolute;background:#432F2E;}
+  .sch-arrows .h{left:25%;right:25%;top:50%;height:3px;margin-top:-1px;}
+  .sch-arrows .v{width:3px;margin-left:-1px;}
+  .sch-arrows .l,.sch-arrows .r{top:50%;bottom:6px;}
+  .sch-arrows .l{left:25%;} .sch-arrows .r{left:75%;}
+  .sch-arrows .l::after,.sch-arrows .r::after{content:'';position:absolute;left:50%;bottom:-6px;margin-left:-8px;border:8px solid transparent;border-top:10px solid #432F2E;border-bottom:0;}
+  .sch-arrows::before{content:'';position:absolute;left:50%;top:0;height:50%;width:3px;margin-left:-1px;background:#432F2E;}
+  .sch-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .sch-box{background:var(--bg-soft);border-radius:20px;padding:18px 14px;text-align:center;}
+  .sch-label{font-size:12px;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.05em;}
+  .sch-rule{font-family:'Manrope',sans-serif;font-weight:800;font-size:15px;margin:4px 0 10px;}
+  .sch-suf{display:inline-block;background:#432F2E;color:#FEEFB8;font-family:'Manrope',sans-serif;font-weight:800;font-size:20px;padding:6px 18px;border-radius:999px;margin-bottom:12px;}
+  .sch-ex{font-family:'Manrope',sans-serif;font-weight:700;font-size:15px;}
+  .section-title.plain{background:none;color:var(--ink);padding:0;border-radius:0;margin:0 0 8px;}
+  .sch-ex u{text-decoration-thickness:3px;text-underline-offset:4px;}
+  .sch-arrows .c{left:50%;top:0;bottom:6px;}
+  .sch-arrows .c::after{content:'';position:absolute;left:50%;bottom:-6px;margin-left:-8px;border:8px solid transparent;border-top:10px solid #432F2E;border-bottom:0;}
+  .sch-row.one{grid-template-columns:1fr;width:50%;margin:0 auto;}
 </style>
 </head>
 <body>
@@ -393,7 +426,7 @@
   </div>
 
   <h1>Правопис прикметникових <span class="hl">суфіксів</span></h1>
-  <p class="sub">Суфікси -ов-, -ев-, -єв- та суфікси присвійних прикметників: як вибрати правильний варіант.</p>
+  <p class="sub">Суфікси -ов-, -ев-, -єв-: як вибрати правильний варіант.</p>
 
   <div class="tabbar" id="subtabbar"></div>
   <div class="tabbar nested" id="subsubtabbar"></div>
@@ -414,10 +447,10 @@
   </svg>
 </button>
 <div id="drawToolbar">
-  <button class="swatch selected" style="background:#E5484D" data-color="#E5484D"></button>
+  <button class="swatch selected" style="background:#F5304A" data-color="#F5304A"></button>
   <button class="swatch" style="background:#3355EE" data-color="#3355EE"></button>
   <button class="swatch" style="background:#17A863" data-color="#17A863"></button>
-  <button class="swatch" style="background:#13213B" data-color="#13213B"></button>
+  <button class="swatch" style="background:#432F2E" data-color="#432F2E"></button>
   <div class="tool-sep"></div>
   <button class="tool-btn selected" id="xthinBtn" title="Дуже тонка лінія"><span class="dot"></span></button>
   <button class="tool-btn" id="thinBtn" title="Тонка лінія"><span class="dot"></span></button>
@@ -465,36 +498,41 @@
 
 const SUBS = [
   {
-    id: "ov-ev-ev", tab: "-ов-, -ев-, -єв-", dot: "1", type: "cards",
-    title: "Суфікси -ов-, -ев-, -єв-",
-    intro: "Вибір суфікса залежить від <b>наголосу</b> та від того, який приголосний стоїть в основі перед суфіксом.",
-    cards: [
-      {rule: "Наголос на основі + шиплячий або м'який приголосний", desc: "→ суфікс -ев-", examples: [{word:"грушевий"},{word:"овочевий"},{word:"сталевий"}]},
-      {rule: "Наголос на основі + подовжений приголосний або й", desc: "→ суфікс -єв-", examples: [{word:"життєвий"},{word:"магнієвий"},{word:"дієвий"}]},
-      {rule: "Наголос будь-де + твердий приголосний", desc: "→ суфікс -ов-", examples: [{word:"винятковий"},{word:"ваговий"}]},
-      {rule: "Наголос на закінченні + шиплячий або м'який приголосний", desc: "→ суфікс -ов-", examples: [{word:"бойовий"},{word:"дійовий"},{word:"больовий"}]}
+    id: "mishana-myaka", tab: "Мішана та м'яка група", dot: "1", type: "scheme",
+    title: "Мішана та м'яка група",
+    intro: "Основа закінчується на шиплячий або м'який приголосний — суфікс залежить від <b>наголосу</b>.",
+    top: "Мішана та м'яка група",
+    branches: [
+      {label: "Прикметник", rule: "наголос на основі", suffix: "-ев-", example: "гру<u>ш</u>а → груше́вий"},
+      {label: "Прикметник", rule: "наголос на закінченні", suffix: "-ов-", example: "пла<u>щ</u> → плащови́й"}
     ]
   },
   {
-    id: "prysviini", tab: "Присвійні прикметники", dot: "2", type: "table",
-    title: "Суфікси присвійних прикметників",
-    intro: "Суфікс присвійного прикметника залежить від роду й групи іменника, від якого його утворено.",
-    rows: [
-      {write:"Жін. і сер. р., тверда група", say:"суфікс -ов-", example:"Петрове", ipa:"Миколине → Миколове (присвійний)"},
-      {write:"Жін. і сер. р., мішана та м'яка група", say:"суфікси -ев-, -єв-", example:"Ігорева", ipa:"Сергієве"},
-      {write:"Чол. р., усі групи", say:"суфікси -ів-, -їв-", example:"Андріїв", ipa:"Ігорів"}
+    id: "zvuk-y", tab: "Звук [й]", dot: "2", type: "scheme",
+    title: "Звук [й] в основі",
+    intro: "Коли в основі чути звук [й] — суфікс залежить від <b>наголосу</b>.",
+    top: "Звук [й]",
+    branches: [
+      {label: "Прикметник", rule: "наголос на основі", suffix: "-єв-", example: "магні<u>й</u> → ма́гнієвий"},
+      {label: "Прикметник", rule: "наголос на закінченні", suffix: "-ов-", example: "бі<u>й</u> → бойови́й"}
     ]
   },
   {
-    id: "quiz", tab: "Перевір себе", dot: "✓", type: "quiz",
-    title: "Міні-тест",
-    intro: "П'ять запитань — перевір, чи запам'ятав(-ла) правило.",
-    questions: [
-      {q:"Яке слово написано правильно (наголос на основі, шиплячий приголосний)?", opts:["грушовий","грушевий","грушєвий","грушивий"], a:1},
-      {q:"Яке слово написано правильно (подовжений приголосний)?", opts:["життьовий","життевий","життєвий","життявий"], a:2},
-      {q:"Присвійний прикметник жіночого роду твердої групи від «Петро»:", opts:["Петрів","Петрева","Петрове","Петрієве"], a:2},
-      {q:"Присвійний прикметник чоловічого роду від «Ігор»:", opts:["Ігорів","Ігорева","Ігорове","Ігор'їв"], a:0},
-      {q:"Наголос на закінченні, приголосний шиплячий — обери правильний варіант:", opts:["бойовий","боєвий","боявий","боівий"], a:0}
+    id: "podvoiennya", tab: "Подвоєння [нн]", dot: "3", type: "scheme",
+    title: "Подвоєння приголосного [нн]",
+    intro: "Основа закінчується на подовжений (подвоєний) приголосний — суфікс завжди один.",
+    top: "Подвоєння [нн]",
+    branches: [
+      {label: "Прикметник", rule: "завжди", suffix: "-єв-", example: "насіння → насіннєвий<br>життя → життєвий"}
+    ]
+  },
+  {
+    id: "tverda", tab: "Тверда група", dot: "4", type: "scheme",
+    title: "Тверда група",
+    intro: "Основа закінчується на твердий приголосний — суфікс завжди один, незалежно від наголосу.",
+    top: "Тверда група",
+    branches: [
+      {label: "Прикметник", rule: "завжди", suffix: "-ов-", example: "виняток → винятковий"}
     ]
   }
 ];
@@ -542,13 +580,13 @@ function renderSubs(){
       <span class="dot">${s.dot}</span>${s.tab}
     </button>`).join('');
   subtabbar.querySelectorAll('.tab').forEach(btn=>{
-    btn.onclick = ()=>{
+    attachTapToggle(btn, ()=>{
       saveCurrentDrawing();
       activeSub = +btn.dataset.i;
       activeSubsub = 0;
       resetQuiz();
       renderAll();
-    };
+    });
   });
 }
 
@@ -561,18 +599,18 @@ function renderSubSubs(){
       <span class="dot">${s.dot}</span>${s.tab}
     </button>`).join('');
   subsubtabbar.querySelectorAll('.tab').forEach(btn=>{
-    btn.onclick = ()=>{
+    attachTapToggle(btn, ()=>{ saveCurrentDrawing();
       activeSubsub = +btn.dataset.i;
       resetQuiz();
       renderSubSubs();
       renderContent();
-    };
+    });
   });
 }
 
 function renderContent(){
   const s = currentSection();
-  let html = `<p class="section-title">${s.title}</p><p class="section-intro">${s.intro}</p>`;
+  let html = `${s.title ? `<p class="section-title${s.type==='scheme'?' plain':''}">${s.title}</p>` : ''}<p class="section-intro">${s.intro}</p>`;
   if(s.type === "cards"){
     html += `<div class="cardgrid">${s.cards.map((c)=>`
       <div class="flip" data-kind="card">        <div class="flip-inner">
@@ -608,6 +646,20 @@ function renderContent(){
     if(s.mnemo) html += `<div class="mnemo">${s.mnemo}</div>`;
   }
 
+  if(s.type === "scheme"){
+    html += `<div class="scheme">
+      <div class="sch-top">${s.top}</div>
+      ${s.branches.length===1 ? '<div class="sch-arrows"><span class="v c"></span></div>' : '<div class="sch-arrows"><span class="h"></span><span class="v l"></span><span class="v r"></span></div>'}
+      <div class="sch-row${s.branches.length===1?' one':''}">${s.branches.map(x=>`
+        <div class="sch-box">
+          <div class="sch-label">${x.label}:</div>
+          <div class="sch-rule">${x.rule}</div>
+          <div class="sch-suf">${x.suffix}</div>
+          <div class="sch-ex">${x.example}</div>
+        </div>`).join('')}</div>
+    </div>`;
+  }
+
   if(s.type === "quiz"){
     lessonArea.innerHTML = html;
     renderQuiz(s);
@@ -617,7 +669,7 @@ function renderContent(){
 
   lessonArea.innerHTML = html;
   lessonArea.querySelectorAll('[data-kind="card"], [data-kind="chip"], [data-kind="row"]').forEach(el=>{
-    el.onclick = ()=>{ el.classList.toggle('open'); };
+    attachTapToggle(el, ()=>{ el.classList.toggle('open'); });
   });
   syncCanvasAfterRender();
 }
@@ -652,7 +704,7 @@ function renderQuiz(s){
         <button class="btn primary" id="quizRestart" style="margin-top:6px;">Пройти ще раз</button>
       </div>`;
     lessonArea.appendChild(extra);
-    document.getElementById('quizRestart').onclick = ()=>{ resetQuiz(); renderContent(); };
+    attachTapToggle(document.getElementById('quizRestart'), ()=>{ resetQuiz(); renderContent(); });
     return;
   }
 
@@ -688,17 +740,17 @@ function renderQuiz(s){
   }
 
   box.querySelectorAll('.opt').forEach(btn=>{
-    btn.onclick = ()=>{
+    attachTapToggle(btn, ()=>{ saveCurrentDrawing();
       if(quizAnswers[quizIdx]) return;
       const picked = +btn.dataset.i;
       quizAnswers[quizIdx] = {picked, correct: picked===q.a};
       renderContent();
-    };
+    });
   });
   const prevBtn = document.getElementById('quizPrev');
   const nextBtn = document.getElementById('quizNext');
-  if(prevBtn) prevBtn.onclick = ()=>{ saveCurrentDrawing(); quizIdx--; renderContent(); };
-  if(nextBtn) nextBtn.onclick = ()=>{ saveCurrentDrawing(); quizIdx++; renderContent(); };
+  if(prevBtn) attachTapToggle(prevBtn, ()=>{ saveCurrentDrawing(); quizIdx--; renderContent(); });
+  if(nextBtn) attachTapToggle(nextBtn, ()=>{ saveCurrentDrawing(); quizIdx++; renderContent(); });
 }
 
 function renderAll(){
@@ -708,6 +760,24 @@ function renderAll(){
 }
 
 renderAll();
+
+function attachTapToggle(el, handler){
+  let sx = 0, sy = 0, penTap = false, tracking = false;
+  el.addEventListener('pointerdown', (e)=>{
+    tracking = true;
+    sx = e.clientX; sy = e.clientY;
+    penTap = e.pointerType === 'pen';
+  }, {passive:true});
+  el.addEventListener('pointerup', (e)=>{
+    if(!tracking) return;
+    tracking = false;
+    if(penTap && window.isDrawingActive && window.isDrawingActive()) return;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    if(Math.hypot(dx,dy) > 10) return;
+    handler(e);
+  });
+}
+window.attachTapToggle = attachTapToggle;
 
 // ======================================================================
 // МАЛЮВАННЯ ПОВЕРХ ЕКРАНА (режим "учитель")
@@ -746,7 +816,7 @@ renderAll();
 
   let drawingActive = false;
   let isDrawing = false;
-  let currentColor = "#E5484D";
+  let currentColor = "#F5304A";
   let currentWidth = 4;
   let eraserMode = false;
   let lastX = 0, lastY = 0;
@@ -755,11 +825,15 @@ renderAll();
   window.isDrawingActive = function(){ return drawingActive; };
 
   function currentDocHeight(){
-    return Math.max(
+    const prevH = canvas.style.height;
+    canvas.style.height = '0px';
+    const h = Math.max(
       document.documentElement.scrollHeight,
       document.body.scrollHeight,
       window.innerHeight
     );
+    canvas.style.height = prevH;
+    return h;
   }
 
   function resizeCanvas(){
@@ -805,12 +879,16 @@ renderAll();
       return (canvas.width && canvas.height) ? canvas.toDataURL('image/png') : null;
     }catch(e){ return null; }
   };
+  window.__snapTok = 0;
   window.setDrawingSnapshot = function(dataURL){
+    const tok = ++window.__snapTok;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if(!dataURL) return;
     const img = new Image();
     img.onload = function(){
-      ctx.drawImage(img, 0, 0, canvas.width / devicePixelRatio, canvas.height / devicePixelRatio);
+      if(tok !== window.__snapTok) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, img.width / devicePixelRatio, img.height / devicePixelRatio);
     };
     img.src = dataURL;
   };
@@ -904,10 +982,13 @@ renderAll();
 
     e.preventDefault();
     const p = pointerPos(e);
-    ctx.globalCompositeOperation = eraserMode ? 'destination-out' : 'source-over';
+    // кнопка на пері (barrel, buttons&2) або «гумка» на кінці пера (buttons&32) → стирає
+    const penErase = (e.buttons & 2) === 2 || (e.buttons & 32) === 32;
+    const erasing = eraserMode || penErase;
+    ctx.globalCompositeOperation = erasing ? 'destination-out' : 'source-over';
     ctx.strokeStyle = currentColor;
     const pressureFactor = 0.6 + (p.pressure || 0.5) * 0.8;
-    ctx.lineWidth = (eraserMode ? currentWidth * 3 : currentWidth) * pressureFactor;
+    ctx.lineWidth = (erasing ? currentWidth * 3 : currentWidth) * pressureFactor;
     ctx.beginPath();
     ctx.moveTo(lastX, lastY);
     ctx.lineTo(p.x, p.y);
@@ -922,6 +1003,11 @@ renderAll();
   }
   document.addEventListener('pointerup', stopDrawing);
   document.addEventListener('pointercancel', stopDrawing);
+
+  // щоб затискання кнопки на пері не відкривало контекстне меню
+  document.addEventListener('contextmenu', function(e){
+    if(drawingActive) e.preventDefault();
+  });
 
   document.addEventListener('touchmove', function(e){
     if(drawingActive && e.touches && e.touches[0] && e.touches[0].touchType === 'stylus'){
