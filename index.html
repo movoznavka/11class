@@ -548,6 +548,27 @@
   body[data-theme="halloween"] .subgroup-title{ background:rgba(255,240,222,.93); }
   body[data-theme="halloween"] .season-badge{ background:rgba(255,240,222,.93); }
 
+
+  /* ===== Зима: снігопад і шапки снігу на кожній картці ===== */
+  #snowcv{ position:fixed; left:0; top:0; pointer-events:none; z-index:0; }
+  body[data-theme="winter"] .card::before{
+    content:""; position:absolute; left:16px; right:16px; top:-10px; height:22px; pointer-events:none; z-index:2;
+    background:
+      radial-gradient(ellipse 18px 10px at 6% 72%, #fff 96%, transparent 100%),
+      radial-gradient(ellipse 30px 13px at 17% 66%, #fff 96%, transparent 100%),
+      radial-gradient(ellipse 16px 9px at 29% 74%, #fff 96%, transparent 100%),
+      radial-gradient(ellipse 34px 14px at 42% 64%, #fff 96%, transparent 100%),
+      radial-gradient(ellipse 20px 10px at 55% 72%, #fff 96%, transparent 100%),
+      radial-gradient(ellipse 28px 12px at 67% 66%, #fff 96%, transparent 100%),
+      radial-gradient(ellipse 15px 8px at 78% 74%, #fff 96%, transparent 100%),
+      radial-gradient(ellipse 26px 12px at 89% 68%, #fff 96%, transparent 100%),
+      linear-gradient(#fff,#fff) 0 100% / 100% 9px no-repeat;
+    border-radius:0 0 9px 9px;
+    filter:drop-shadow(0 -1px 1px rgba(110,145,190,.5));
+  }
+  body[data-theme="winter"] .card-wrap:nth-child(2n) .card::before{ transform:scaleX(-1); }
+  body[data-theme="winter"] .card-wrap:nth-child(3n+1) .card::before{ left:22px; right:12px; }
+
   /* ===== Новий рік ===== */
   /* Картки: молочно-кремовий фон + тепле золотисто-біле світіння по периметру.
      Внутрішній контур і ближній ореол — у box-shadow самої картки; широкий «дихаючий» ореол —
@@ -2141,6 +2162,7 @@ function showNamePicker_(studentCode, allowed, members){
 
   THEMES.newyear.parts = [];           // Новий рік має власні ефекти (гірлянди, ялинка, камін, вікно)
   THEMES.newyear.engine = 'newyear';
+  THEMES.winter.parts = []; THEMES.winter.engine = 'snow';
 
   var params = new URLSearchParams(location.search);
   var forced = params.get('theme');
@@ -2749,10 +2771,66 @@ function showNamePicker_(studentCode, allowed, members){
   }
   function stopNewYear(){ if (nyEng){ nyEng.stop(); nyEng=null; } }
 
+
+  // ===== Зима: реалістичний снігопад (canvas): різна глибина, розмір, швидкість, легкий вітер =====
+  var snowEng=null;
+  function startSnow(){
+    if (snowEng) return;
+    var tok={}; snowEng=tok;
+    var cv=document.createElement('canvas'); cv.id='snowcv'; tok.cv=cv; document.body.appendChild(cv);
+    var ctx=cv.getContext('2d'), dpr=1, W=0, H=0, flakes=[];
+    var sp=document.createElement('canvas'); sp.width=sp.height=64;
+    (function(){ var c=sp.getContext('2d'), g=c.createRadialGradient(32,32,0,32,32,32);
+      g.addColorStop(0,'rgba(255,255,255,1)'); g.addColorStop(.3,'rgba(255,255,255,.95)');
+      g.addColorStop(.58,'rgba(205,225,248,.5)'); g.addColorStop(1,'rgba(205,225,248,0)');
+      c.fillStyle=g; c.fillRect(0,0,64,64); })();
+    function mk(initial){
+      var z=Math.pow(Math.random(),1.6);               // більшість — далекі дрібні
+      return { x:rnd(-20,W+20), y:initial?rnd(-10,H):rnd(-40,-8), z:z,
+               r:1.1+z*3.6, vy:(16+z*52)*rnd(.8,1.2), amp:rnd(6,26)*(0.5+z), ph:rnd(0,6.28), w:rnd(.35,1.0),
+               a:0.62+z*0.38 };
+    }
+    function size(){
+      dpr=Math.min(window.devicePixelRatio||1,2); W=window.innerWidth; H=window.innerHeight;
+      cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr); cv.style.width=W+'px'; cv.style.height=H+'px';
+      var n=Math.max(70,Math.min(190,Math.round(W*H/8500))); if (reduce) n=Math.round(n*.6);
+      while (flakes.length<n) flakes.push(mk(true));
+      if (flakes.length>n) flakes.length=n;
+    }
+    size(); tok.onr=size; window.addEventListener('resize',size);
+    var last=0, t=0, k=reduce?0.45:1;
+    function frame(ts){
+      tok.raf=requestAnimationFrame(frame);
+      if (document.hidden){ last=0; return; }
+      var dt=last?Math.min(0.05,(ts-last)/1000):0.016; last=ts; t+=dt*k;
+      ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,W,H);
+      var wind=-8+12*Math.sin(t*0.21)+7*Math.sin(t*0.53+1.1);
+      for (var i=0;i<flakes.length;i++){
+        var f=flakes[i];
+        f.y+=f.vy*dt*k; f.ph+=f.w*dt*k;
+        var x=f.x+Math.sin(f.ph)*f.amp;                                  // хитання вбік
+        f.x+=wind*(0.25+f.z*0.9)*dt*k;
+        if (f.y>H+12){ flakes[i]=mk(false); continue; }
+        if (f.x<-30) f.x=W+20; else if (f.x>W+30) f.x=-20;
+        var d=f.r*2.7;
+        ctx.globalAlpha=f.a; ctx.drawImage(sp,x-d/2,f.y-d/2,d,d);
+      }
+      ctx.globalAlpha=1;
+    }
+    tok.raf=requestAnimationFrame(frame);
+  }
+  function stopSnow(){
+    if (!snowEng) return;
+    if (snowEng.raf) cancelAnimationFrame(snowEng.raf);
+    if (snowEng.onr) window.removeEventListener('resize',snowEng.onr);
+    if (snowEng.cv) snowEng.cv.remove();
+    snowEng=null;
+  }
+
   function clearTheme(){
     var b=document.querySelector('.season-badge'); if (b) b.remove();
     if (fx) { fx.remove(); fx=null; }
-    stopLeaves(); stopNewYear();
+    stopLeaves(); stopNewYear(); stopSnow();
     if (scene) { scene.remove(); scene=null; }
     document.body.removeAttribute('data-theme');
     current=null; cur=null;
@@ -2778,6 +2856,7 @@ function showNamePicker_(studentCode, allowed, members){
     document.body.appendChild(scene);
 
     if (t.engine==='newyear') { startNewYear(); return; }
+    if (t.engine==='snow') { startSnow(); return; }
     if (reduce) return;
     if (t.engine==='leaves') { startLeaves(); return; }
     fx=document.createElement('div');
