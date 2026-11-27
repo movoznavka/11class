@@ -1460,17 +1460,16 @@ function showNamePicker_(studentCode, allowed, members){
     var today=new Date(y,m-1,d);
     var diff=Math.round((today-orthodoxEaster(y))/86400000);
     if (diff>=-7 && diff<=6) return 'easter';
-    if (md>=1220 || md<=108) return 'newyear';
-    if (md>=212 && md<=214) return 'love';
-    if (md>=306 && md<=308) return 'women';
-    if (md>=820 && md<=824) return 'independence';
-    if (md>=1028 && md<=1031) return 'halloween';
+    if (md>=1205 || md<=102) return 'newyear';                 // 5.12 – 2.01
+    if (md>=213 && md<=214) return 'love';                     // 13.02 – 14.02
+    if (md>=307 && md<=308) return 'women';                    // 7.03 – 8.03
+    if (md>=820 && md<=824) return 'independence';             // 20.08 – 24.08 (замість літа)
+    if (md>=1028 && md<=1031) return 'halloween';              // 28.10 – 31.10
     if (m===5 && d===thirdThursdayOfMay(y)) return 'vyshyvanka';
-    if (md>=1201 && md<=1219) return 'winter';
-    if (md<=305) return 'winter';
-    if (md<=531) return 'spring';
-    if (md<=831) return 'summer';
-    if (md<=930) return 'school';
+    if ((md>=1201 && md<=1204) || (md>=103 && md<=212) || (md>=215 && md<=229)) return 'winter';   // 1–4.12, 3.01–12.02, 15.02–28(29).02
+    if (md>=301 && md<=531) return 'spring';                   // 1.03–6.03 та 9.03 – до Пасхи й далі до 31.05
+    if (md<=831) return 'summer';                              // 1.06 – 31.08
+    if (md<=907) return 'school';                              // 1.09 – 7.09 (один тиждень)
     return 'autumn';
   }
 
