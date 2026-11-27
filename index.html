@@ -1303,7 +1303,45 @@ function applyAccessAndRender_(studentCode, allowed, displayName){
 // Для них ДЗ шукаємо за особистим ім'ям, а не кодом посилання.
 const HW_SPLIT_GROUPS = ["марина світлана"];
 
+// ---- Прогрес: % тем, за якими учень уже надіслав результат тесту ----
+function normName_(x){
+  return (x||'').toString().toLowerCase().replace(/[’ʼ`]/g,"'").replace(/[^a-zа-яіїєґ0-9']+/g,' ').replace(/\s+/g,' ').trim();
+}
+function computeProgress_(){
+  const names = window.__resultNames;
+  if (!names) return;
+  const cards = document.querySelectorAll('.card-wrap .card:not(.soon)');
+  let total = 0, done = 0;
+  cards.forEach(function(c){
+    const tEl = c.querySelector('.card-title');
+    const tt = normName_(tEl ? tEl.textContent : '');
+    if (!tt) return;
+    total++;
+    if (names.some(function(r){ return r.length >= 4 && (r.indexOf(tt) !== -1 || tt.indexOf(r) !== -1); })) done++;
+  });
+  window.__progressPct = total ? Math.round(done * 100 / total) : null;
+  if (window.__refreshBadge) window.__refreshBadge();
+}
+function loadProgress_(studentCode, displayName){
+  if(!HOMEWORK_API_URL || HOMEWORK_API_URL.indexOf('ВСТАВТЕ') === 0) return;
+  window.applyProgress = function(list){
+    window.__resultNames = (list || []).map(normName_).filter(Boolean);
+    computeProgress_();
+    const blocksEl = document.getElementById('blocks');
+    if (blocksEl && window.MutationObserver) {
+      let tm = null;
+      new MutationObserver(function(){ clearTimeout(tm); tm = setTimeout(computeProgress_, 150); })
+        .observe(blocksEl, { childList: true, subtree: true });
+    }
+  };
+  const sep = HOMEWORK_API_URL.indexOf('?') > -1 ? '&' : '?';
+  const sc = document.createElement('script');
+  sc.src = HOMEWORK_API_URL + sep + 'mode=progress&callback=applyProgress&student=' + encodeURIComponent(studentCode) + '&name=' + encodeURIComponent(displayName || '') + '&_=' + Date.now();
+  document.body.appendChild(sc);
+}
+
 function finishStudentView_(studentCode, allowedStatic, displayName){
+  loadProgress_(studentCode, displayName);
   const hwLookupCode = HW_SPLIT_GROUPS.indexOf(studentCode) !== -1 ? displayName : studentCode;
   loadHomework(hwLookupCode);
   loadRepeat(studentCode);   // «Повторити» — спільне для всього коду (пари теж)
@@ -1511,7 +1549,8 @@ function showNamePicker_(studentCode, allowed, members){
   // dx — зсув убік (вітер), dur — тривалість, size — розмір.
   var THEMES = {
  "autumn": {
-  "label": "🍂 Осінній настрій",
+  "label": "🍂 Прогрес",
+  "progress": true,
   "parts": [
    {
     "kind": "leaf",
@@ -1559,7 +1598,8 @@ function showNamePicker_(studentCode, allowed, members){
   "pxm": 0.78
  },
  "winter": {
-  "label": "❄️ Зимовий настрій",
+  "label": "❄️ Прогрес",
+  "progress": true,
   "parts": [
    {
     "kind": "snow",
@@ -1850,7 +1890,8 @@ function showNamePicker_(studentCode, allowed, members){
   "pxm": 0.5
  },
  "summer": {
-  "label": "☀️ Літній настрій",
+  "label": "☀️ Прогрес",
+  "progress": true,
   "parts": [
    {
     "kind": "leaf",
@@ -2810,6 +2851,13 @@ function showNamePicker_(studentCode, allowed, members){
     current=null; cur=null;
   }
 
+  function badgeText_(){
+    if (!cur) return '';
+    var p=window.__progressPct;
+    return cur.label + ((cur.progress && p!=null) ? ': '+p+'%' : '');
+  }
+  window.__refreshBadge=function(){ var b=document.querySelector('.season-badge'); if (b && cur) b.textContent=badgeText_(); };
+
   function applyTheme(name){
     var t=THEMES[name];
     if (!t || name===current) return;
@@ -2821,7 +2869,7 @@ function showNamePicker_(studentCode, allowed, members){
     if (h1) {
       var badge=document.createElement('div');
       badge.className='season-badge';
-      badge.textContent=t.label;
+      badge.textContent=badgeText_();
       h1.parentNode.insertBefore(badge, h1);
     }
 
