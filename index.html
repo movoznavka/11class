@@ -2926,6 +2926,7 @@ function showNamePicker_(studentCode, allowed, members){
     clearTheme();
     current=name; cur=t;
     document.body.setAttribute('data-theme', name);
+    try { localStorage.setItem('portalTheme', JSON.stringify({n:name, t:Date.now()})); } catch(e){}
 
     var h1=document.querySelector('h1');
     if (h1) {
