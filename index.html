@@ -1308,31 +1308,22 @@ function normName_(x){
   return (x||'').toString().toLowerCase().replace(/[’ʼ`]/g,"'").replace(/[^a-zа-яіїєґ0-9']+/g,' ').replace(/\s+/g,' ').trim();
 }
 function computeProgress_(){
-  const names = window.__resultNames;
-  if (!names) return;
-  const cards = document.querySelectorAll('.card-wrap .card:not(.soon)');
-  let total = 0, done = 0;
-  cards.forEach(function(c){
-    const tEl = c.querySelector('.card-title');
-    const tt = normName_(tEl ? tEl.textContent : '');
-    if (!tt) return;
-    total++;
+  const names = window.__resultNames, all = window.__allTitles;
+  if (!names || !all || !all.length) return;
+  let done = 0;
+  all.forEach(function(tt){
     if (names.some(function(r){ return r.length >= 4 && (r.indexOf(tt) !== -1 || tt.indexOf(r) !== -1); })) done++;
   });
-  window.__progressPct = total ? Math.round(done * 100 / total) : null;
+  window.__progressPct = Math.round(done * 100 / all.length);
   if (window.__refreshBadge) window.__refreshBadge();
 }
 function loadProgress_(studentCode, displayName){
   if(!HOMEWORK_API_URL || HOMEWORK_API_URL.indexOf('ВСТАВТЕ') === 0) return;
+  // Усі готові теми порталу (до того, як приховаємо невідкриті) — це 100%
+  window.__allTitles = Array.prototype.map.call(document.querySelectorAll('.card-wrap .card:not(.soon) .card-title'), function(e){ return normName_(e.textContent); }).filter(Boolean);
   window.applyProgress = function(list){
     window.__resultNames = (list || []).map(normName_).filter(Boolean);
     computeProgress_();
-    const blocksEl = document.getElementById('blocks');
-    if (blocksEl && window.MutationObserver) {
-      let tm = null;
-      new MutationObserver(function(){ clearTimeout(tm); tm = setTimeout(computeProgress_, 150); })
-        .observe(blocksEl, { childList: true, subtree: true });
-    }
   };
   const sep = HOMEWORK_API_URL.indexOf('?') > -1 ? '&' : '?';
   const sc = document.createElement('script');
