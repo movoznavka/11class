@@ -1496,6 +1496,7 @@ function showNamePicker_(studentCode, allowed, members){
   const allowed = studentCode ? NORMALIZED_ACCESS[studentCode] : null;
 
   if (isTeacher) {
+    try { localStorage.setItem('pgTeacher','1'); } catch(e){}  // нові теми сторінок уроків бачить лише вчитель
     document.body.classList.add('teacher-mode');
 
     function renderOpenBadges_(dynamicMap){
@@ -2281,6 +2282,7 @@ function showNamePicker_(studentCode, allowed, members){
 
   var params = new URLSearchParams(location.search);
   var forced = params.get('theme');
+  var isTeacherView = params.get('vchytel') === '1';
   if (forced === 'off') return;
 
   var code = (params.get('u') || '').trim().replace(/\s+/g,' ').toLowerCase();
@@ -2979,7 +2981,7 @@ function showNamePicker_(studentCode, allowed, members){
     };
     var sep = HOMEWORK_API_URL.indexOf('?') > -1 ? '&' : '?';
     var sc = document.createElement('script');
-    sc.src = HOMEWORK_API_URL + sep + 'mode=theme&callback=applyThemeOverride&student=' + encodeURIComponent(code) + '&_=' + Date.now();
+    sc.src = HOMEWORK_API_URL + sep + 'mode=theme&callback=applyThemeOverride&student=' + encodeURIComponent(code) + (isTeacherView ? '&teacher=1' : '') + '&_=' + Date.now();
     document.body.appendChild(sc);
   }
 })();
