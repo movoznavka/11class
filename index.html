@@ -1307,22 +1307,93 @@ const HW_SPLIT_GROUPS = ["марина світлана"];
 function normName_(x){
   return (x||'').toString().toLowerCase().replace(/[’ʼ`]/g,"'").replace(/[^a-zа-яіїєґ0-9']+/g,' ').replace(/\s+/g,' ').trim();
 }
+const PROGRESS_ALIASES = {
+ "фонетика": "fonetyka",
+ "орфографія · правопис не": "ne-z-chastynamy-movy",
+ "чергування у-в, і-й": "cherguvannya-u-v",
+ "спрощення приголосних": "sproshchennya",
+ "правопис і творення суфіксів": "sufiksy-vsi",
+ "прикметникові суфікси": "prykmetnyk-sufiksy",
+ "подвоєння букв": "podvoiennya",
+ "велика буква й лапки": "velyka-bukva",
+ "велика буква й лапки у власних назвах": "velyka-bukva",
+ "займенник": "zaimennyk",
+ "займенник: розряди й правопис": "zaimennyk",
+ "апостроф": "apostrof",
+ "м'який знак": "myakyj-znak",
+ "правопис префіксів": "prefiksy",
+ "іншомовні слова · букви и, і": "inshomovni-y-i",
+ "іншомовні слова · подвоєні букви": "inshomovni-podvoiennya",
+ "іншомовні слова · м'який знак": "inshomovni-myakyj-znak",
+ "іншомовні слова · апостроф": "inshomovni-apostrof",
+ "рід іменника": "rid_imennyka_trainer",
+ "групи іменників": "imennyk-hrupy",
+ "відміни іменників": "imennyk-vidminy",
+ "родовий відмінок іменників": "imennyk-rodovyi",
+ "іменник · кличний відмінок": "klychnyj-vidminok",
+ "імена по батькові": "imennyk-po-batkovi",
+ "складні іменники": "skladni-imennyky",
+ "складні прикметники": "skladni-prykmetnyky",
+ "складний прислівник": "skladni-prysliv",
+ "морфологія · ступені порівняння прикметників": "prykmetnyk-stupeni",
+ "відмінювання числівників": "chyslivnyk-vidminy",
+ "узгодження числівника з іменником": "chyslivnyk-uzgodzhennya",
+ "числівник · позначення часу": "chyslivnyk-chas",
+ "дієприкметник": "diyeprykmetnyk",
+ "дієприслівник": "diyeprysliv",
+ "дієвідміни дієслів": "diyeslovo-diyevidminy",
+ "способи дієслова": "diyeslovo-sposoby",
+ "головні члени речення": "chleny-holovni",
+ "другорядні члени речення": "chleny-druhoryadni",
+ "тире (тест)": "tyre-pidmet-prysudok",
+ "односкладні речення (тест)": "odnoskladni",
+ "однорідні члени": "odnoridni",
+ "однорідні члени 2": "odnoridni-neodnoridni",
+ "вставні слова": "vstavni",
+ "звертання": "zvertannya",
+ "відокремлені означення": "vidokremleni-oznachennya",
+ "відокремлена прикладка": "vidokremleni-prykladka",
+ "відокремлена обставина": "vidokremleni-obstavyna",
+ "відокремлений додаток": "vidokremleni-dodatok",
+ "складносурядне речення": "skladne-suryadni",
+ "орфографія · загальний тест": "orfografiya-zagalnyi",
+ "орфографія: загальний тест": "orfografiya-zagalnyi",
+ "складні слова · загальний тест": "skladni-slova-zagalnyi",
+ "морфологія · загальний тест": "morfologiya-zagalnyi",
+ "морфологія: загальний тест": "morfologiya-zagalnyi",
+ "морфологія: відповідність (частини мови)": "morfologiya-vidpovidnist",
+ "службові частини мови · загальний тест": "sluzhbovi-zagalnyi",
+ "члени речення · загальний тест": "chleny-zagalnyi",
+ "відокремлені члени речення · загальний тест": "vidokremleni-zagalnyi"
+};
 function computeProgress_(){
-  const names = window.__resultNames, all = window.__allTitles;
-  if (!names || !all || !all.length) return;
-  let done = 0;
-  all.forEach(function(tt){
-    if (names.some(function(r){ return r.length >= 4 && (r.indexOf(tt) !== -1 || tt.indexOf(r) !== -1); })) done++;
+  const res = window.__results, all = window.__allTopics;
+  if (!res || !all || !all.length) return;
+  const doneKeys = {};
+  res.forEach(function(r){
+    const f = PROGRESS_ALIASES[r.n];
+    if (f) doneKeys[f] = true;
+    (r.l.match(/[^\/?#=]+?\.html/g) || []).forEach(function(x){ doneKeys[x.replace(/\.html$/,'')] = true; });
   });
+  let done = 0;
+  all.forEach(function(tp){ if (tp.k && doneKeys[tp.k]) done++; });
   window.__progressPct = Math.round(done * 100 / all.length);
   if (window.__refreshBadge) window.__refreshBadge();
 }
 function loadProgress_(studentCode, displayName){
   if(!HOMEWORK_API_URL || HOMEWORK_API_URL.indexOf('ВСТАВТЕ') === 0) return;
   // Усі готові теми порталу (до того, як приховаємо невідкриті) — це 100%
-  window.__allTitles = Array.prototype.map.call(document.querySelectorAll('.card-wrap .card:not(.soon) .card-title'), function(e){ return normName_(e.textContent); }).filter(Boolean);
+  window.__allTopics = Array.prototype.map.call(document.querySelectorAll('.card-wrap .card:not(.soon)'), function(c){
+    const pill = c.parentNode.querySelector('.test-pill');
+    const tk = pill ? (pill.getAttribute('data-testkey') || '') : '';
+    const m = tk.match(/([^\/?#]+?)\.html/);
+    return { k: m ? m[1].toLowerCase() : '' };
+  }).filter(function(x){ return x.k; });
   window.applyProgress = function(list){
-    window.__resultNames = (list || []).map(normName_).filter(Boolean);
+    window.__results = (list || []).map(function(x){
+      if (typeof x === 'string') x = { t: x, l: '' };
+      return { n: (x.t || '').toString().toLowerCase().replace(/\s+/g, ' ').trim(), l: (x.l || '').toString().toLowerCase() };
+    });
     computeProgress_();
   };
   const sep = HOMEWORK_API_URL.indexOf('?') > -1 ? '&' : '?';
